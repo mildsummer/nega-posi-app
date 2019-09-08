@@ -13,6 +13,8 @@ export default class App extends Component {
     this.hideSettingMenu = this.hideSettingMenu.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.takePhoto = this.takePhoto.bind(this);
+    this.togglePause = this.togglePause.bind(this);
+    this.onClickCamera = this.onClickCamera.bind(this);
     this.state = {
       showSettingMenu: true,
       baseColor: Colors.base[0],
@@ -20,8 +22,18 @@ export default class App extends Component {
       contrast: 0,
       contrastThreshold: CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: false,
-      luminanceData: null
+      luminanceData: null,
+      pause: false
     };
+  }
+
+  onClickCamera() {
+    const { showSettingMenu } = this.state;
+    if (showSettingMenu) {
+      this.hideSettingMenu();
+    } else {
+      this.togglePause();
+    }
   }
 
   onChange(key, value) {
@@ -48,6 +60,11 @@ export default class App extends Component {
     a.download = `nega-posi_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
     a.target = '_blank';
     a.click();
+  }
+
+  togglePause() {
+    const { pause } = this.state;
+    this.setState({ pause: !pause });
   }
 
   render() {
@@ -80,7 +97,7 @@ export default class App extends Component {
             }
           }}
           {...this.state}
-          onClick={this.hideSettingMenu}
+          onClick={this.onClickCamera}
           onUpdate={this.onUpdate}
         />
       </div>

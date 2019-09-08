@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
 import CameraWorker from 'worker-loader?inline!../worker';
 
@@ -29,7 +30,8 @@ export default class Camera extends Component {
       || nextProps.drawingColor !== this.props.drawingColor
       || nextProps.contrast !== this.props.contrast
       || nextProps.contrastThreshold !== this.props.contrastThreshold
-      || nextProps.inversion !== this.props.inversion;
+      || nextProps.inversion !== this.props.inversion
+      || nextProps.pause !== this.props.pause;
   }
 
   componentDidMount() {
@@ -37,7 +39,14 @@ export default class Camera extends Component {
   }
 
   componentDidUpdate() {
-    this.update();
+    const { pause } = this.props;
+    if (pause && this.tick) {
+      this.pause();
+    } else if (!pause && !this.tick) {
+      this.start();
+    } else {
+      this.update();
+    }
   }
 
   init() {
@@ -134,11 +143,30 @@ export default class Camera extends Component {
     }, this.update);
   }
 
+  pause() {
+    window.clearInterval(this.tick);
+    delete this.tick;
+    this.video.pause();
+  }
+
+  start() {
+    this.video.play().catch((error) => {
+      console.error(error);
+    });
+    this.update();
+    this.tick = window.setInterval(this.update, INTERVAL);
+  }
+
   render() {
     const { width, height } = this.state;
-    const { onClick } = this.props;
+    const { onClick, pause } = this.props;
     return (
-      <div className='camera' onClick={onClick}>
+      <div
+        className={classNames('camera', {
+          'camera--paused': pause
+        })}
+        onClick={onClick}
+      >
         <video
           ref={(ref) => {
             this.video = ref;
@@ -182,5 +210,6 @@ Camera.propTypes = {
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired
+  onUpdate: PropTypes.func.isRequired,
+  pause: PropTypes.bool.isRequired
 };

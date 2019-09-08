@@ -10,9 +10,10 @@ export default class ContrastSlider extends Component {
   constructor(props) {
     super(props);
     this.onPanStart = this.onPanStart.bind(this);
-    this.onPan = throttle(this.onPan.bind(this), 150);
+    this.onPan = throttle(this.onPan.bind(this), 50);
     this.onPanEnd = this.onPanEnd.bind(this);
     this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
     this.state = {
       panning: false
     };
@@ -43,7 +44,7 @@ export default class ContrastSlider extends Component {
 
   onPanEnd() {
     this.setState({
-      panning: true
+      panning: false
     });
   }
 
@@ -63,6 +64,15 @@ export default class ContrastSlider extends Component {
             (x - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
       );
     }
+    this.setState({
+      panning: true
+    });
+  }
+
+  onTouchEnd() {
+    this.setState({
+      panning: false
+    });
   }
 
   render() {
@@ -83,6 +93,9 @@ export default class ContrastSlider extends Component {
           onPanEnd={this.onPanEnd}
           onPanCancel={this.onPanEnd}
           onTouchStart={this.onTouchStart}
+          onMouseDown={this.onTouchStart}
+          onTouchEnd={this.onTouchEnd}
+          onMouseUp={this.onTouchEnd}
           options={
             {
               recognizers: {

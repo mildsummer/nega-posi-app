@@ -42,6 +42,7 @@
       background-color: $color-white
       z-index: 1
       cursor: pointer
+      transition: transform 100ms ease
     &::before
       content: ''
       display: block
@@ -53,6 +54,7 @@
       border-radius: 50%
       background-color: rgba($color-black, 0.1)
       cursor: pointer
+      transition: transform 100ms ease
   &__direction
     display: flex
     position: absolute
@@ -68,3 +70,8 @@
       transform: scaleX(2)
   &--threshold &__value
     background: none
+  &--active &__value
+    &::after
+      transform: scale(1.2)
+    &::before
+      transform: scale(1.1)
