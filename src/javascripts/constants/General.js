@@ -1,2 +1,3 @@
 export const CONTRAST_LENGTH = 50;
 export const CONTRAST_THRESHOLD_LENGTH = 100;
+export const LUMINANCE_DATA_UNIT = 15;

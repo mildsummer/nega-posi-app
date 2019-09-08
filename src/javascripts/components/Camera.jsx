@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
+import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
 
 const INTERVAL = 800;
 const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
@@ -17,8 +17,16 @@ export default class Camera extends Component {
     };
   }
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.baseColor !== this.props.baseColor
+      || nextProps.drawingColor !== this.props.drawingColor
+      || nextProps.contrast !== this.props.contrast
+      || nextProps.contrastThreshold !== this.props.contrastThreshold
+      || nextProps.inversion !== this.props.inversion;
+  }
+
   componentDidMount() {
-    // this.init();
+    this.init();
   }
 
   componentDidUpdate() {
@@ -53,33 +61,38 @@ export default class Camera extends Component {
 
   update() {
     const { width, height } = this.state;
-    const { baseColor, drawingColor, contrast, contrastThreshold, inversion } = this.props;
+    const { baseColor, drawingColor, contrast, contrastThreshold, inversion, onUpdate } = this.props;
     const videoWidth = this.video.videoWidth;
     const videoHeight = this.video.videoHeight;
+    const context = this.canvas.getContext('2d');
     if (videoWidth / videoHeight > width / height) {
       const w = videoWidth * (height / videoHeight);
-      this.context.drawImage(this.video, (width - w) / 2, 0, w, height);
+      context.drawImage(this.video, (width - w) / 2, 0, w, height);
     } else {
       const h = videoHeight * (width / videoWidth);
-      this.context.drawImage(this.video, 0, (height - h) / 2, width, h);
+      context.drawImage(this.video, 0, (height - h) / 2, width, h);
     }
-    const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
     const data = imageData.data;
+    const luminanceData = [];
     const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
       for (let i = 0; i < data.length; i += 4) {
-      let lightness = (data[i] * LUMINANCE_COEFFICIENT[0]
+      let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
         + data[i + 1] * LUMINANCE_COEFFICIENT[1]
         + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
-      lightness = (lightness - contrastThresholdValue)
+      const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
+      luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+      luminance = (luminance - contrastThresholdValue)
         * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
-      lightness /= 255;
-      lightness = Math.max(0, Math.min(1, lightness));
-      lightness = inversion ? (1 - lightness) : lightness;
-      data[i] = Math.round(lightness * baseColor.value[0] + (1 - lightness) * drawingColor.value[0]);
-      data[i + 1] = Math.round(lightness * baseColor.value[1] + (1 - lightness) * drawingColor.value[1]);
-      data[i + 2] = Math.round(lightness * baseColor.value[2] + (1 - lightness) * drawingColor.value[2]);
+      luminance /= 255;
+      luminance = Math.max(0, Math.min(1, luminance));
+      luminance = inversion ? (1 - luminance) : luminance;
+      data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
+      data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
+      data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
     }
-    this.context.putImageData(imageData, 0, 0);
+    context.putImageData(imageData, 0, 0);
+    onUpdate(luminanceData);
   }
 
   onResize() {
@@ -104,10 +117,10 @@ export default class Camera extends Component {
           autoPlay
         />
         <canvas
+          key='canvas'
           ref={(ref) => {
             if (ref) {
               this.canvas = ref;
-              this.context = ref.getContext('2d');
             }
           }}
           className='camera__viewer'
@@ -125,5 +138,6 @@ Camera.propTypes = {
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired
 };

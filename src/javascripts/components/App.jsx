@@ -11,13 +11,15 @@ export default class App extends Component {
     this.onChange = this.onChange.bind(this);
     this.toggleSettingMenu = this.toggleSettingMenu.bind(this);
     this.hideSettingMenu = this.hideSettingMenu.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
     this.state = {
       showSettingMenu: true,
       baseColor: Colors[0],
       drawingColor: Colors[1],
       contrast: 0,
       contrastThreshold: CONTRAST_THRESHOLD_LENGTH / 2,
-      inversion: false
+      inversion: false,
+      luminanceData: null
     };
   }
 
@@ -32,6 +34,10 @@ export default class App extends Component {
 
   hideSettingMenu() {
     this.setState({ showSettingMenu: false });
+  }
+
+  onUpdate(luminanceData) {
+    this.setState({ luminanceData });
   }
 
   render() {
@@ -54,6 +60,7 @@ export default class App extends Component {
         <Camera
           {...this.state}
           onClick={this.hideSettingMenu}
+          onUpdate={this.onUpdate}
         />
       </div>
     );
