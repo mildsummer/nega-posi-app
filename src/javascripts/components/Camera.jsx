@@ -4,6 +4,7 @@ import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from 
 
 const INTERVAL = 800;
 const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
+const LUMINANCE_DATA_INTERVAL = 500;
 
 export default class Camera extends Component {
   constructor(props) {
@@ -80,8 +81,10 @@ export default class Camera extends Component {
       let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
         + data[i + 1] * LUMINANCE_COEFFICIENT[1]
         + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
-      const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
-      luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+      if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
+        const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
+        luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+      }
       luminance = (luminance - contrastThresholdValue)
         * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
       luminance /= 255;

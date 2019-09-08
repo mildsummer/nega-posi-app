@@ -12,6 +12,7 @@ export default class App extends Component {
     this.toggleSettingMenu = this.toggleSettingMenu.bind(this);
     this.hideSettingMenu = this.hideSettingMenu.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
+    this.takePhoto = this.takePhoto.bind(this);
     this.state = {
       showSettingMenu: true,
       baseColor: Colors[0],
@@ -40,6 +41,14 @@ export default class App extends Component {
     this.setState({ luminanceData });
   }
 
+  takePhoto() {
+    const date = new Date();
+    const a = document.createElement('a');
+    a.href = this.camera.canvas.toDataURL('image/jpeg');
+    a.download = `nega-posi_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
+    a.click();
+  }
+
   render() {
     const { showSettingMenu } = this.state;
     return (
@@ -49,7 +58,13 @@ export default class App extends Component {
             'tools--show-menu': showSettingMenu
           })}
         >
-          <button type='button' className='tools__photo-button'>Take a photo</button>
+          <button
+            type='button'
+            className='tools__photo-button'
+            onClick={this.takePhoto}
+          >
+            Take a photo
+          </button>
           <SettingMenu
             visible={showSettingMenu}
             onChange={this.onChange}
@@ -58,6 +73,11 @@ export default class App extends Component {
           />
         </div>
         <Camera
+          ref={(ref) => {
+            if (ref) {
+              this.camera = ref;
+            }
+          }}
           {...this.state}
           onClick={this.hideSettingMenu}
           onUpdate={this.onUpdate}
