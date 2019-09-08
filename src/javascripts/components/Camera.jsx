@@ -91,8 +91,9 @@ export default class Camera extends Component {
 
   render() {
     const { width, height } = this.state;
+    const { onClick } = this.props;
     return (
-      <div className='camera'>
+      <div className='camera' onClick={onClick}>
         <video
           ref={(ref) => {
             this.video = ref;
@@ -123,5 +124,6 @@ Camera.propTypes = {
   drawingColor: PropTypes.object.isRequired,
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
-  inversion: PropTypes.bool.isRequired
+  inversion: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired
 };

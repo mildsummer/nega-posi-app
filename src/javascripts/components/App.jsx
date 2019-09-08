@@ -9,8 +9,10 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
+    this.toggleSettingMenu = this.toggleSettingMenu.bind(this);
+    this.hideSettingMenu = this.hideSettingMenu.bind(this);
     this.state = {
-      showSettingMenu: false,
+      showSettingMenu: true,
       baseColor: Colors[0],
       drawingColor: Colors[1],
       contrast: 0,
@@ -26,6 +28,10 @@ export default class App extends Component {
   toggleSettingMenu() {
     const { showSettingMenu } = this.state;
     this.setState({ showSettingMenu: !showSettingMenu });
+  }
+
+  hideSettingMenu() {
+    this.setState({ showSettingMenu: false });
   }
 
   render() {
@@ -45,7 +51,10 @@ export default class App extends Component {
             {...this.state}
           />
         </div>
-        <Camera {...this.state} />
+        <Camera
+          {...this.state}
+          onClick={this.hideSettingMenu}
+        />
       </div>
     );
   }

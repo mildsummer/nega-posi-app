@@ -1,3 +1,156 @@
 .setting-menu
-  position: fixed
-  z-index: 10
+  position: relative
+  width: 100%
+  text-align: center
+  box-sizing: border-box
+  &::before
+    content: ''
+    display: block
+    position: absolute
+    width: 6px
+    height: 2px
+    top: 24px
+    left: 50%
+    margin: 0 0 0 -1px
+    background-color: $color-white
+    transform: rotate(45deg)
+    transform-origin: left center
+    transition: transform 300ms ease
+  &::after
+    content: ''
+    display: block
+    position: absolute
+    width: 6px
+    height: 2px
+    top: 24px
+    left: 50%
+    margin: 0 0 0 -6px
+    background-color: $color-white
+    transform: rotate(-45deg)
+    transform-origin: right center
+    transition: transform 300ms ease
+  &--visible
+    &::before
+      transform: translateY(5px) rotate(-45deg)
+    &::after
+      transform: translateY(5px) rotate(45deg)
+  &__toggle
+    position: relative
+    display: block
+    width: 100%
+    height: 60px
+    margin: 0 0 -20px
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 100%
+    z-index: 1
+    &::before
+      +icon('settings')
+      position: absolute
+      top: 17px
+      left: 50%
+      margin: 0 0 0 -12.5px
+      font-size: 25px
+      text-indent: 0
+      color: $color-white
+  &__inner
+    position: relative
+    background-color: $color-white
+    padding: 10px 10px 10px
+    &::before
+      content: ''
+      display: block
+      position: absolute
+      width: calc(50% - 10px)
+      height: 25px
+      top: -12px
+      left: 0
+      background-color: $color-white
+    &::after
+      content: ''
+      display: block
+      position: absolute
+      width: calc(50% - 10px)
+      height: 25px
+      top: -12px
+      right: 0
+      background-color: $color-white
+  &__item
+    padding: 15px 0
+    border-bottom: solid 1px $color-light-gray
+    &:last-child
+      border-bottom: none
+    &-title
+      margin: 0 0 8px
+      +fontSize(14px)
+  input
+    display: none
+  &__inversion
+    display: block
+    position: relative
+    width: 30px
+    height: 30px
+    margin: 0 auto
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 100%
+    &::after
+      display: block
+      position: absolute
+      width: 100%
+      height: 100%
+      top: 0
+      left: 0
+      line-height: 30px
+      text-indent: 0
+      font-size: 28px
+      +icon('disable-inversion')
+    input:checked + &
+      &::after
+        +icon('inversion')
+  &__color
+    position: relative
+    display: block
+    width: 36px
+    height: 36px
+    margin: 0 6px 0 0
+    padding: 2px
+    border: solid 2px $color-white
+    outline: solid 1px $color-light-gray
+    box-sizing: border-box
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 36px
+    transition: outline-color 100ms ease
+    &-list
+      display: flex
+    &--drawing
+      background: none
+      border: none
+      outline: none
+      &::after
+        +icon('drawing')
+        position: absolute
+        width: 100%
+        top: 3px
+        left: 0
+        font-size: 30px
+        line-height: 1
+        text-indent: 0
+        text-align: center
+      &::before
+        +icon('drawing-border')
+        position: absolute
+        width: 100%
+        top: 0
+        left: 0
+        font-size: 36px
+        line-height: 1
+        text-indent: 0
+        text-align: center
+        color: $color-light-gray
+        transition: color 100ms ease
+    &--current
+      outline-color: $color-dark-gray
+      &::before
+        color: $color-dark-gray

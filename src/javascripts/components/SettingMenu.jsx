@@ -37,102 +37,108 @@ export default class SettingMenu extends Component {
   }
 
   render() {
-    const { visible, baseColor, drawingColor, contrast, contrastThreshold, inversion } = this.props;
+    const { visible, baseColor, drawingColor, contrast, contrastThreshold, inversion, onToggle } = this.props;
     return (
       <div
         className={classNames('setting-menu', {
           'setting-menu--visible': visible
         })}
       >
-        <button type='button' className='setting-menu__toggle'>
+        <button
+          type='button'
+          className='setting-menu__toggle'
+          onClick={onToggle}
+        >
           {visible ? 'Hide' : 'Show'} setting menu
         </button>
-        <section className='setting-menu__item'>
-          <p className='setting-menu__item-title'>
-            Inversion
-          </p>
-          <label className='setting-menu__inversion'>
-            {inversion ? 'disable inversion' : 'inversion'}
+        <div className='setting-menu__inner'>
+          <section className='setting-menu__item'>
+            <p className='setting-menu__item-title'>
+              Inversion
+            </p>
             <input
               type='checkbox'
               onChange={this.onChangeInversion}
               checked={inversion}
-              value='inversion'
+              id='inversion'
             />
-          </label>
-        </section>
-        <section className='setting-menu__item'>
-          <p className='setting-menu__item-title'>
-            Base color
-          </p>
-          <ul className='setting-menu__color-list setting-menu__color-list--base'>
-            {Colors.map((color) => (
-              <li
-                key={color.id}
-                className={classNames('setting-menu__color setting-menu__color--base', {
-                  'setting-menu__color--current': baseColor.id === color.id
-                })}
-                style={{
-                  backgroundColor: `rgb(${color.value.join(',')})`
-                }}
-                data-color-type='base'
-                data-color-id={color.id}
-                onClick={this.onChangeColor}
-              >
-                {color.name}
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section className='setting-menu__item'>
-          <p className='setting-menu__item-title'>
-            Drawing color
-          </p>
-          <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
-            {Colors.map((color) => (
-              <li
-                key={color.id}
-                className={classNames('setting-menu__color setting-menu__color--drawing', {
-                  'setting-menu__color--current': drawingColor.id === color.id
-                })}
-                style={{
-                  backgroundColor: `rgb(${color.value.join(',')})`
-                }}
-                data-color-type='drawing'
-                data-color-id={color.id}
-                onClick={this.onChangeColor}
-              >
-                {color.name}
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section className='setting-menu__item'>
-          <div className='setting-menu__item-section'>
+            <label className='setting-menu__inversion' htmlFor='inversion'>
+              {inversion ? 'disable inversion' : 'inversion'}
+            </label>
+          </section>
+          <section className='setting-menu__item'>
             <p className='setting-menu__item-title'>
-              Contrast
+              Base color
             </p>
-            <input
-              type='number'
-              max={CONTRAST_LENGTH}
-              min={-CONTRAST_LENGTH}
-              value={contrast}
-              onChange={this.onChangeContrast}
-            />
-          </div>
-          <div className='setting-menu__item-section'>
-            <p className='setting-menu__item-title setting-menu__item-title--sub'>
-              Contrast threshold
+            <ul className='setting-menu__color-list setting-menu__color-list--base'>
+              {Colors.map((color) => (
+                <li
+                  key={color.id}
+                  className={classNames('setting-menu__color setting-menu__color--base', {
+                    'setting-menu__color--current': baseColor.id === color.id
+                  })}
+                  style={{
+                    backgroundColor: `rgb(${color.value.join(',')})`
+                  }}
+                  data-color-type='base'
+                  data-color-id={color.id}
+                  onClick={this.onChangeColor}
+                >
+                  {color.name}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className='setting-menu__item'>
+            <p className='setting-menu__item-title'>
+              Drawing color
             </p>
-            <input
-              type='number'
-              max={CONTRAST_THRESHOLD_LENGTH}
-              min={0}
-              value={contrastThreshold}
-              onChange={this.onChangeContrastThreshold}
-            />
-          </div>
-        </section>
+            <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
+              {Colors.map((color) => (
+                <li
+                  key={color.id}
+                  className={classNames('setting-menu__color setting-menu__color--drawing', {
+                    'setting-menu__color--current': drawingColor.id === color.id
+                  })}
+                  style={{
+                    color: `rgb(${color.value.join(',')})`
+                  }}
+                  data-color-type='drawing'
+                  data-color-id={color.id}
+                  onClick={this.onChangeColor}
+                >
+                  {color.name}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className='setting-menu__item'>
+            <div className='setting-menu__item-section'>
+              <p className='setting-menu__item-title'>
+                Contrast
+              </p>
+              <input
+                type='number'
+                max={CONTRAST_LENGTH}
+                min={-CONTRAST_LENGTH}
+                value={contrast}
+                onChange={this.onChangeContrast}
+              />
+            </div>
+            <div className='setting-menu__item-section'>
+              <p className='setting-menu__item-title setting-menu__item-title--sub'>
+                Contrast threshold
+              </p>
+              <input
+                type='number'
+                max={CONTRAST_THRESHOLD_LENGTH}
+                min={0}
+                value={contrastThreshold}
+                onChange={this.onChangeContrastThreshold}
+              />
+            </div>
+          </section>
+        </div>
       </div>
     );
   }
@@ -141,6 +147,7 @@ export default class SettingMenu extends Component {
 SettingMenu.propTypes = {
   visible: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired,
   baseColor: PropTypes.object.isRequired,
   drawingColor: PropTypes.object.isRequired,
   contrast: PropTypes.number.isRequired,
