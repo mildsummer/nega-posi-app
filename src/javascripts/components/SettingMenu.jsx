@@ -6,6 +6,7 @@ import Colors from '../constants/Colors';
 import ContrastSlider from './ContrastSlider';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 
+window.colors = Colors;
 export default class SettingMenu extends Component {
   constructor(props) {
     super(props);
@@ -18,8 +19,8 @@ export default class SettingMenu extends Component {
 
   onChangeColor(e) {
     const { onChange } = this.props;
-    const selectedColor = find(Colors, { id: e.target.getAttribute('data-color-id') });
     const type = e.target.getAttribute('data-color-type');
+    const selectedColor = find(Colors[type], { name: e.target.getAttribute('data-color-name') });
     onChange(`${type}Color`, selectedColor);
   }
 
@@ -81,17 +82,17 @@ export default class SettingMenu extends Component {
                   Base color
                 </p>
                 <ul className='setting-menu__color-list setting-menu__color-list--base'>
-                  {Colors.map((color) => (
+                  {Colors.base.map((color) => (
                     <li
-                      key={color.id}
+                      key={color.name}
                       className={classNames('setting-menu__color setting-menu__color--base', {
-                        'setting-menu__color--current': baseColor.id === color.id
+                        'setting-menu__color--current': baseColor === color
                       })}
                       style={{
                         backgroundColor: `rgb(${color.value.join(',')})`
                       }}
                       data-color-type='base'
-                      data-color-id={color.id}
+                      data-color-name={color.name}
                       onClick={this.onChangeColor}
                     >
                       {color.name}
@@ -104,17 +105,17 @@ export default class SettingMenu extends Component {
                   Drawing color
                 </p>
                 <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
-                  {Colors.map((color) => (
+                  {Colors.drawing.map((color) => (
                     <li
-                      key={color.id}
+                      key={color.name}
                       className={classNames('setting-menu__color setting-menu__color--drawing', {
-                        'setting-menu__color--current': drawingColor.id === color.id
+                        'setting-menu__color--current': drawingColor === color
                       })}
                       style={{
                         color: `rgb(${color.value.join(',')})`
                       }}
                       data-color-type='drawing'
-                      data-color-id={color.id}
+                      data-color-name={color.name}
                       onClick={this.onChangeColor}
                     >
                       {color.name}

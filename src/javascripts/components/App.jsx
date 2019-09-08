@@ -15,8 +15,8 @@ export default class App extends Component {
     this.takePhoto = this.takePhoto.bind(this);
     this.state = {
       showSettingMenu: true,
-      baseColor: Colors[0],
-      drawingColor: Colors[1],
+      baseColor: Colors.base[0],
+      drawingColor: Colors.drawing[0],
       contrast: 0,
       contrastThreshold: CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: false,
