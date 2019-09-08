@@ -1,0 +1,15 @@
+.introjs-tooltipReferenceLayer
+  .introjs-tooltip
+    min-width: 250px
+    max-width: calc(100% - 30px)
+    text-align: center
+    box-sizing: border-box
+  .introjs-helperNumberLayer
+    background: $blue-gradient
+
+body
+  &.scroll
+    .introjs-helperLayer, .introjs-tooltipReferenceLayer
+      transition: none !important
+  .introjs-overlay
+    pointer-events: none
