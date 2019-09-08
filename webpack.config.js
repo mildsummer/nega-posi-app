@@ -10,15 +10,15 @@ module.exports = (env, argv) => {
   return {
     mode: PROD ? 'production' : 'development',
     entry: {
-      app: [
-        './src/javascripts/entry.js'
-      ]
+      app: './src/javascripts/entry.js',
+      worker: './src/javascripts/worker.js'
     },
     output: {
       path: path.resolve(__dirname, 'dist/assets'),
       publicPath: '/assets/',
       filename: '[name].js',
-      sourceMapFilename: '[name].js.map'
+      sourceMapFilename: '[name].js.map',
+      globalObject: 'this'
     },
     devServer: {
       contentBase: './dist',

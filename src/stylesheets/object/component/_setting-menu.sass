@@ -44,6 +44,8 @@
     white-space: nowrap
     text-indent: 100%
     z-index: 1
+    flex-shrink: 0
+    cursor: pointer
     &::before
       +icon('settings')
       position: absolute
@@ -53,10 +55,9 @@
       font-size: 25px
       text-indent: 0
       color: $color-white
-  &__inner
+  &__container
     position: relative
     background-color: $color-white
-    padding: 10px 15px 15px
     border-radius: 3px
     &::before
       content: ''
@@ -78,6 +79,11 @@
       right: 0
       border-radius: 0 3px 0 0
       background-color: $color-white
+  &__inner
+    padding: 10px 15px 15px
+    max-height: calc(100vh - 170px)
+    overflow-y: auto
+    -webkit-overflow-scrolling: touch
   &__item
     padding: 15px 0
     border-bottom: solid 1px $color-light-gray
@@ -97,6 +103,7 @@
     overflow: hidden
     white-space: nowrap
     text-indent: 100%
+    cursor: pointer
     &::after
       display: block
       position: absolute
@@ -125,6 +132,7 @@
     white-space: nowrap
     text-indent: 36px
     transition: outline-color 100ms ease
+    cursor: pointer
     &-list
       display: flex
     &--drawing
@@ -166,3 +174,4 @@
     padding: 0 5px
     line-height: 21px
     color: $color-dark-gray
+    cursor: pointer

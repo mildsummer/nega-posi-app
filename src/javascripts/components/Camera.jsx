@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
+import CameraWorker from 'worker-loader?inline!../worker';
 
-const INTERVAL = 800;
+const INTERVAL = 300;
 const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
 const LUMINANCE_DATA_INTERVAL = 500;
 
@@ -12,6 +13,11 @@ export default class Camera extends Component {
     this.update = this.update.bind(this);
     this.onResize = this.onResize.bind(this);
     window.addEventListener('resize', this.onResize);
+    if (window.Worker) {
+      this.worker = new CameraWorker;
+      console.log(this.worker);
+      this.worker.onmessage = this.onWorkerMessage.bind(this);
+    }
     this.state = {
       width: window.innerWidth,
       height: window.innerHeight
@@ -65,7 +71,7 @@ export default class Camera extends Component {
     const { baseColor, drawingColor, contrast, contrastThreshold, inversion, onUpdate } = this.props;
     const videoWidth = this.video.videoWidth;
     const videoHeight = this.video.videoHeight;
-    const context = this.canvas.getContext('2d');
+    const context = (this.dummyCanvas || this.canvas).getContext('2d');
     if (videoWidth / videoHeight > width / height) {
       const w = videoWidth * (height / videoHeight);
       context.drawImage(this.video, (width - w) / 2, 0, w, height);
@@ -74,28 +80,51 @@ export default class Camera extends Component {
       context.drawImage(this.video, 0, (height - h) / 2, width, h);
     }
     const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-    const data = imageData.data;
-    const luminanceData = [];
-    const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
+    if (this.worker) {
+      this.worker.postMessage({
+        imageData,
+        baseColor,
+        drawingColor,
+        inversion,
+        contrast,
+        contrastThreshold,
+        CONTRAST_LENGTH,
+        CONTRAST_THRESHOLD_LENGTH,
+        LUMINANCE_COEFFICIENT,
+        LUMINANCE_DATA_INTERVAL,
+        LUMINANCE_DATA_UNIT
+      });
+    } else {
+      const data = imageData.data;
+      const luminanceData = [];
+      const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
       for (let i = 0; i < data.length; i += 4) {
-      let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
-        + data[i + 1] * LUMINANCE_COEFFICIENT[1]
-        + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
-      if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
-        const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
-        luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+        let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
+          + data[i + 1] * LUMINANCE_COEFFICIENT[1]
+          + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
+        if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
+          const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
+          luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+        }
+        luminance = (luminance - contrastThresholdValue)
+          * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
+        luminance /= 255;
+        luminance = Math.max(0, Math.min(1, luminance));
+        luminance = inversion ? (1 - luminance) : luminance;
+        data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
+        data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
+        data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
       }
-      luminance = (luminance - contrastThresholdValue)
-        * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
-      luminance /= 255;
-      luminance = Math.max(0, Math.min(1, luminance));
-      luminance = inversion ? (1 - luminance) : luminance;
-      data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
-      data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
-      data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
+      context.putImageData(imageData, 0, 0);
+      onUpdate(luminanceData);
     }
-    context.putImageData(imageData, 0, 0);
-    onUpdate(luminanceData);
+  }
+
+  onWorkerMessage(e) {
+    const { onUpdate } = this.props;
+    const context = this.canvas.getContext('2d');
+    context.putImageData(e.data.imageData, 0, 0);
+    onUpdate(e.data.luminanceData);
   }
 
   onResize() {
@@ -120,7 +149,6 @@ export default class Camera extends Component {
           autoPlay
         />
         <canvas
-          key='canvas'
           ref={(ref) => {
             if (ref) {
               this.canvas = ref;
@@ -130,6 +158,18 @@ export default class Camera extends Component {
           width={width}
           height={height}
         />
+        {this.worker ? (
+          <canvas
+            ref={(ref) => {
+              if (ref) {
+                this.dummyCanvas = ref;
+              }
+            }}
+            className='camera__dummy'
+            width={width}
+            height={height}
+          />
+        ) : null}
       </div>
     );
   }

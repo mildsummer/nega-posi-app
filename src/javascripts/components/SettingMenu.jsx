@@ -59,98 +59,100 @@ export default class SettingMenu extends Component {
         >
           {visible ? 'Hide' : 'Show'} setting menu
         </button>
-        <div className='setting-menu__inner'>
-          <div className='setting-menu__main'>
-            <section className='setting-menu__item'>
-              <p className='setting-menu__item-title'>
-                Inversion
-              </p>
-              <input
-                type='checkbox'
-                onChange={this.onChangeInversion}
-                checked={inversion}
-                id='inversion'
-              />
-              <label className='setting-menu__inversion' htmlFor='inversion'>
-                {inversion ? 'disable inversion' : 'inversion'}
-              </label>
-            </section>
-            <section className='setting-menu__item'>
-              <p className='setting-menu__item-title'>
-                Base color
-              </p>
-              <ul className='setting-menu__color-list setting-menu__color-list--base'>
-                {Colors.map((color) => (
-                  <li
-                    key={color.id}
-                    className={classNames('setting-menu__color setting-menu__color--base', {
-                      'setting-menu__color--current': baseColor.id === color.id
-                    })}
-                    style={{
-                      backgroundColor: `rgb(${color.value.join(',')})`
-                    }}
-                    data-color-type='base'
-                    data-color-id={color.id}
-                    onClick={this.onChangeColor}
-                  >
-                    {color.name}
-                  </li>
-                ))}
-              </ul>
-            </section>
-            <section className='setting-menu__item'>
-              <p className='setting-menu__item-title'>
-                Drawing color
-              </p>
-              <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
-                {Colors.map((color) => (
-                  <li
-                    key={color.id}
-                    className={classNames('setting-menu__color setting-menu__color--drawing', {
-                      'setting-menu__color--current': drawingColor.id === color.id
-                    })}
-                    style={{
-                      color: `rgb(${color.value.join(',')})`
-                    }}
-                    data-color-type='drawing'
-                    data-color-id={color.id}
-                    onClick={this.onChangeColor}
-                  >
-                    {color.name}
-                  </li>
-                ))}
-              </ul>
-            </section>
-            <section className='setting-menu__item'>
-              <div className='setting-menu__item-section'>
-                <div className='setting-menu__header'>
-                  <p className='setting-menu__item-title'>
-                    Contrast
-                  </p>
-                  <button
-                    type='button'
-                    className='setting-menu__reset'
-                    onClick={this.resetContrast}
-                  >Reset</button>
+        <div className='setting-menu__container'>
+          <div className='setting-menu__inner'>
+            <div className='setting-menu__main'>
+              <section className='setting-menu__item'>
+                <p className='setting-menu__item-title'>
+                  Inversion
+                </p>
+                <input
+                  type='checkbox'
+                  onChange={this.onChangeInversion}
+                  checked={inversion}
+                  id='inversion'
+                />
+                <label className='setting-menu__inversion' htmlFor='inversion'>
+                  {inversion ? 'disable inversion' : 'inversion'}
+                </label>
+              </section>
+              <section className='setting-menu__item'>
+                <p className='setting-menu__item-title'>
+                  Base color
+                </p>
+                <ul className='setting-menu__color-list setting-menu__color-list--base'>
+                  {Colors.map((color) => (
+                    <li
+                      key={color.id}
+                      className={classNames('setting-menu__color setting-menu__color--base', {
+                        'setting-menu__color--current': baseColor.id === color.id
+                      })}
+                      style={{
+                        backgroundColor: `rgb(${color.value.join(',')})`
+                      }}
+                      data-color-type='base'
+                      data-color-id={color.id}
+                      onClick={this.onChangeColor}
+                    >
+                      {color.name}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section className='setting-menu__item'>
+                <p className='setting-menu__item-title'>
+                  Drawing color
+                </p>
+                <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
+                  {Colors.map((color) => (
+                    <li
+                      key={color.id}
+                      className={classNames('setting-menu__color setting-menu__color--drawing', {
+                        'setting-menu__color--current': drawingColor.id === color.id
+                      })}
+                      style={{
+                        color: `rgb(${color.value.join(',')})`
+                      }}
+                      data-color-type='drawing'
+                      data-color-id={color.id}
+                      onClick={this.onChangeColor}
+                    >
+                      {color.name}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section className='setting-menu__item'>
+                <div className='setting-menu__item-section'>
+                  <div className='setting-menu__header'>
+                    <p className='setting-menu__item-title'>
+                      Contrast
+                    </p>
+                    <button
+                      type='button'
+                      className='setting-menu__reset'
+                      onClick={this.resetContrast}
+                    >Reset</button>
+                  </div>
+                  <ContrastSlider
+                    value={contrast}
+                    onChange={this.onChangeContrast}
+                  />
+                  <ContrastSlider
+                    value={contrastThreshold}
+                    onChange={this.onChangeContrastThreshold}
+                    threshold
+                    luminanceData={luminanceData}
+                  />
                 </div>
-                <ContrastSlider
-                  value={contrast}
-                  onChange={this.onChangeContrast}
-                />
-                <ContrastSlider
-                  value={contrastThreshold}
-                  onChange={this.onChangeContrastThreshold}
-                  threshold
-                  luminanceData={luminanceData}
-                />
-              </div>
-            </section>
+              </section>
+            </div>
+            <footer className='footer'>
+              <small
+                className='footer__copy-right'
+              >&copy; Nodoka Yamamoto</small>
+            </footer>
           </div>
-          <footer className='footer'>
-            <small
-              className='footer__copy-right'
-            >&copy; Nodoka Yamamoto</small>
-          </footer>
         </div>
       </div>
     );

@@ -12,7 +12,7 @@ export default class ContrastSlider extends Component {
     this.onPanStart = this.onPanStart.bind(this);
     this.onPan = throttle(this.onPan.bind(this), 150);
     this.onPanEnd = this.onPanEnd.bind(this);
-    this.onClick = this.onClick.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
     this.state = {
       panning: false
     };
@@ -47,19 +47,20 @@ export default class ContrastSlider extends Component {
     });
   }
 
-  onClick(e) {
+  onTouchStart(e) {
     const { onChange, threshold } = this.props;
+    const x = e.nativeEvent.clientX || e.nativeEvent.touches[0].clientX || 0;
     if (threshold) {
       onChange(
         Math.min(CONTRAST_THRESHOLD_LENGTH,
           Math.max(0,
-            (e.clientX - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_THRESHOLD_LENGTH))
+            (x - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_THRESHOLD_LENGTH))
       );
     } else {
       onChange(
         Math.min(CONTRAST_LENGTH,
           Math.max(-CONTRAST_LENGTH,
-            (e.clientX - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
+            (x - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
       );
     }
   }
@@ -81,6 +82,7 @@ export default class ContrastSlider extends Component {
           onPanStart={this.onPanStart}
           onPanEnd={this.onPanEnd}
           onPanCancel={this.onPanEnd}
+          onTouchStart={this.onTouchStart}
           options={
             {
               recognizers: {
@@ -96,8 +98,6 @@ export default class ContrastSlider extends Component {
               'slider--active': panning,
               'slider--threshold': threshold
             })}
-            onMouseDown={this.onClick}
-            onTouchStart={this.onClick}
             role='slider'
           >
             {threshold ? null : (
