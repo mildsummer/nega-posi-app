@@ -99,6 +99,9 @@ export default class SettingMenu extends Component {
                     </li>
                   ))}
                 </ul>
+                <p className='setting-menu__selected'>
+                  {baseColor.name}
+                </p>
               </section>
               <section className='setting-menu__item'>
                 <p className='setting-menu__item-title'>
@@ -122,6 +125,9 @@ export default class SettingMenu extends Component {
                     </li>
                   ))}
                 </ul>
+                <p className='setting-menu__selected'>
+                  {drawingColor.name}
+                </p>
               </section>
               <section className='setting-menu__item'>
                 <div className='setting-menu__item-section'>

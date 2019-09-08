@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
 import CameraWorker from 'worker-loader?inline!../worker';
 
-const INTERVAL = 300;
+const INTERVAL = 250;
 const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
 const LUMINANCE_DATA_INTERVAL = 500;
 

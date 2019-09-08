@@ -233,6 +233,14 @@ const Colors = {
         194,
         187
       ]
+    },
+    {
+      name: 'true white',
+      value: [
+        255,
+        255,
+        255
+      ]
     }
   ]
 };

@@ -16,7 +16,7 @@ export default class App extends Component {
     this.togglePause = this.togglePause.bind(this);
     this.onClickCamera = this.onClickCamera.bind(this);
     this.state = {
-      showSettingMenu: true,
+      showSettingMenu: false,
       baseColor: Colors.base[0],
       drawingColor: Colors.drawing[0],
       contrast: 0,
