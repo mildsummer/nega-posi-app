@@ -1,14 +1,6 @@
 const Colors = {
   base: [
     {
-      name: 'true white',
-      value: [
-        255,
-        255,
-        255
-      ]
-    },
-    {
       name: 'antique white',
       value: [
         249,

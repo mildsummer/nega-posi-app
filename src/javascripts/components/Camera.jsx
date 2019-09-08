@@ -16,7 +16,6 @@ export default class Camera extends Component {
     window.addEventListener('resize', this.onResize);
     if (window.Worker) {
       this.worker = new CameraWorker;
-      console.log(this.worker);
       this.worker.onmessage = this.onWorkerMessage.bind(this);
     }
     this.state = {

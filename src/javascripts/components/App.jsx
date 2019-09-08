@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
+import find from 'lodash.find';
 import Camera from './Camera';
 import SettingMenu from './SettingMenu';
 import Colors from '../constants/Colors';
+import Storage from '../utils/Storage';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 
 export default class App extends Component {
@@ -17,11 +19,13 @@ export default class App extends Component {
     this.onClickCamera = this.onClickCamera.bind(this);
     this.state = {
       showSettingMenu: false,
-      baseColor: Colors.base[0],
-      drawingColor: Colors.drawing[0],
-      contrast: 0,
-      contrastThreshold: CONTRAST_THRESHOLD_LENGTH / 2,
-      inversion: false,
+      baseColor: Storage.getItem('baseColor') ? find(Colors.base, { name: Storage.getItem('baseColor') })
+        : Colors.base[0],
+      drawingColor: Storage.getItem('drawingColor') ? find(Colors.drawing, { name: Storage.getItem('drawingColor') })
+        : Colors.drawing[0],
+      contrast: Storage.getItem('contrast') * 1 || 0,
+      contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
+      inversion: Storage.getItem('inversion'),
       luminanceData: null,
       pause: false
     };
@@ -38,6 +42,11 @@ export default class App extends Component {
 
   onChange(key, value) {
     this.setState({ [key]: value });
+    if (key === 'baseColor' || key === 'drawingColor') {
+      Storage.setItem(key, value.name);
+    } else {
+      Storage.setItem(key, value);
+    }
   }
 
   toggleSettingMenu() {
