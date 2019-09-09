@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import find from 'lodash.find';
 import Colors from '../constants/Colors';
 import ContrastSlider from './ContrastSlider';
+import ColorList from './ColorList';
 import Tap from './Tap';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 
@@ -18,11 +18,9 @@ export default class SettingMenu extends Component {
     this.resetContrast = this.resetContrast.bind(this);
   }
 
-  onChangeColor(e) {
+  onChangeColor(color, type) {
     const { onChange } = this.props;
-    const type = e.target.getAttribute('data-color-type');
-    const selectedColor = find(Colors[type], { name: e.target.getAttribute('data-color-name') });
-    onChange(`${type}Color`, selectedColor);
+    onChange(`${type}Color`, color);
   }
 
   onChangeContrast(value) {
@@ -82,26 +80,12 @@ export default class SettingMenu extends Component {
                 <p className='setting-menu__item-title'>
                   Base color
                 </p>
-                <ul className='setting-menu__color-list setting-menu__color-list--base'>
-                  {Colors.base.map((color) => (
-                    <Tap
-                      component='li'
-                      key={color.name}
-                      className={classNames('setting-menu__color setting-menu__color--base', {
-                        'setting-menu__color--current': baseColor === color
-                      })}
-                      style={{
-                        backgroundColor: `rgb(${color.value.join(',')})`
-                      }}
-                      data-color-type='base'
-                      data-color-name={color.name}
-                      title={color.name}
-                      onClick={this.onChangeColor}
-                    >
-                      {color.name}
-                    </Tap>
-                  ))}
-                </ul>
+                <ColorList
+                  data={Colors.base}
+                  selected={baseColor}
+                  type='base'
+                  onChange={this.onChangeColor}
+                />
                 <p className='setting-menu__selected'>
                   {baseColor.name}
                 </p>
@@ -110,26 +94,12 @@ export default class SettingMenu extends Component {
                 <p className='setting-menu__item-title'>
                   Drawing color
                 </p>
-                <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
-                  {Colors.drawing.map((color) => (
-                    <Tap
-                      component='li'
-                      key={color.name}
-                      className={classNames('setting-menu__color setting-menu__color--drawing', {
-                        'setting-menu__color--current': drawingColor === color
-                      })}
-                      style={{
-                        color: `rgb(${color.value.join(',')})`
-                      }}
-                      data-color-type='drawing'
-                      data-color-name={color.name}
-                      title={color.name}
-                      onClick={this.onChangeColor}
-                    >
-                      {color.name}
-                    </Tap>
-                  ))}
-                </ul>
+                <ColorList
+                  data={Colors.drawing}
+                  selected={drawingColor}
+                  type='drawing'
+                  onChange={this.onChangeColor}
+                />
                 <p className='setting-menu__selected'>
                   {drawingColor.name}
                 </p>
