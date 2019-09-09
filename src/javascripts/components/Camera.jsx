@@ -87,9 +87,6 @@ export default class Camera extends Component {
       });
     this.video.onloadedmetadata = () => {
       this.start();
-      window.setTimeout(() => {
-        this.pause();
-      }, 2000);
     };
   }
 
