@@ -26,5 +26,6 @@ self.onmessage = (e) => {
     data[i + 1] = round(luminance * baseColorValue[1] + (1 - luminance) * drawingColorValue[1]);
     data[i + 2] = round(luminance * baseColorValue[2] + (1 - luminance) * drawingColorValue[2]);
   }
-  self.postMessage({ imageData, luminanceData }, [data.buffer]);
+  // self.postMessage({ imageData, luminanceData }, [data.buffer]);
+  self.postMessage({ imageData, luminanceData });
 };

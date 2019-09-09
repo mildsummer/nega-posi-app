@@ -7,7 +7,7 @@ import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
 import { getDevice, getMediaManifest } from '../utils/Utils';
 import CameraWorker from 'worker-loader?inline!../worker';
 
-const INTERVAL = 150;
+const INTERVAL = 80;
 
 export default class Camera extends Component {
   constructor(props) {
@@ -21,6 +21,7 @@ export default class Camera extends Component {
     if (window.Worker) {
       this.worker = new CameraWorker;
       this.worker.onmessage = this.onWorkerMessage.bind(this);
+      this.hasPostedToWorker = false;
     }
     this.state = {
       init: false,
@@ -70,56 +71,62 @@ export default class Camera extends Component {
   }
 
   update() {
-    const { width, height } = this.state;
-    const { baseColor, drawingColor, contrast, contrastThreshold, inversion, onUpdate } = this.props;
-    const videoWidth = this.video.videoWidth;
-    const videoHeight = this.video.videoHeight;
-    const context = (this.dummyCanvas || this.canvas).getContext('2d');
-    if (videoWidth / videoHeight > width / height) {
-      const w = videoWidth * (height / videoHeight);
-      context.drawImage(this.video, (width - w) / 2, 0, w, height);
-    } else {
-      const h = videoHeight * (width / videoWidth);
-      context.drawImage(this.video, 0, (height - h) / 2, width, h);
-    }
-    const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-    if (this.worker) {
-      this.worker.postMessage({
-        imageData,
-        baseColor,
-        drawingColor,
-        inversion,
-        contrast,
-        contrastThreshold,
-        CONTRAST_LENGTH,
-        CONTRAST_THRESHOLD_LENGTH,
-        LUMINANCE_COEFFICIENT,
-        LUMINANCE_DATA_INTERVAL,
-        LUMINANCE_DATA_UNIT
-      }, [imageData.data.buffer]);
-    } else {
-      const data = imageData.data;
-      const luminanceData = [];
-      const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
-      for (let i = 0; i < data.length; i += 4) {
-        let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
-          + data[i + 1] * LUMINANCE_COEFFICIENT[1]
-          + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
-        if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
-          const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
-          luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
-        }
-        luminance = (luminance - contrastThresholdValue)
-          * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
-        luminance /= 255;
-        luminance = Math.max(0, Math.min(1, luminance));
-        luminance = inversion ? (1 - luminance) : luminance;
-        data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
-        data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
-        data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
+    if (!this.worker || !this.hasPostedToWorker) {
+      const { width, height } = this.state;
+      const { baseColor, drawingColor, contrast, contrastThreshold, inversion, onUpdate } = this.props;
+      const videoWidth = this.video.videoWidth;
+      const videoHeight = this.video.videoHeight;
+      const context = (this.dummyCanvas || this.canvas).getContext('2d');
+      if (videoWidth / videoHeight > width / height) {
+        const w = videoWidth * (height / videoHeight);
+        context.drawImage(this.video, (width - w) / 2, 0, w, height);
+      } else {
+        const h = videoHeight * (width / videoWidth);
+        context.drawImage(this.video, 0, (height - h) / 2, width, h);
       }
-      context.putImageData(imageData, 0, 0);
-      onUpdate(luminanceData);
+      const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+      if (this.worker) {
+        this.hasPostedToWorker = true;
+        this.worker.postMessage({
+          imageData,
+          baseColor,
+          drawingColor,
+          inversion,
+          contrast,
+          contrastThreshold,
+          CONTRAST_LENGTH,
+          CONTRAST_THRESHOLD_LENGTH,
+          LUMINANCE_COEFFICIENT,
+          LUMINANCE_DATA_INTERVAL,
+          LUMINANCE_DATA_UNIT
+        // }, [imageData.data.buffer]);
+        });
+      } else {
+        const data = imageData.data;
+        const luminanceData = [];
+        const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
+        for (let i = 0; i < data.length; i += 4) {
+          let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
+            + data[i + 1] * LUMINANCE_COEFFICIENT[1]
+            + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
+          if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
+            const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
+            luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
+          }
+          luminance = (luminance - contrastThresholdValue)
+            * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
+          luminance /= 255;
+          luminance = Math.max(0, Math.min(1, luminance));
+          luminance = inversion ? (1 - luminance) : luminance;
+          data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
+          data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
+          data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
+        }
+        context.putImageData(imageData, 0, 0);
+        onUpdate(luminanceData);
+      }
+    } else {
+      console.log('処理だまり発生');
     }
   }
 
@@ -128,6 +135,7 @@ export default class Camera extends Component {
     const context = this.canvas.getContext('2d');
     context.putImageData(e.data.imageData, 0, 0);
     onUpdate(e.data.luminanceData);
+    this.hasPostedToWorker = false;
   }
 
   onResize() {
@@ -144,11 +152,13 @@ export default class Camera extends Component {
   }
 
   start() {
-    this.video.play().catch((error) => {
-      console.error(error);
-    });
-    this.tick = window.setInterval(this.update, INTERVAL);
-    this.update();
+    if (!this.tick && this.video.paused) {
+      this.video.play().catch((error) => {
+        console.error(error);
+      });
+      this.tick = window.setInterval(this.update, INTERVAL);
+      this.update();
+    }
   }
 
   render() {
