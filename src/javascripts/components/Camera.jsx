@@ -125,8 +125,6 @@ export default class Camera extends Component {
         context.putImageData(imageData, 0, 0);
         onUpdate(luminanceData);
       }
-    } else {
-      console.log('処理だまり発生');
     }
   }
 
