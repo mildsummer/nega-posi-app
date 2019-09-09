@@ -1,28 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import max from 'lodash.max';
-import { LUMINANCE_DATA_UNIT } from '../constants/General';
 
 export default class Histogram extends Component {
   constructor(props) {
     super(props);
     this.update = this.update.bind(this);
-    this.onResize = this.onResize.bind(this);
-    this.state = {
-      width: null,
-      height: null
-    };
   }
 
   shouldComponentUpdate(nextProps) {
     return nextProps.data !== this.props.data;
-  }
-
-  componentDidMount() {
-    window.setTimeout(() => {
-      this.setState({ width: this.canvas.clientWidth, height: this.canvas.clientHeight }, this.update);
-    });
-    window.addEventListener('resize', this.onResize);
   }
 
   componentDidUpdate() {
@@ -33,22 +20,18 @@ export default class Histogram extends Component {
     const { data } = this.props;
     const context = this.canvas.getContext('2d');
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    context.fillStyle = '#eeeeee';
     const maxValue = max(data);
-    const size = this.canvas.width / (255 / LUMINANCE_DATA_UNIT);
     data.forEach((value, index) => {
       if (value) {
         const length = this.canvas.height * value / maxValue;
-        context.fillRect(index * size, this.canvas.height - length, size, length);
+        context.fillRect(index, this.canvas.height - length, 1, length);
       }
     });
   }
 
-  onResize() {
-    this.setState({ width: this.canvas.clientWidth, height: this.canvas.clientHeight });
-  }
-
   render() {
-    const { width, height } = this.state;
+    const { data } = this.props;
     return (
       <canvas
         ref={(ref) => {
@@ -57,7 +40,8 @@ export default class Histogram extends Component {
           }
         }}
         className='histogram'
-        width={width} height={height}
+        width={data.length}
+        height={40}
       />
     );
   }
