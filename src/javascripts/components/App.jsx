@@ -27,6 +27,7 @@ export default class App extends Component {
       contrast: Storage.getItem('contrast') * 1 || 0,
       contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: Storage.getItem('inversion') || false,
+      flip: Storage.getItem('flip') || false,
       luminanceData: null,
       pause: false
     };
@@ -64,12 +65,31 @@ export default class App extends Component {
   }
 
   takePhoto() {
+    const { flip } = this.state;
     const date = new Date();
     const a = document.createElement('a');
-    a.href = this.camera.canvas.toDataURL('image/jpeg');
-    a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
-    a.target = '_blank';
-    a.click();
+    if (flip) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = this.camera.canvas.width;
+      canvas.height = this.camera.canvas.height;
+      const imageObject = new Image();
+      imageObject.onload = () => {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+        context.drawImage(imageObject, 0, 0);
+        a.href = canvas.toDataURL('image/jpeg');
+        a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
+        a.target = '_blank';
+        a.click();
+      };
+      imageObject.src = this.camera.canvas.toDataURL();
+    } else {
+      a.href = this.camera.canvas.toDataURL('image/jpeg');
+      a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
+      a.target = '_blank';
+      a.click();
+    }
   }
 
   togglePause() {

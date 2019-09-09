@@ -15,6 +15,7 @@ export default class SettingMenu extends Component {
     this.onChangeContrast = this.onChangeContrast.bind(this);
     this.onChangeContrastThreshold = this.onChangeContrastThreshold.bind(this);
     this.onChangeInversion = this.onChangeInversion.bind(this);
+    this.onChangeFlip = this.onChangeFlip.bind(this);
     this.resetContrast = this.resetContrast.bind(this);
   }
 
@@ -44,8 +45,14 @@ export default class SettingMenu extends Component {
     onChange('inversion', e.target.checked);
   }
 
+  onChangeFlip(e) {
+    const { onChange } = this.props;
+    onChange('flip', e.target.checked);
+  }
+
   render() {
-    const { visible, baseColor, drawingColor, contrast, contrastThreshold, inversion, onToggle, luminanceData } = this.props;
+    const { visible, baseColor, drawingColor, contrast, contrastThreshold,
+      inversion, flip, onToggle, luminanceData } = this.props;
     return (
       <div
         className={classNames('setting-menu', {
@@ -64,17 +71,28 @@ export default class SettingMenu extends Component {
             <div className='setting-menu__main'>
               <section className='setting-menu__item'>
                 <p className='setting-menu__item-title'>
-                  Inversion
+                  Invert / Flip
                 </p>
-                <input
-                  type='checkbox'
-                  onChange={this.onChangeInversion}
-                  checked={inversion}
-                  id='inversion'
-                />
-                <Tap component='label' className='setting-menu__inversion' htmlFor='inversion'>
-                  {inversion ? 'disable inversion' : 'inversion'}
-                </Tap>
+                <div className='setting-menu__horizontal'>
+                  <input
+                    type='checkbox'
+                    onChange={this.onChangeInversion}
+                    checked={inversion}
+                    id='inversion'
+                  />
+                  <Tap component='label' className='setting-menu__inversion' htmlFor='inversion'>
+                    {inversion ? 'disable inversion' : 'inversion'}
+                  </Tap>
+                  <input
+                    type='checkbox'
+                    onChange={this.onChangeFlip}
+                    checked={flip}
+                    id='flip'
+                  />
+                  <Tap component='label' className='setting-menu__flip' htmlFor='flip'>
+                    {flip ? 'disable flip' : 'flip'}
+                  </Tap>
+                </div>
               </section>
               <section className='setting-menu__item'>
                 <p className='setting-menu__item-title'>
@@ -151,5 +169,6 @@ SettingMenu.propTypes = {
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
+  flip: PropTypes.bool.isRequired,
   luminanceData: PropTypes.arrayOf(PropTypes.number)
 };

@@ -35,6 +35,7 @@ export default class Camera extends Component {
       || nextProps.contrast !== this.props.contrast
       || nextProps.contrastThreshold !== this.props.contrastThreshold
       || nextProps.inversion !== this.props.inversion
+      || nextProps.flip !== this.props.flip
       || nextProps.pause !== this.props.pause
       || nextState.width !== this.state.width
       || nextState.height !== this.state.height
@@ -152,12 +153,13 @@ export default class Camera extends Component {
 
   render() {
     const { init, width, height } = this.state;
-    const { onClick, pause } = this.props;
+    const { onClick, pause, flip } = this.props;
     return (
       <div
         className={classNames('camera', {
           'camera--paused': pause,
-          'camera--init': init
+          'camera--init': init,
+          'camera--flip': flip
         })}
         onClick={onClick}
       >
@@ -206,6 +208,7 @@ Camera.propTypes = {
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
+  flip: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,

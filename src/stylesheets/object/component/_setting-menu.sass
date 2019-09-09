@@ -101,6 +101,9 @@
     max-height: 50vh
     overflow-y: auto
     -webkit-overflow-scrolling: touch
+  &__horizontal
+    display: flex
+    justify-content: center
   &__item
     display: flex
     position: relative
@@ -128,7 +131,7 @@
     position: relative
     width: 30px
     height: 30px
-    margin: 0 auto
+    margin: 0 15px 0 0
     overflow: hidden
     white-space: nowrap
     text-indent: 100%
@@ -148,6 +151,33 @@
     input:checked + &
       &::after
         +icon('inversion')
+    &.tap-active
+      transform: scale(0.9)
+  &__flip
+    display: block
+    position: relative
+    width: 30px
+    height: 30px
+    margin: 0
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 100%
+    cursor: pointer
+    transition: transform 100ms ease
+    &::after
+      display: block
+      position: absolute
+      width: 100%
+      height: 100%
+      top: 0
+      left: 0
+      line-height: 30px
+      text-indent: 0
+      +fontSize(28px)
+      +icon('flip')
+    input:checked + &
+      &::after
+        transform: scale(-1, 1)
     &.tap-active
       transform: scale(0.9)
   &__color
