@@ -5,7 +5,7 @@ import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
 import CameraWorker from 'worker-loader?inline!../worker';
 
-const INTERVAL = 100;
+const INTERVAL = 150;
 const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
 const LUMINANCE_DATA_INTERVAL = 500;
 
@@ -15,13 +15,14 @@ export default class Camera extends Component {
     this.update = this.update.bind(this);
     this.onResize = this.onResize.bind(this);
     window.addEventListener('resize', throttle(this.onResize, 500));
+    this.ratio = window.devicePixelRatio;
     if (window.Worker) {
       this.worker = new CameraWorker;
       this.worker.onmessage = this.onWorkerMessage.bind(this);
     }
     this.state = {
-      width: window.innerWidth,
-      height: window.innerHeight
+      width: window.innerWidth * this.ratio,
+      height: window.innerHeight * this.ratio
     };
   }
 
@@ -52,14 +53,29 @@ export default class Camera extends Component {
   }
 
   init() {
-    window.navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } })
+    window.navigator.mediaDevices.getUserMedia({
+      video: {
+        width: 1024,
+        height: 768,
+        facingMode: {
+          exact: 'environment'
+        }
+      }
+    })
       .then((stream) => {
         this.video.srcObject = stream;
       })
       .catch(() => {
-        window.navigator.mediaDevices.getUserMedia({ video: true })
+        window.navigator.mediaDevices.getUserMedia({
+          video: {
+            width: window.innerWidth,
+            height: window.innerHeight
+          }
+        })
           .then((stream) => {
             this.video.srcObject = stream;
+            this.ratio = 1;
+            this.onResize();
           })
           .catch((error) => {
             console.error(error);
@@ -140,8 +156,8 @@ export default class Camera extends Component {
 
   onResize() {
     this.setState({
-      width: window.innerWidth,
-      height: window.innerHeight
+      width: window.innerWidth * this.ratio,
+      height: window.innerHeight * this.ratio
     });
   }
 
@@ -215,5 +231,5 @@ Camera.propTypes = {
   onUpdate: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
   width: PropTypes.number,
-  height: PopStateEvent.number
+  height: PropTypes.number
 };
