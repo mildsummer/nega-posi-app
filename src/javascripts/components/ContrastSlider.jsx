@@ -32,12 +32,12 @@ export default class ContrastSlider extends Component {
     if (threshold) {
       onChange(
         Math.min(CONTRAST_THRESHOLD_LENGTH,
-          Math.max(0, this.panStartValue + (e.deltaX / this.container.clientWidth) * CONTRAST_THRESHOLD_LENGTH))
+          Math.max(0, this.panStartValue + (e.deltaX / this.base.clientWidth) * CONTRAST_THRESHOLD_LENGTH))
       );
     } else {
       onChange(
         Math.min(CONTRAST_LENGTH,
-          Math.max(-CONTRAST_LENGTH, this.panStartValue + (e.deltaX / this.container.clientWidth) * CONTRAST_LENGTH * 2))
+          Math.max(-CONTRAST_LENGTH, this.panStartValue + (e.deltaX / this.base.clientWidth) * CONTRAST_LENGTH * 2))
       );
     }
   }
@@ -55,13 +55,13 @@ export default class ContrastSlider extends Component {
       onChange(
         Math.min(CONTRAST_THRESHOLD_LENGTH,
           Math.max(0,
-            (x - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_THRESHOLD_LENGTH))
+            (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * CONTRAST_THRESHOLD_LENGTH))
       );
     } else {
       onChange(
         Math.min(CONTRAST_LENGTH,
           Math.max(-CONTRAST_LENGTH,
-            (x - this.container.getBoundingClientRect().left) / this.container.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
+            (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
       );
     }
     this.setState({
@@ -79,14 +79,7 @@ export default class ContrastSlider extends Component {
     const { panning } = this.state;
     const { value, threshold, luminanceData } = this.props;
     return (
-      <div
-        ref={(ref) => {
-          if (ref) {
-            this.container = ref;
-          }
-        }}
-        className='slider__wrapper'
-      >
+      <div className='slider__wrapper'>
         <Hammer
           onPan={this.onPan}
           onPanStart={this.onPanStart}
@@ -120,7 +113,14 @@ export default class ContrastSlider extends Component {
               </p>
             )}
             <div className='slider__inner'>
-              <div className='slider__base' />
+              <div
+                className='slider__base'
+                ref={(ref) => {
+                  if (ref) {
+                    this.base = ref;
+                  }
+                }}
+              />
               {threshold ? null : <div className='slider__origin' />}
               <div
                 className='slider__value'
