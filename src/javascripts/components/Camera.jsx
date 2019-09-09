@@ -21,6 +21,7 @@ export default class Camera extends Component {
       this.worker.onmessage = this.onWorkerMessage.bind(this);
     }
     this.state = {
+      init: false,
       width: window.innerWidth * this.ratio,
       height: window.innerHeight * this.ratio
     };
@@ -34,7 +35,8 @@ export default class Camera extends Component {
       || nextProps.inversion !== this.props.inversion
       || nextProps.pause !== this.props.pause
       || nextState.width !== this.state.width
-      || nextState.height !== this.state.height;
+      || nextState.height !== this.state.height
+      || nextState.init !== this.state.init;
   }
 
   componentDidMount() {
@@ -64,6 +66,7 @@ export default class Camera extends Component {
     })
       .then((stream) => {
         this.video.srcObject = stream;
+        this.setState({ init: true });
       })
       .catch(() => {
         window.navigator.mediaDevices.getUserMedia({
@@ -76,6 +79,7 @@ export default class Camera extends Component {
             this.video.srcObject = stream;
             this.ratio = 1;
             this.onResize();
+            this.setState({ init: true });
           })
           .catch((error) => {
             console.error(error);
@@ -172,15 +176,19 @@ export default class Camera extends Component {
   }
 
   render() {
-    const { width, height } = this.state;
+    const { init, width, height } = this.state;
     const { onClick, pause } = this.props;
     return (
       <div
         className={classNames('camera', {
-          'camera--paused': pause
+          'camera--paused': pause,
+          'camera--init': init
         })}
         onClick={onClick}
       >
+        <p className='camera__description'>
+          This app needs a permission of your camera &#x1f4f7;
+        </p>
         <video
           ref={(ref) => {
             this.video = ref;
@@ -227,5 +235,6 @@ Camera.propTypes = {
   onUpdate: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
   width: PropTypes.number,
-  height: PropTypes.number
+  height: PropTypes.number,
+  init: PropTypes.bool
 };

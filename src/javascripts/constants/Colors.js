@@ -17,14 +17,6 @@ const Colors = {
       ]
     },
     {
-      name: 'black',
-      value: [
-        0,
-        0,
-        0
-      ]
-    },
-    {
       name: 'light gray',
       value: [
         218,

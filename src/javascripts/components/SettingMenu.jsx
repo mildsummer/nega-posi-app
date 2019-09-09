@@ -95,6 +95,7 @@ export default class SettingMenu extends Component {
                       }}
                       data-color-type='base'
                       data-color-name={color.name}
+                      title={color.name}
                       onClick={this.onChangeColor}
                     >
                       {color.name}
@@ -122,6 +123,7 @@ export default class SettingMenu extends Component {
                       }}
                       data-color-type='drawing'
                       data-color-name={color.name}
+                      title={color.name}
                       onClick={this.onChangeColor}
                     >
                       {color.name}

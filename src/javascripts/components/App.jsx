@@ -26,7 +26,7 @@ export default class App extends Component {
         : Colors.drawing[0],
       contrast: Storage.getItem('contrast') * 1 || 0,
       contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
-      inversion: Storage.getItem('inversion'),
+      inversion: Storage.getItem('inversion') || false,
       luminanceData: null,
       pause: false
     };
