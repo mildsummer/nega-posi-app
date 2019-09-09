@@ -1,7 +1,6 @@
 {
-  "name": "nega-posi-app",
-  "version": "0.1.0",
-  "main": "index.js",
+  "name": "intaglio-simulator",
+  "version": "1.0.0",
   "author": "Nodoka Yamamoto",
   "scripts": {
     "start": "NODE_ENV=development && webpack-dev-server --config webpack.config.js --content-base dist/ --mode=development -d",

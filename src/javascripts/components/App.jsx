@@ -67,7 +67,7 @@ export default class App extends Component {
     const date = new Date();
     const a = document.createElement('a');
     a.href = this.camera.canvas.toDataURL('image/jpeg');
-    a.download = `nega-posi_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
+    a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
     a.target = '_blank';
     a.click();
   }
