@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import find from 'lodash.find';
 import Camera from './Camera';
 import SettingMenu from './SettingMenu';
+import Tap from './Tap';
 import Colors from '../constants/Colors';
 import Storage from '../utils/Storage';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
@@ -85,13 +86,14 @@ export default class App extends Component {
             'tools--show-menu': showSettingMenu
           })}
         >
-          <button
+          <Tap
+            component='button'
             type='button'
             className='tools__photo-button'
             onClick={this.takePhoto}
           >
             Take a photo
-          </button>
+          </Tap>
           <SettingMenu
             visible={showSettingMenu}
             onChange={this.onChange}

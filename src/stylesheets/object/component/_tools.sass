@@ -37,6 +37,7 @@
     text-indent: 100%
     flex-shrink: 0
     cursor: pointer
+    transition: transform 100ms ease
     &::after
       +icon('camera')
       display: block
@@ -49,3 +50,8 @@
       text-indent: 0
       color: $color-white
       text-shadow: 0 2px 4px rgba($color-black, 0.5)
+      transition: color 100ms ease
+    &.tap-active
+      transform: rotate(90deg) scale(0.9)
+      &::after
+        color: $color-light-gray

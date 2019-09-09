@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import find from 'lodash.find';
 import Colors from '../constants/Colors';
 import ContrastSlider from './ContrastSlider';
+import Tap from './Tap';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 
 window.colors = Colors;
@@ -73,9 +74,9 @@ export default class SettingMenu extends Component {
                   checked={inversion}
                   id='inversion'
                 />
-                <label className='setting-menu__inversion' htmlFor='inversion'>
+                <Tap component='label' className='setting-menu__inversion' htmlFor='inversion'>
                   {inversion ? 'disable inversion' : 'inversion'}
-                </label>
+                </Tap>
               </section>
               <section className='setting-menu__item'>
                 <p className='setting-menu__item-title'>
@@ -83,7 +84,8 @@ export default class SettingMenu extends Component {
                 </p>
                 <ul className='setting-menu__color-list setting-menu__color-list--base'>
                   {Colors.base.map((color) => (
-                    <li
+                    <Tap
+                      component='li'
                       key={color.name}
                       className={classNames('setting-menu__color setting-menu__color--base', {
                         'setting-menu__color--current': baseColor === color
@@ -96,7 +98,7 @@ export default class SettingMenu extends Component {
                       onClick={this.onChangeColor}
                     >
                       {color.name}
-                    </li>
+                    </Tap>
                   ))}
                 </ul>
                 <p className='setting-menu__selected'>
@@ -109,7 +111,8 @@ export default class SettingMenu extends Component {
                 </p>
                 <ul className='setting-menu__color-list setting-menu__color-list--drawing'>
                   {Colors.drawing.map((color) => (
-                    <li
+                    <Tap
+                      component='li'
                       key={color.name}
                       className={classNames('setting-menu__color setting-menu__color--drawing', {
                         'setting-menu__color--current': drawingColor === color
@@ -122,7 +125,7 @@ export default class SettingMenu extends Component {
                       onClick={this.onChangeColor}
                     >
                       {color.name}
-                    </li>
+                    </Tap>
                   ))}
                 </ul>
                 <p className='setting-menu__selected'>

@@ -82,14 +82,10 @@ export default class Camera extends Component {
           });
       });
     this.video.onloadedmetadata = () => {
-      this.video.play().catch((error) => {
-        console.error(error);
-      });
-      this.update();
-      this.tick = window.setInterval(this.update, INTERVAL);
-      // window.setTimeout(() => {
-      //   window.clearInterval(this.tick);
-      // }, 2000);
+      this.start();
+      window.setTimeout(() => {
+        this.pause();
+      }, 2000);
     };
   }
 
@@ -171,8 +167,8 @@ export default class Camera extends Component {
     this.video.play().catch((error) => {
       console.error(error);
     });
-    this.update();
     this.tick = window.setInterval(this.update, INTERVAL);
+    this.update();
   }
 
   render() {

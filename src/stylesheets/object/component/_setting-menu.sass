@@ -119,6 +119,7 @@
     white-space: nowrap
     text-indent: 100%
     cursor: pointer
+    transition: transform 100ms ease
     &::after
       display: block
       position: absolute
@@ -133,6 +134,8 @@
     input:checked + &
       &::after
         +icon('inversion')
+    &.tap-active
+      transform: scale(0.9)
   &__color
     position: relative
     display: block
@@ -146,7 +149,7 @@
     overflow: hidden
     white-space: nowrap
     text-indent: 36px
-    transition: outline-color 100ms ease
+    transition: outline-color 100ms ease, transform 100ms ease
     cursor: pointer
     flex-shrink: 0
     &:last-child
@@ -210,6 +213,8 @@
       outline-width: 2px
       &::before
         color: $color-dark-gray
+    &.tap-active
+      transform: scale(0.9)
   &__selected
     margin: 0
     +fontSize(12px)
