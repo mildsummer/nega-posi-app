@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
 import CameraWorker from 'worker-loader?inline!../worker';
 
@@ -13,7 +14,7 @@ export default class Camera extends Component {
     super(props);
     this.update = this.update.bind(this);
     this.onResize = this.onResize.bind(this);
-    window.addEventListener('resize', this.onResize);
+    window.addEventListener('resize', throttle(this.onResize, 500));
     if (window.Worker) {
       this.worker = new CameraWorker;
       this.worker.onmessage = this.onWorkerMessage.bind(this);
@@ -24,13 +25,15 @@ export default class Camera extends Component {
     };
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     return nextProps.baseColor !== this.props.baseColor
       || nextProps.drawingColor !== this.props.drawingColor
       || nextProps.contrast !== this.props.contrast
       || nextProps.contrastThreshold !== this.props.contrastThreshold
       || nextProps.inversion !== this.props.inversion
-      || nextProps.pause !== this.props.pause;
+      || nextProps.pause !== this.props.pause
+      || nextState.width !== this.state.width
+      || nextState.height !== this.state.height;
   }
 
   componentDidMount() {
@@ -139,7 +142,7 @@ export default class Camera extends Component {
     this.setState({
       width: window.innerWidth,
       height: window.innerHeight
-    }, this.update);
+    });
   }
 
   pause() {
@@ -210,5 +213,7 @@ Camera.propTypes = {
   inversion: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
-  pause: PropTypes.bool.isRequired
+  pause: PropTypes.bool.isRequired,
+  width: PropTypes.number,
+  height: PopStateEvent.number
 };

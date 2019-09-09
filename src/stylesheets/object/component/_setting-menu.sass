@@ -52,7 +52,7 @@
       top: 17px
       left: 50%
       margin: 0 0 0 -12.5px
-      font-size: 25px
+      +fontSize(25px)
       text-indent: 0
       color: $color-white
   &__container
@@ -83,7 +83,7 @@
       background-color: $color-white
       pointer-events: none
   &__inner
-    padding: 10px 0 15px
+    padding: 10px 0 0
     max-height: 50vh
     overflow-y: auto
     -webkit-overflow-scrolling: touch
@@ -128,7 +128,7 @@
       left: 0
       line-height: 30px
       text-indent: 0
-      font-size: 28px
+      +fontSize(28px)
       +icon('disable-inversion')
     input:checked + &
       &::after
@@ -189,7 +189,7 @@
         width: 100%
         top: 3px
         left: 0
-        font-size: 30px
+        +fontSize(30px)
         line-height: 1
         text-indent: 0
         text-align: center
@@ -199,7 +199,7 @@
         width: 100%
         top: 0
         left: 0
-        font-size: 36px
+        +fontSize(36px)
         line-height: 1
         text-indent: 0
         text-align: center
@@ -212,7 +212,7 @@
         color: $color-dark-gray
   &__selected
     margin: 0
-    font-size: 12px
+    +fontSize(12px)
   &__header
     position: relative
   &__reset
