@@ -160,6 +160,7 @@ export default class SettingMenu extends Component {
               </section>
             </div>
             <footer className='footer'>
+              Intaglio Simulator
               <small
                 className='footer__copy-right'
               >&copy; Nodoka Yamamoto</small>
