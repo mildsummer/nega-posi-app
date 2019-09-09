@@ -2,20 +2,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
-import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT } from '../constants/General';
+import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
+  LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
+import { getDevice, getMediaManifest } from '../utils/Utils';
 import CameraWorker from 'worker-loader?inline!../worker';
 
 const INTERVAL = 150;
-const LUMINANCE_COEFFICIENT = [0.298912, 0.586611, 0.114478];
-const LUMINANCE_DATA_INTERVAL = 500;
 
 export default class Camera extends Component {
   constructor(props) {
     super(props);
     this.update = this.update.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.start = this.start.bind(this);
+    this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
-    this.ratio = window.devicePixelRatio;
+    this.ratio = this.isSP ? window.devicePixelRatio : 1;
     if (window.Worker) {
       this.worker = new CameraWorker;
       this.worker.onmessage = this.onWorkerMessage.bind(this);
@@ -55,39 +57,15 @@ export default class Camera extends Component {
   }
 
   init() {
-    window.navigator.mediaDevices.getUserMedia({
-      video: {
-        width: 1024,
-        height: 768,
-        facingMode: {
-          exact: 'environment'
-        }
-      }
-    })
+    window.navigator.mediaDevices.getUserMedia(getMediaManifest())
       .then((stream) => {
         this.video.srcObject = stream;
         this.setState({ init: true });
       })
-      .catch(() => {
-        window.navigator.mediaDevices.getUserMedia({
-          video: {
-            width: window.innerWidth,
-            height: window.innerHeight
-          }
-        })
-          .then((stream) => {
-            this.video.srcObject = stream;
-            this.ratio = 1;
-            this.onResize();
-            this.setState({ init: true });
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+      .catch((error) => {
+        console.error(error);
       });
-    this.video.onloadedmetadata = () => {
-      this.start();
-    };
+    this.video.onloadedmetadata = this.start;
   }
 
   update() {
@@ -117,7 +95,7 @@ export default class Camera extends Component {
         LUMINANCE_COEFFICIENT,
         LUMINANCE_DATA_INTERVAL,
         LUMINANCE_DATA_UNIT
-      });
+      }, [imageData.data.buffer]);
     } else {
       const data = imageData.data;
       const luminanceData = [];
