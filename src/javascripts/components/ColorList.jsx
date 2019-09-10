@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import find from 'lodash.find';
 import Tap from './Tap';
-import find from "lodash.find";
 
 export default class ColorList extends Component {
   constructor(props) {
@@ -11,7 +11,14 @@ export default class ColorList extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return nextProps.selected !== this.props.selected;
+    return nextProps.selected !== this.props.selected ||
+      nextProps.customColor !== this.props.customColor;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.customColor !== this.props.customColor) {
+      this.scrollLeft();
+    }
   }
 
   componentDidMount() {
@@ -26,13 +33,18 @@ export default class ColorList extends Component {
   }
 
   onChange(e) {
-    const { data, type, onChange } = this.props;
-    const selectedColor = find(data, { name: e.target.getAttribute('data-color-name') });
+    const { data, type, customColor, onChange } = this.props;
+    const isCustom = e.target.getAttribute('data-is-custom') === 'true';
+    const selectedColor = isCustom ? customColor : find(data, { name: e.target.getAttribute('data-color-name') });
     onChange(selectedColor, type);
   }
 
+  scrollLeft() {
+    this.element.scrollLeft = 0;
+  }
+
   render() {
-    const { data, selected, type } = this.props;
+    const { data, customColor, selected, type } = this.props;
     return (
       <ul
         ref={(ref) => {
@@ -42,17 +54,19 @@ export default class ColorList extends Component {
         }}
         className={`setting-menu__color-list setting-menu__color-list--${type}`}
       >
-        {data.map((color) => (
+        {(customColor ? [customColor].concat(data) : data).map((color) => (
           <Tap
             component='li'
             key={color.name}
             className={classNames(`setting-menu__color setting-menu__color--${type}`, {
-              'setting-menu__color--current': selected === color
+              'setting-menu__color--current': selected === color,
+              'setting-menu__color--custom': color.isCustom
             })}
             style={{
               [type === 'base' ? 'backgroundColor' : 'color']: `rgb(${color.value.join(',')})`
             }}
             data-color-name={color.name}
+            data-is-custom={color.isCustom}
             title={color.name}
             onClick={this.onChange}
           >
@@ -66,6 +80,7 @@ export default class ColorList extends Component {
 
 ColorList.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  customColor: PropTypes.object,
   selected: PropTypes.object.isRequired,
   type: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired

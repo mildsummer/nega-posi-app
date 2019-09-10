@@ -1,3 +1,5 @@
+import color from 'color-convert';
+
 export const getDevice = () => {
   let device = 'other';
   const ua = window.navigator.userAgent;
@@ -48,3 +50,9 @@ export const getMediaManifest = () => {
   }
   return manifest;
 };
+
+export const createCustomColor = (hsv) => ({
+  name: `user custom color`,
+  value: color.hsv.rgb(hsv[0] === 1 ? 0 : hsv[0] * 360, hsv[1] * 100, hsv[2] * 100),
+  isCustom: true
+});

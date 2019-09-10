@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import find from 'lodash.find';
+import assign from 'lodash.assign';
 import Camera from './Camera';
 import SettingMenu from './SettingMenu';
 import Tap from './Tap';
+import ColorPicker from './ColorPicker';
 import Colors from '../constants/Colors';
 import Storage from '../utils/Storage';
+import { createCustomColor } from '../utils/Utils';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 
 export default class App extends Component {
@@ -18,18 +21,31 @@ export default class App extends Component {
     this.takePhoto = this.takePhoto.bind(this);
     this.togglePause = this.togglePause.bind(this);
     this.onClickCamera = this.onClickCamera.bind(this);
+    this.onEditCustomColor = this.onEditCustomColor.bind(this);
+    this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
+    this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
+    let customColor = {};
+    try {
+      customColor = Storage.getItem('customColor') ? JSON.parse(Storage.getItem('customColor')) : {};
+    } catch (error) {
+      console.error(error);
+    }
     this.state = {
       showSettingMenu: false,
-      baseColor: Storage.getItem('baseColor') ? find(Colors.base, { name: Storage.getItem('baseColor') })
-        : Colors.base[0],
-      drawingColor: Storage.getItem('drawingColor') ? find(Colors.drawing, { name: Storage.getItem('drawingColor') })
-        : Colors.drawing[0],
+      baseColor: (Storage.getItem('baseColor') ?
+        find(Colors.base.concat(customColor.base), { name: Storage.getItem('baseColor') })
+        : Colors.base[0]) || Colors.base[0],
+      drawingColor: (Storage.getItem('drawingColor') ?
+        find(Colors.drawing.concat(customColor.drawing), { name: Storage.getItem('drawingColor') })
+        : Colors.drawing[0] || Colors.drawing[0]),
+      customColor,
       contrast: Storage.getItem('contrast') * 1 || 0,
       contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: Storage.getItem('inversion') || false,
       flip: Storage.getItem('flip') || false,
       luminanceData: null,
-      pause: false
+      pause: false,
+      colorPickerType: null
     };
   }
 
@@ -46,6 +62,8 @@ export default class App extends Component {
     this.setState({ [key]: value });
     if (key === 'baseColor' || key === 'drawingColor') {
       Storage.setItem(key, value.name);
+    } else if (key === 'customColor') {
+      Storage.setItem(key, JSON.stringify(value));
     } else {
       Storage.setItem(key, value);
     }
@@ -97,10 +115,38 @@ export default class App extends Component {
     this.setState({ pause: !pause });
   }
 
+  onEditCustomColor(type) {
+    this.setState({ colorPickerType: type });
+  }
+
+  onChangeCustomColor(hsv) {
+    const { customColor, colorPickerType } = this.state;
+    const newCustomColor = assign({}, customColor, {
+      [colorPickerType]: createCustomColor(hsv)
+    });
+    this.setState({
+      colorPickerType: null
+    });
+    this.onChange(`${colorPickerType}Color`, newCustomColor[colorPickerType]);
+    this.onChange('customColor', newCustomColor);
+  }
+
+  onCancelCustomColor() {
+    this.setState({ colorPickerType: null });
+  }
+
   render() {
-    const { showSettingMenu } = this.state;
+    const { showSettingMenu, colorPickerType, customColor } = this.state;
     return (
       <div className='app-container'>
+        <ColorPicker
+          visible={!!colorPickerType}
+          onChange={this.onChangeCustomColor}
+          onCancel={this.onCancelCustomColor}
+          {...(colorPickerType && customColor[colorPickerType] ? {
+            rgb: customColor[colorPickerType].value
+          } : null)}
+        />
         <div
           className={classNames('tools', {
             'tools--show-menu': showSettingMenu
@@ -118,6 +164,7 @@ export default class App extends Component {
             visible={showSettingMenu}
             onChange={this.onChange}
             onToggle={this.toggleSettingMenu}
+            onEditCustomColor={this.onEditCustomColor}
             {...this.state}
           />
         </div>

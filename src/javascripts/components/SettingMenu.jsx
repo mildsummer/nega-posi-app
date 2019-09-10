@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import colorConvert from 'color-convert';
 import Colors from '../constants/Colors';
 import ContrastSlider from './ContrastSlider';
 import ColorList from './ColorList';
@@ -17,6 +18,7 @@ export default class SettingMenu extends Component {
     this.onChangeInversion = this.onChangeInversion.bind(this);
     this.onChangeFlip = this.onChangeFlip.bind(this);
     this.resetContrast = this.resetContrast.bind(this);
+    this.editCustomColor = this.editCustomColor.bind(this);
   }
 
   onChangeColor(color, type) {
@@ -50,8 +52,13 @@ export default class SettingMenu extends Component {
     onChange('flip', e.target.checked);
   }
 
+  editCustomColor(e) {
+    const { onEditCustomColor } = this.props;
+    onEditCustomColor(e.target.getAttribute('data-color-type'));
+  }
+
   render() {
-    const { visible, baseColor, drawingColor, contrast, contrastThreshold,
+    const { visible, baseColor, drawingColor, customColor, contrast, contrastThreshold,
       inversion, flip, onToggle, luminanceData } = this.props;
     return (
       <div
@@ -95,31 +102,59 @@ export default class SettingMenu extends Component {
                 </div>
               </section>
               <section className='setting-menu__item'>
-                <p className='setting-menu__item-title'>
-                  Base color
-                </p>
+                <div className='setting-menu__header'>
+                  <p className='setting-menu__item-title'>
+                    Base color
+                  </p>
+                  {!customColor.base || customColor.base === baseColor ? (
+                    <button
+                      type='button'
+                      className='setting-menu__sub'
+                      data-color-type='base'
+                      onClick={this.editCustomColor}
+                    >
+                      {customColor.base ? 'Edit': 'Custom'}
+                    </button>
+                  ) : null}
+                </div>
                 <ColorList
                   data={Colors.base}
+                  customColor={customColor.base}
                   selected={baseColor}
                   type='base'
                   onChange={this.onChangeColor}
                 />
                 <p className='setting-menu__selected'>
                   {baseColor.name}
+                  {baseColor.isCustom ? ` / rgb(${baseColor.value.join(', ')}) / #${colorConvert.rgb.hex(baseColor.value)}` : ''}
                 </p>
               </section>
               <section className='setting-menu__item'>
-                <p className='setting-menu__item-title'>
-                  Drawing color
-                </p>
+                <div className='setting-menu__header'>
+                  <p className='setting-menu__item-title'>
+                    Drawing color
+                  </p>
+                  {!customColor.drawing || customColor.drawing === drawingColor ? (
+                    <button
+                      type='button'
+                      className='setting-menu__sub'
+                      data-color-type='drawing'
+                      onClick={this.editCustomColor}
+                    >
+                      {customColor.drawing ? 'Edit': 'Custom'}
+                    </button>
+                  ) : null}
+                </div>
                 <ColorList
                   data={Colors.drawing}
+                  customColor={customColor.drawing}
                   selected={drawingColor}
                   type='drawing'
                   onChange={this.onChangeColor}
                 />
                 <p className='setting-menu__selected'>
                   {drawingColor.name}
+                  {drawingColor.isCustom ? ` / rgb(${drawingColor.value.join(', ')}) / #${colorConvert.rgb.hex(drawingColor.value)}` : ''}
                 </p>
               </section>
               <section className='setting-menu__item'>
@@ -130,9 +165,11 @@ export default class SettingMenu extends Component {
                     </p>
                     <button
                       type='button'
-                      className='setting-menu__reset'
+                      className='setting-menu__sub'
                       onClick={this.resetContrast}
-                    >Reset</button>
+                    >
+                      Reset
+                    </button>
                   </div>
                   <ContrastSlider
                     value={contrast}
@@ -164,8 +201,10 @@ SettingMenu.propTypes = {
   visible: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   onToggle: PropTypes.func.isRequired,
+  onEditCustomColor: PropTypes.func.isRequired,
   baseColor: PropTypes.object.isRequired,
   drawingColor: PropTypes.object.isRequired,
+  customColor: PropTypes.object,
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
