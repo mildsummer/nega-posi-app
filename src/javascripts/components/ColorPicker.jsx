@@ -48,6 +48,7 @@ export default class ColorPicker extends Component {
   }
 
   onTouchStartSV(e) {
+    e.nativeEvent.preventDefault();
     const s = zeroToOne(((e.nativeEvent.clientX || e.nativeEvent.touches[0].clientX || 0)
       - this.svField.getBoundingClientRect().left) / this.svField.clientWidth);
     const v = 1 - zeroToOne(((e.nativeEvent.clientY || e.nativeEvent.touches[0].clientY || 0)
@@ -55,13 +56,15 @@ export default class ColorPicker extends Component {
     this.setState({ s, v });
   }
 
-  onPanStartSV() {
+  onPanStartSV(e) {
+    e.preventDefault();
     const { s, v } = this.state;
     this.panStartS = s;
     this.panStartV = v;
   }
 
   onPanSV(e) {
+    e.preventDefault();
     const s = zeroToOne(this.panStartS + e.deltaX / this.svField.clientWidth);
     const v = zeroToOne(this.panStartV - e.deltaY / this.svField.clientHeight);
     this.setState({ s, v });
@@ -72,17 +75,20 @@ export default class ColorPicker extends Component {
   }
 
   onTouchStartHue(e) {
+    e.nativeEvent.preventDefault();
     const h = zeroToOne(((e.nativeEvent.clientY || e.nativeEvent.touches[0].clientY || 0)
       - this.hueField.getBoundingClientRect().top) / this.hueField.clientHeight);
     this.setState({ h });
   }
 
-  onPanStartHue() {
+  onPanStartHue(e) {
+    e.preventDefault();
     const { h } = this.state;
     this.panStartHue = h;
   }
 
   onPanHue(e) {
+    e.preventDefault();
     const h = zeroToOne(this.panStartHue + e.deltaY / this.hueField.clientHeight);
     this.setState({ h });
   }
