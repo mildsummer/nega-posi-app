@@ -5,7 +5,7 @@ import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
   LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
 import { getDevice, getMediaManifest } from '../utils/Utils';
-import CameraWorker from 'worker-loader?inline!../worker';
+import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
 
 const INTERVAL = 80;
 

@@ -10,8 +10,7 @@ module.exports = (env, argv) => {
   return {
     mode: PROD ? 'production' : 'development',
     entry: {
-      app: './src/javascripts/entry.js',
-      worker: './src/javascripts/worker.js'
+      app: './src/javascripts/entry.js'
     },
     output: {
       path: path.resolve(__dirname, 'dist/assets'),
@@ -41,7 +40,8 @@ module.exports = (env, argv) => {
             loader: 'babel-loader',
             options: {
               presets: ['@babel/preset-env', '@babel/preset-react'],
-              shouldPrintComment: PROD ? (value) => (value.match(printedCommentRegExp)) : () => (true)
+              shouldPrintComment: PROD ? (value) => (value.match(printedCommentRegExp)) : () => (true),
+              compact: true
             }
           }]
         },

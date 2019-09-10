@@ -2921,11 +2921,6 @@ hpack.js@^2.1.6:
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
 
-hsv-rgb@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/hsv-rgb/-/hsv-rgb-1.0.0.tgz#8e13727c27ca9d5b7dd6fe383abd09ca920ba09a"
-  integrity sha1-jhNyfCfKnVt91v44Or0JypILoJo=
-
 html-entities@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
