@@ -24,6 +24,7 @@ export default class App extends Component {
     this.onEditCustomColor = this.onEditCustomColor.bind(this);
     this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
+    this.onRemoveCustomColor = this.onRemoveCustomColor.bind(this);
     let customColor = {};
     try {
       customColor = Storage.getItem('customColor') ? JSON.parse(Storage.getItem('customColor')) : {};
@@ -135,6 +136,19 @@ export default class App extends Component {
     this.setState({ colorPickerType: null });
   }
 
+  onRemoveCustomColor() {
+    const { customColor, colorPickerType } = this.state;
+    const newCustomColor = assign({}, customColor);
+    delete newCustomColor[colorPickerType];
+    this.setState({
+      colorPickerType: null
+    });
+    if (this.state[`${colorPickerType}Color`] === customColor[colorPickerType]) {
+      this.onChange(`${colorPickerType}Color`, Colors[colorPickerType][0]);
+    }
+    this.onChange('customColor', newCustomColor);
+  }
+
   render() {
     const { showSettingMenu, colorPickerType, customColor } = this.state;
     return (
@@ -146,6 +160,7 @@ export default class App extends Component {
           {...(colorPickerType && customColor[colorPickerType] ? {
             rgb: customColor[colorPickerType].value
           } : null)}
+          onRemove={colorPickerType && customColor[colorPickerType] ? this.onRemoveCustomColor : null}
         />
         <div
           className={classNames('tools', {

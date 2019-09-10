@@ -106,16 +106,14 @@ export default class SettingMenu extends Component {
                   <p className='setting-menu__item-title'>
                     Base color
                   </p>
-                  {!customColor.base || customColor.base === baseColor ? (
-                    <button
-                      type='button'
-                      className='setting-menu__sub'
-                      data-color-type='base'
-                      onClick={this.editCustomColor}
-                    >
-                      {customColor.base ? 'Edit': 'Custom'}
-                    </button>
-                  ) : null}
+                  <button
+                    type='button'
+                    className='setting-menu__sub'
+                    data-color-type='base'
+                    onClick={this.editCustomColor}
+                  >
+                    {customColor.base ? 'Edit': 'Custom'}
+                  </button>
                 </div>
                 <ColorList
                   data={Colors.base}
@@ -134,16 +132,14 @@ export default class SettingMenu extends Component {
                   <p className='setting-menu__item-title'>
                     Drawing color
                   </p>
-                  {!customColor.drawing || customColor.drawing === drawingColor ? (
-                    <button
-                      type='button'
-                      className='setting-menu__sub'
-                      data-color-type='drawing'
-                      onClick={this.editCustomColor}
-                    >
-                      {customColor.drawing ? 'Edit': 'Custom'}
-                    </button>
-                  ) : null}
+                  <button
+                    type='button'
+                    className='setting-menu__sub'
+                    data-color-type='drawing'
+                    onClick={this.editCustomColor}
+                  >
+                    {customColor.drawing ? 'Edit': 'Custom'}
+                  </button>
                 </div>
                 <ColorList
                   data={Colors.drawing}

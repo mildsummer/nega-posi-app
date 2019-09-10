@@ -68,7 +68,7 @@ export default class ColorPicker extends Component {
   }
 
   onPanEndSV() {
-    console.log('sv end');
+    // console.log('sv end');
   }
 
   onTouchStartHue(e) {
@@ -88,11 +88,11 @@ export default class ColorPicker extends Component {
   }
 
   onPanEndHue() {
-    console.log('Hue end');
+    // console.log('Hue end');
   }
 
   render() {
-    const { visible, onCancel } = this.props;
+    const { visible, onCancel, onRemove } = this.props;
     const { h, s, v } = this.state;
     const rgb = hsvToRgb(h === 1 ? 0 : h * 360, s * 100, v * 100);
     return (
@@ -101,7 +101,10 @@ export default class ColorPicker extends Component {
           'color-picker--visible': visible
         })}
       >
-        <div className='color-picker__bg' />
+        <div
+          className='color-picker__bg'
+          onClick={onCancel}
+        />
         <div className='color-picker__inner'>
           <div className='color-picker__field'>
             <div
@@ -203,6 +206,16 @@ export default class ColorPicker extends Component {
             >
               Cancel
             </Tap>
+            {onRemove ? (
+              <Tap
+                component='button'
+                type='button'
+                className='color-picker__remove'
+                onClick={onRemove}
+              >
+                Remove
+              </Tap>
+            ) : null}
           </div>
         </div>
       </div>
@@ -218,5 +231,6 @@ ColorPicker.propTypes = {
   rgb: PropTypes.arrayOf(PropTypes.number),
   visible: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
+  onCancel: PropTypes.func.isRequired,
+  onRemove: PropTypes.func
 };
