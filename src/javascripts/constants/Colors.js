@@ -226,51 +226,10 @@ const Colors = {
         255
       ]
     }
-  ],
-  mat: [
-    {
-      name: 'antique white',
-      value: [
-        249,
-        245,
-        234
-      ]
-    },
-    {
-      name: 'vanilla',
-      value: [
-        245,
-        245,
-        219
-      ]
-    },
-    {
-      name: 'light gray',
-      value: [
-        218,
-        215,
-        206
-      ]
-    },
-    {
-      name: 'cream',
-      value: [
-        249,
-        237,
-        223
-      ]
-    },
-    {
-      name: 'beige',
-      value: [
-        221,
-        203,
-        179
-      ]
-    }
   ]
 };
 
 Colors.base = Colors.base.concat(Colors.drawing);
+Colors.mat = Colors.base.concat();
 
 export default Colors;

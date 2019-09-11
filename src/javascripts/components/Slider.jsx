@@ -3,10 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Hammer from 'react-hammerjs';
 import throttle from 'lodash.throttle';
-import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
-import Histogram from './Histogram';
 
-export default class ContrastSlider extends Component {
+export default class Slider extends Component {
   constructor(props) {
     super(props);
     this.onPanStart = this.onPanStart.bind(this);
@@ -28,18 +26,11 @@ export default class ContrastSlider extends Component {
   }
 
   onPan(e) {
-    const { onChange, threshold } = this.props;
-    if (threshold) {
-      onChange(
-        Math.min(CONTRAST_THRESHOLD_LENGTH,
-          Math.max(0, this.panStartValue + (e.deltaX / this.base.clientWidth) * CONTRAST_THRESHOLD_LENGTH))
-      );
-    } else {
-      onChange(
-        Math.min(CONTRAST_LENGTH,
-          Math.max(-CONTRAST_LENGTH, this.panStartValue + (e.deltaX / this.base.clientWidth) * CONTRAST_LENGTH * 2))
-      );
-    }
+    const { onChange, max, min } = this.props;
+    onChange(
+      Math.min(max,
+        Math.max(min, this.panStartValue + (e.deltaX / this.base.clientWidth) * (max - min)))
+    );
   }
 
   onPanEnd() {
@@ -49,21 +40,13 @@ export default class ContrastSlider extends Component {
   }
 
   onTouchStart(e) {
-    const { onChange, threshold } = this.props;
+    const { onChange, max, min } = this.props;
     const x = e.nativeEvent.clientX || e.nativeEvent.touches[0].clientX || 0;
-    if (threshold) {
-      onChange(
-        Math.min(CONTRAST_THRESHOLD_LENGTH,
-          Math.max(0,
-            (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * CONTRAST_THRESHOLD_LENGTH))
-      );
-    } else {
-      onChange(
-        Math.min(CONTRAST_LENGTH,
-          Math.max(-CONTRAST_LENGTH,
-            (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * CONTRAST_LENGTH * 2 - CONTRAST_LENGTH))
-      );
-    }
+    onChange(
+      Math.min(max,
+        Math.max(min,
+          (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * (max - min) + min))
+    );
     this.setState({
       panning: true
     });
@@ -77,7 +60,7 @@ export default class ContrastSlider extends Component {
 
   render() {
     const { panning } = this.state;
-    const { value, threshold, luminanceData } = this.props;
+    const { value, max, min } = this.props;
     return (
       <div className='slider__wrapper'>
         <Hammer
@@ -102,17 +85,16 @@ export default class ContrastSlider extends Component {
           <div
             className={classNames('slider', {
               'slider--active': panning,
-              'slider--origin': !threshold,
-              'slider--threshold': threshold
+              'slider--origin': max > 0 && min < 0
             })}
             role='slider'
           >
-            {threshold ? null : (
+            {max > 0 && min < 0 ? (
               <p className='slider__direction'>
                 <span className='slider__direction-item'>-</span>
                 <span className='slider__direction-item'>+</span>
               </p>
-            )}
+            ) : null}
             <div className='slider__inner'>
               <div
                 className='slider__base'
@@ -122,16 +104,13 @@ export default class ContrastSlider extends Component {
                   }
                 }}
               />
+              <div className='slider__origin' />
               <div
                 className='slider__value'
                 style={{
-                  width: threshold ? `${100 * value / CONTRAST_THRESHOLD_LENGTH}%`
-                    : `${100 * (value + CONTRAST_LENGTH) / (CONTRAST_LENGTH * 2)}%`
+                  width: `${100 * (value - min) / (max - min)}%`
                 }}
               />
-              {luminanceData ? (
-                <Histogram data={luminanceData} />
-              ) : null}
             </div>
           </div>
         </Hammer>
@@ -140,9 +119,9 @@ export default class ContrastSlider extends Component {
   }
 }
 
-ContrastSlider.propTypes = {
+Slider.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.number.isRequired,
-  threshold: PropTypes.bool,
-  luminanceData: PropTypes.arrayOf(PropTypes.number)
+  max: PropTypes.number.isRequired,
+  min: PropTypes.number.isRequired
 };

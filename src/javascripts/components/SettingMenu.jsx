@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import colorConvert from 'color-convert';
 import Colors from '../constants/Colors';
 import ContrastSlider from './ContrastSlider';
+import Slider from './Slider';
 import ColorList from './ColorList';
 import Tap from './Tap';
 import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
@@ -19,6 +20,7 @@ export default class SettingMenu extends Component {
     this.onChangeFlip = this.onChangeFlip.bind(this);
     this.onChangeClipSize = this.onChangeClipSize.bind(this);
     this.onChangeClipRatio = this.onChangeClipRatio.bind(this);
+    this.onChangeMatThickness = this.onChangeMatThickness.bind(this);
     this.resetContrast = this.resetContrast.bind(this);
     this.resetClipSize = this.resetClipSize.bind(this);
     this.editCustomColor = this.editCustomColor.bind(this);
@@ -49,6 +51,11 @@ export default class SettingMenu extends Component {
     onChange('clipRatio', value);
   }
 
+  onChangeMatThickness(value) {
+    const { onChange } = this.props;
+    onChange('matThickness', value);
+  }
+
   resetContrast() {
     const { onChange } = this.props;
     onChange('contrast', 0);
@@ -58,7 +65,8 @@ export default class SettingMenu extends Component {
   resetClipSize() {
     const { onChange } = this.props;
     onChange('clipSize', 0.5);
-    onChange('clipRatio', 1);
+    onChange('clipRatio', 0);
+    onChange('matThickness', 10);
   }
 
   onChangeInversion(e) {
@@ -78,7 +86,7 @@ export default class SettingMenu extends Component {
 
   render() {
     const { visible, baseColor, drawingColor, matColor, customColor, contrast, contrastThreshold,
-      inversion, flip, clipSize, clipRatio, onToggle, luminanceData } = this.props;
+      inversion, flip, clipSize, clipRatio, matThickness, onToggle, luminanceData } = this.props;
     return (
       <div
         className={classNames('setting-menu', {
@@ -222,14 +230,14 @@ export default class SettingMenu extends Component {
                 />
                 <p className='setting-menu__selected'>
                   {matColor ? matColor.name : 'NONE'}
-                  {matColor && matColor.isCustom ? ` / rgb(${matColor.value.join(', ')}) / #${matColor.rgb.hex(matColor.value)}` : ''}
+                  {matColor && matColor.isCustom ? ` / rgb(${matColor.value.join(', ')}) / #${colorConvert.rgb.hex(matColor.value)}` : ''}
                 </p>
               </section>
               <section className='setting-menu__item'>
                 <div className='setting-menu__item-section'>
                   <div className='setting-menu__header'>
                     <p className='setting-menu__item-title'>
-                      Mat size
+                      Mat size / ratio / thickness
                     </p>
                     <button
                       type='button'
@@ -239,13 +247,23 @@ export default class SettingMenu extends Component {
                       Reset
                     </button>
                   </div>
-                  <ContrastSlider
+                  <Slider
                     value={clipSize}
+                    max={1}
+                    min={0}
                     onChange={this.onChangeClipSize}
                   />
-                  <ContrastSlider
+                  <Slider
                     value={clipRatio}
+                    max={1}
+                    min={-1}
                     onChange={this.onChangeClipRatio}
+                  />
+                  <Slider
+                    value={matThickness}
+                    max={20}
+                    min={0}
+                    onChange={this.onChangeMatThickness}
                   />
                 </div>
               </section>
@@ -278,5 +296,6 @@ SettingMenu.propTypes = {
   flip: PropTypes.bool.isRequired,
   clipSize: PropTypes.number.isRequired,
   clipRatio: PropTypes.number.isRequired,
+  matThickness: PropTypes.number.isRequired,
   luminanceData: PropTypes.arrayOf(PropTypes.number)
 };

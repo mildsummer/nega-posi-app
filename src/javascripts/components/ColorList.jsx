@@ -24,7 +24,8 @@ export default class ColorList extends Component {
   componentDidMount() {
     const { selected } = this.props;
     if (this.element) {
-      const selectedElement = this.element.querySelector(`[data-color-name='${selected.name}']`);
+      const selectedElement = selected ? this.element.querySelector(`[data-color-name='${selected.name}']`)
+        : this.element.querySelector('[title="NONE"]');
       this.element.scrollLeft = selectedElement.getBoundingClientRect().left
         - this.element.getBoundingClientRect().left
         - this.element.offsetWidth / 2

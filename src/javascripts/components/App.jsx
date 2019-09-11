@@ -41,14 +41,15 @@ export default class App extends Component {
         : Colors.drawing[0] || Colors.drawing[0]),
       customColor,
       matColor: (Storage.getItem('matColor') ?
-        find(Colors.mat.concat(customColor.mat), { name: Storage.getItem('matColor') })
-        : Colors.mat[0] || Colors.mat[0]),
+        find(Colors.mat.concat(customColor.mat), { name: Storage.getItem('matColor') }) || null
+        : null),
       contrast: Storage.getItem('contrast') * 1 || 0,
       contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: Storage.getItem('inversion') || false,
       flip: Storage.getItem('flip') || false,
-      clipSize: Storage.getItem('clipSize') || 0.5,
-      clipRatio: Storage.getItem('clipRatio') || 1,
+      clipSize: Storage.getItem('clipSize') * 1 || 0.5,
+      clipRatio: Storage.getItem('clipRatio') * 1 || 1,
+      matThickness: Storage.getItem('matThickness') * 1 || 10,
       luminanceData: null,
       pause: false,
       colorPickerType: null
