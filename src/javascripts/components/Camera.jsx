@@ -6,6 +6,7 @@ import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
   LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
 import { getDevice, getMediaManifest } from '../utils/Utils';
 import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
+import Frame from './Frame';
 
 const INTERVAL = 80;
 
@@ -33,10 +34,14 @@ export default class Camera extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.baseColor !== this.props.baseColor
       || nextProps.drawingColor !== this.props.drawingColor
+      || nextProps.matColor !== this.props.matColor
       || nextProps.contrast !== this.props.contrast
       || nextProps.contrastThreshold !== this.props.contrastThreshold
       || nextProps.inversion !== this.props.inversion
       || nextProps.flip !== this.props.flip
+      || nextProps.clipSize !== this.props.clipSize
+      || nextProps.clipRatio !== this.props.clipRatio
+      || nextProps.matThickness !== this.props.matThickness
       || nextProps.pause !== this.props.pause
       || nextState.width !== this.state.width
       || nextState.height !== this.state.height
@@ -157,11 +162,14 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
+    window.setTimeout(() => {
+      this.pause();
+    }, 2000);
   }
 
   render() {
     const { init, width, height } = this.state;
-    const { onClick, pause, flip } = this.props;
+    const { onClick, pause, flip, matColor, clipSize, clipRatio, matThickness } = this.props;
     return (
       <div
         className={classNames('camera', {
@@ -183,16 +191,25 @@ export default class Camera extends Component {
           playsInline
           autoPlay
         />
-        <canvas
-          ref={(ref) => {
-            if (ref) {
-              this.canvas = ref;
-            }
-          }}
-          className='camera__viewer'
+        <Frame
           width={width}
           height={height}
-        />
+          clipSize={clipSize}
+          clipRatio={clipRatio}
+          thickness={matThickness}
+          color={matColor}
+        >
+          <canvas
+            ref={(ref) => {
+              if (ref) {
+                this.canvas = ref;
+              }
+            }}
+            className='camera__viewer'
+            width={width}
+            height={height}
+          />
+        </Frame>
         {this.worker ? (
           <canvas
             ref={(ref) => {
@@ -213,10 +230,14 @@ export default class Camera extends Component {
 Camera.propTypes = {
   baseColor: PropTypes.object.isRequired,
   drawingColor: PropTypes.object.isRequired,
+  matColor: PropTypes.object,
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
   flip: PropTypes.bool.isRequired,
+  clipSize: PropTypes.number,
+  clipRatio: PropTypes.number,
+  matThickness: PropTypes.number,
   onClick: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,

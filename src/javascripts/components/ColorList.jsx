@@ -35,8 +35,13 @@ export default class ColorList extends Component {
   onChange(e) {
     const { data, type, customColor, onChange } = this.props;
     const isCustom = e.target.getAttribute('data-is-custom') === 'true';
-    const selectedColor = isCustom ? customColor : find(data, { name: e.target.getAttribute('data-color-name') });
-    onChange(selectedColor, type);
+    const name = e.target.getAttribute('data-color-name');
+    if (!name) {
+      onChange(null, type);
+    } else {
+      const selectedColor = isCustom ? customColor : find(data, { name });
+      onChange(selectedColor, type);
+    }
   }
 
   scrollLeft() {
@@ -44,7 +49,7 @@ export default class ColorList extends Component {
   }
 
   render() {
-    const { data, customColor, selected, type } = this.props;
+    const { data, customColor, selected, type, required } = this.props;
     return (
       <ul
         ref={(ref) => {
@@ -54,6 +59,18 @@ export default class ColorList extends Component {
         }}
         className={`setting-menu__color-list setting-menu__color-list--${type}`}
       >
+        {required ? null : (
+          <Tap
+            component='li'
+            className={classNames(`setting-menu__color setting-menu__color--${type} setting-menu__color--none`, {
+              'setting-menu__color--current': !selected
+            })}
+            title='NONE'
+            onClick={this.onChange}
+          >
+            NONE
+          </Tap>
+        )}
         {(customColor ? [customColor].concat(data) : data).map((color) => (
           <Tap
             component='li'
@@ -63,7 +80,7 @@ export default class ColorList extends Component {
               'setting-menu__color--custom': color.isCustom
             })}
             style={{
-              [type === 'base' ? 'backgroundColor' : 'color']: `rgb(${color.value.join(',')})`
+              [type === 'drawing' ? 'color' : 'backgroundColor']: `rgb(${color.value.join(',')})`
             }}
             data-color-name={color.name}
             data-is-custom={color.isCustom}
@@ -78,10 +95,15 @@ export default class ColorList extends Component {
   }
 }
 
+ColorList.defaultProps = {
+  required: true
+};
+
 ColorList.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   customColor: PropTypes.object,
-  selected: PropTypes.object.isRequired,
+  selected: PropTypes.object,
   type: PropTypes.string.isRequired,
+  required: PropTypes.bool,
   onChange: PropTypes.func.isRequired
 };

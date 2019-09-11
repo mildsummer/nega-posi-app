@@ -40,10 +40,15 @@ export default class App extends Component {
         find(Colors.drawing.concat(customColor.drawing), { name: Storage.getItem('drawingColor') })
         : Colors.drawing[0] || Colors.drawing[0]),
       customColor,
+      matColor: (Storage.getItem('matColor') ?
+        find(Colors.mat.concat(customColor.mat), { name: Storage.getItem('matColor') })
+        : Colors.mat[0] || Colors.mat[0]),
       contrast: Storage.getItem('contrast') * 1 || 0,
       contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
       inversion: Storage.getItem('inversion') || false,
       flip: Storage.getItem('flip') || false,
+      clipSize: Storage.getItem('clipSize') || 0.5,
+      clipRatio: Storage.getItem('clipRatio') || 1,
       luminanceData: null,
       pause: false,
       colorPickerType: null
@@ -61,8 +66,12 @@ export default class App extends Component {
 
   onChange(key, value) {
     this.setState({ [key]: value });
-    if (key === 'baseColor' || key === 'drawingColor') {
-      Storage.setItem(key, value.name);
+    if (key === 'baseColor' || key === 'drawingColor' || key === 'matColor') {
+      if (value) {
+        Storage.setItem(key, value.name);
+      } else {
+        Storage.removeItem(key);
+      }
     } else if (key === 'customColor') {
       Storage.setItem(key, JSON.stringify(value));
     } else {

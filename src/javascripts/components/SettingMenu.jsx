@@ -17,7 +17,10 @@ export default class SettingMenu extends Component {
     this.onChangeContrastThreshold = this.onChangeContrastThreshold.bind(this);
     this.onChangeInversion = this.onChangeInversion.bind(this);
     this.onChangeFlip = this.onChangeFlip.bind(this);
+    this.onChangeClipSize = this.onChangeClipSize.bind(this);
+    this.onChangeClipRatio = this.onChangeClipRatio.bind(this);
     this.resetContrast = this.resetContrast.bind(this);
+    this.resetClipSize = this.resetClipSize.bind(this);
     this.editCustomColor = this.editCustomColor.bind(this);
   }
 
@@ -36,10 +39,26 @@ export default class SettingMenu extends Component {
     onChange('contrastThreshold', value);
   }
 
+  onChangeClipSize(value) {
+    const { onChange } = this.props;
+    onChange('clipSize', value);
+  }
+
+  onChangeClipRatio(value) {
+    const { onChange } = this.props;
+    onChange('clipRatio', value);
+  }
+
   resetContrast() {
     const { onChange } = this.props;
     onChange('contrast', 0);
     onChange('contrastThreshold', CONTRAST_THRESHOLD_LENGTH / 2);
+  }
+
+  resetClipSize() {
+    const { onChange } = this.props;
+    onChange('clipSize', 0.5);
+    onChange('clipRatio', 1);
   }
 
   onChangeInversion(e) {
@@ -58,8 +77,8 @@ export default class SettingMenu extends Component {
   }
 
   render() {
-    const { visible, baseColor, drawingColor, customColor, contrast, contrastThreshold,
-      inversion, flip, onToggle, luminanceData } = this.props;
+    const { visible, baseColor, drawingColor, matColor, customColor, contrast, contrastThreshold,
+      inversion, flip, clipSize, clipRatio, onToggle, luminanceData } = this.props;
     return (
       <div
         className={classNames('setting-menu', {
@@ -179,6 +198,57 @@ export default class SettingMenu extends Component {
                   />
                 </div>
               </section>
+              <section className='setting-menu__item'>
+                <div className='setting-menu__header'>
+                  <p className='setting-menu__item-title'>
+                    Mat color
+                  </p>
+                  <button
+                    type='button'
+                    className='setting-menu__sub'
+                    data-color-type='mat'
+                    onClick={this.editCustomColor}
+                  >
+                    {customColor.mat ? 'Edit': 'Custom'}
+                  </button>
+                </div>
+                <ColorList
+                  data={Colors.mat}
+                  customColor={customColor.mat}
+                  selected={matColor}
+                  type='mat'
+                  required={false}
+                  onChange={this.onChangeColor}
+                />
+                <p className='setting-menu__selected'>
+                  {matColor ? matColor.name : 'NONE'}
+                  {matColor && matColor.isCustom ? ` / rgb(${matColor.value.join(', ')}) / #${matColor.rgb.hex(matColor.value)}` : ''}
+                </p>
+              </section>
+              <section className='setting-menu__item'>
+                <div className='setting-menu__item-section'>
+                  <div className='setting-menu__header'>
+                    <p className='setting-menu__item-title'>
+                      Mat size
+                    </p>
+                    <button
+                      type='button'
+                      className='setting-menu__sub'
+                      onClick={this.resetClipSize}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  <ContrastSlider
+                    value={clipSize}
+                    onChange={this.onChangeClipSize}
+                  />
+                  <ContrastSlider
+                    value={clipRatio}
+                    onChange={this.onChangeClipRatio}
+                  />
+                </div>
+              </section>
             </div>
             <footer className='footer'>
               Intaglio Simulator
@@ -200,10 +270,13 @@ SettingMenu.propTypes = {
   onEditCustomColor: PropTypes.func.isRequired,
   baseColor: PropTypes.object.isRequired,
   drawingColor: PropTypes.object.isRequired,
+  matColor: PropTypes.object,
   customColor: PropTypes.object,
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
   flip: PropTypes.bool.isRequired,
+  clipSize: PropTypes.number.isRequired,
+  clipRatio: PropTypes.number.isRequired,
   luminanceData: PropTypes.arrayOf(PropTypes.number)
 };

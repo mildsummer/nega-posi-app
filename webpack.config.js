@@ -72,10 +72,15 @@ module.exports = (env, argv) => {
               loader: 'sass-loader',
               options: {
                 outputStyle: PROD ? 'compressed' : 'expanded',
-                sourceMap: false
+                sourceMap: false,
+                url: false
               }
             }
           ]
+        },
+        {
+          test: /\.(gif|png|jpg|eot|wof|woff|woff2|ttf|svg)$/,
+          loader: 'url-loader',
         }
       ]
     },
