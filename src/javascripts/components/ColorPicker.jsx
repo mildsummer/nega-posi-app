@@ -14,6 +14,7 @@ export default class ColorPicker extends Component {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
+    this.onRemove = this.onRemove.bind(this);
     this.onTouchStartSV = this.onTouchStartSV.bind(this);
     this.onPanStartSV = this.onPanStartSV.bind(this);
     this.onPanSV = this.onPanSV.bind(this);
@@ -22,7 +23,7 @@ export default class ColorPicker extends Component {
     this.onPanStartHue = this.onPanStartHue.bind(this);
     this.onPanHue = this.onPanHue.bind(this);
     this.onPanEndHue = this.onPanEndHue.bind(this);
-    const hsv = rgbToHsv(props.rgb);
+    const hsv = rgbToHsv(props.value);
     this.state = {
       h: zeroToOne(hsv[0]),
       s: zeroToOne(hsv[1]),
@@ -32,7 +33,7 @@ export default class ColorPicker extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible && !this.props.visible) {
-      const hsv = rgbToHsv(nextProps.rgb);
+      const hsv = rgbToHsv(nextProps.value);
       this.setState({
         h: zeroToOne(hsv[0] / 360),
         s: zeroToOne(hsv[1] / 100),
@@ -45,6 +46,11 @@ export default class ColorPicker extends Component {
     const { onChange } = this.props;
     const { h, s, v } = this.state;
     onChange([h, s, v]);
+  }
+
+  onRemove() {
+    const { onChange } = this.props;
+    onChange();
   }
 
   onTouchStartSV(e) {
@@ -98,7 +104,7 @@ export default class ColorPicker extends Component {
   }
 
   render() {
-    const { visible, onCancel, onRemove } = this.props;
+    const { visible, value, onCancel } = this.props;
     const { h, s, v } = this.state;
     const rgb = hsvToRgb(h === 1 ? 0 : h * 360, s * 100, v * 100);
     return (
@@ -212,12 +218,12 @@ export default class ColorPicker extends Component {
             >
               Cancel
             </Tap>
-            {onRemove ? (
+            {value ? (
               <Tap
                 component='button'
                 type='button'
                 className='color-picker__remove'
-                onClick={onRemove}
+                onClick={this.onRemove}
               >
                 Remove
               </Tap>
@@ -230,13 +236,12 @@ export default class ColorPicker extends Component {
 }
 
 ColorPicker.defaultProps = {
-  rgb: [0, 0, 0]
+  value: [0, 0, 0]
 };
 
 ColorPicker.propTypes = {
-  rgb: PropTypes.arrayOf(PropTypes.number),
+  value: PropTypes.arrayOf(PropTypes.number),
   visible: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onRemove: PropTypes.func
+  onCancel: PropTypes.func.isRequired
 };

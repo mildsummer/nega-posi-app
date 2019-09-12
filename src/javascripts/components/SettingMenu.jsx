@@ -1,92 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import colorConvert from 'color-convert';
-import Colors from '../constants/Colors';
-import ContrastSlider from './ContrastSlider';
-import Slider from './Slider';
-import ColorList from './ColorList';
-import Tap from './Tap';
-import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
+import SettingMenuItem from './SettingMenuItem';
+import Options from '../constants/Options';
 
-window.colors = Colors;
 export default class SettingMenu extends Component {
-  constructor(props) {
-    super(props);
-    this.onChangeColor = this.onChangeColor.bind(this);
-    this.onChangeContrast = this.onChangeContrast.bind(this);
-    this.onChangeContrastThreshold = this.onChangeContrastThreshold.bind(this);
-    this.onChangeInversion = this.onChangeInversion.bind(this);
-    this.onChangeFlip = this.onChangeFlip.bind(this);
-    this.onChangeClipSize = this.onChangeClipSize.bind(this);
-    this.onChangeClipRatio = this.onChangeClipRatio.bind(this);
-    this.onChangeMatThickness = this.onChangeMatThickness.bind(this);
-    this.resetContrast = this.resetContrast.bind(this);
-    this.resetClipSize = this.resetClipSize.bind(this);
-    this.editCustomColor = this.editCustomColor.bind(this);
-  }
-
-  onChangeColor(color, type) {
-    const { onChange } = this.props;
-    onChange(`${type}Color`, color);
-  }
-
-  onChangeContrast(value) {
-    const { onChange } = this.props;
-    onChange('contrast', value);
-  }
-
-  onChangeContrastThreshold(value) {
-    const { onChange } = this.props;
-    onChange('contrastThreshold', value);
-  }
-
-  onChangeClipSize(value) {
-    const { onChange } = this.props;
-    onChange('clipSize', value);
-  }
-
-  onChangeClipRatio(value) {
-    const { onChange } = this.props;
-    onChange('clipRatio', value);
-  }
-
-  onChangeMatThickness(value) {
-    const { onChange } = this.props;
-    onChange('matThickness', value);
-  }
-
-  resetContrast() {
-    const { onChange } = this.props;
-    onChange('contrast', 0);
-    onChange('contrastThreshold', CONTRAST_THRESHOLD_LENGTH / 2);
-  }
-
-  resetClipSize() {
-    const { onChange } = this.props;
-    onChange('clipSize', 0.5);
-    onChange('clipRatio', 0);
-    onChange('matThickness', 10);
-  }
-
-  onChangeInversion(e) {
-    const { onChange } = this.props;
-    onChange('inversion', e.target.checked);
-  }
-
-  onChangeFlip(e) {
-    const { onChange } = this.props;
-    onChange('flip', e.target.checked);
-  }
-
-  editCustomColor(e) {
-    const { onEditCustomColor } = this.props;
-    onEditCustomColor(e.target.getAttribute('data-color-type'));
-  }
-
   render() {
-    const { visible, baseColor, drawingColor, matColor, customColor, contrast, contrastThreshold,
-      inversion, flip, clipSize, clipRatio, matThickness, onToggle, luminanceData } = this.props;
+    // const { visible, data, onToggle, luminanceData } = this.props;
+    const { visible, data, onToggle, onChange, onEditCustomColor } = this.props;
     return (
       <div
         className={classNames('setting-menu', {
@@ -95,7 +16,7 @@ export default class SettingMenu extends Component {
       >
         <button
           type='button'
-          className='setting-menu__toggle'
+          className='setting-menu__button'
           onClick={onToggle}
         >
           {visible ? 'Hide' : 'Show'} setting menu
@@ -103,170 +24,16 @@ export default class SettingMenu extends Component {
         <div className='setting-menu__container'>
           <div className='setting-menu__inner'>
             <div className='setting-menu__main'>
-              <section className='setting-menu__item'>
-                <p className='setting-menu__item-title'>
-                  Invert / Flip
-                </p>
-                <div className='setting-menu__horizontal'>
-                  <input
-                    type='checkbox'
-                    onChange={this.onChangeInversion}
-                    checked={inversion}
-                    id='inversion'
-                  />
-                  <Tap component='label' className='setting-menu__inversion' htmlFor='inversion'>
-                    {inversion ? 'disable inversion' : 'inversion'}
-                  </Tap>
-                  <input
-                    type='checkbox'
-                    onChange={this.onChangeFlip}
-                    checked={flip}
-                    id='flip'
-                  />
-                  <Tap component='label' className='setting-menu__flip' htmlFor='flip'>
-                    {flip ? 'disable flip' : 'flip'}
-                  </Tap>
-                </div>
-              </section>
-              <section className='setting-menu__item'>
-                <div className='setting-menu__header'>
-                  <p className='setting-menu__item-title'>
-                    Base color
-                  </p>
-                  <button
-                    type='button'
-                    className='setting-menu__sub'
-                    data-color-type='base'
-                    onClick={this.editCustomColor}
-                  >
-                    {customColor.base ? 'Edit': 'Custom'}
-                  </button>
-                </div>
-                <ColorList
-                  data={Colors.base}
-                  customColor={customColor.base}
-                  selected={baseColor}
-                  type='base'
-                  onChange={this.onChangeColor}
+              {Options.map((option) => (
+                <SettingMenuItem
+                  key={option.name}
+                  data={option}
+                  values={option.items.map((item) => (data[item.name]))}
+                  customValue={option.customColor ? data.customColor[option.items[0].name] : null}
+                  onEditCustomColor={option.customColor ? onEditCustomColor : null}
+                  onChange={onChange}
                 />
-                <p className='setting-menu__selected'>
-                  {baseColor.name}
-                  {baseColor.isCustom ? ` / rgb(${baseColor.value.join(', ')}) / #${colorConvert.rgb.hex(baseColor.value)}` : ''}
-                </p>
-              </section>
-              <section className='setting-menu__item'>
-                <div className='setting-menu__header'>
-                  <p className='setting-menu__item-title'>
-                    Drawing color
-                  </p>
-                  <button
-                    type='button'
-                    className='setting-menu__sub'
-                    data-color-type='drawing'
-                    onClick={this.editCustomColor}
-                  >
-                    {customColor.drawing ? 'Edit': 'Custom'}
-                  </button>
-                </div>
-                <ColorList
-                  data={Colors.drawing}
-                  customColor={customColor.drawing}
-                  selected={drawingColor}
-                  type='drawing'
-                  onChange={this.onChangeColor}
-                />
-                <p className='setting-menu__selected'>
-                  {drawingColor.name}
-                  {drawingColor.isCustom ? ` / rgb(${drawingColor.value.join(', ')}) / #${colorConvert.rgb.hex(drawingColor.value)}` : ''}
-                </p>
-              </section>
-              <section className='setting-menu__item'>
-                <div className='setting-menu__item-section'>
-                  <div className='setting-menu__header'>
-                    <p className='setting-menu__item-title'>
-                      Contrast
-                    </p>
-                    <button
-                      type='button'
-                      className='setting-menu__sub'
-                      onClick={this.resetContrast}
-                    >
-                      Reset
-                    </button>
-                  </div>
-                  <ContrastSlider
-                    value={contrast}
-                    onChange={this.onChangeContrast}
-                  />
-                  <ContrastSlider
-                    value={contrastThreshold}
-                    onChange={this.onChangeContrastThreshold}
-                    threshold
-                    luminanceData={luminanceData}
-                  />
-                </div>
-              </section>
-              <section className='setting-menu__item'>
-                <div className='setting-menu__header'>
-                  <p className='setting-menu__item-title'>
-                    Mat color
-                  </p>
-                  <button
-                    type='button'
-                    className='setting-menu__sub'
-                    data-color-type='mat'
-                    onClick={this.editCustomColor}
-                  >
-                    {customColor.mat ? 'Edit': 'Custom'}
-                  </button>
-                </div>
-                <ColorList
-                  data={Colors.mat}
-                  customColor={customColor.mat}
-                  selected={matColor}
-                  type='mat'
-                  required={false}
-                  onChange={this.onChangeColor}
-                />
-                <p className='setting-menu__selected'>
-                  {matColor ? matColor.name : 'NONE'}
-                  {matColor && matColor.isCustom ? ` / rgb(${matColor.value.join(', ')}) / #${colorConvert.rgb.hex(matColor.value)}` : ''}
-                </p>
-              </section>
-              <section className='setting-menu__item'>
-                <div className='setting-menu__item-section'>
-                  <div className='setting-menu__header'>
-                    <p className='setting-menu__item-title'>
-                      Mat size / ratio / thickness
-                    </p>
-                    <button
-                      type='button'
-                      className='setting-menu__sub'
-                      onClick={this.resetClipSize}
-                    >
-                      Reset
-                    </button>
-                  </div>
-                  <Slider
-                    value={clipSize}
-                    max={1}
-                    min={0}
-                    onChange={this.onChangeClipSize}
-                  />
-                  <Slider
-                    value={clipRatio}
-                    max={1}
-                    min={-1}
-                    onChange={this.onChangeClipRatio}
-                  />
-                  <Slider
-                    value={matThickness}
-                    max={20}
-                    min={0}
-                    onChange={this.onChangeMatThickness}
-                  />
-                </div>
-              </section>
+              ))}
             </div>
             <footer className='footer'>
               Intaglio Simulator
@@ -283,19 +50,9 @@ export default class SettingMenu extends Component {
 
 SettingMenu.propTypes = {
   visible: PropTypes.bool.isRequired,
+  data: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onToggle: PropTypes.func.isRequired,
   onEditCustomColor: PropTypes.func.isRequired,
-  baseColor: PropTypes.object.isRequired,
-  drawingColor: PropTypes.object.isRequired,
-  matColor: PropTypes.object,
-  customColor: PropTypes.object,
-  contrast: PropTypes.number.isRequired,
-  contrastThreshold: PropTypes.number.isRequired,
-  inversion: PropTypes.bool.isRequired,
-  flip: PropTypes.bool.isRequired,
-  clipSize: PropTypes.number.isRequired,
-  clipRatio: PropTypes.number.isRequired,
-  matThickness: PropTypes.number.isRequired,
   luminanceData: PropTypes.arrayOf(PropTypes.number)
 };

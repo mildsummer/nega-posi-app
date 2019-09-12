@@ -34,14 +34,14 @@ export default class ColorList extends Component {
   }
 
   onChange(e) {
-    const { data, type, customColor, onChange } = this.props;
+    const { data, customColor, onChange } = this.props;
     const isCustom = e.target.getAttribute('data-is-custom') === 'true';
     const name = e.target.getAttribute('data-color-name');
     if (!name) {
-      onChange(null, type);
+      onChange(null);
     } else {
       const selectedColor = isCustom ? customColor : find(data, { name });
-      onChange(selectedColor, type);
+      onChange(selectedColor);
     }
   }
 

@@ -34,9 +34,9 @@
       transform: translateY(5px) rotate(-45deg)
     &::after
       transform: translateY(5px) rotate(45deg)
-  &--visible &__toggle::after
+  &--visible &__button::after
     opacity: 0
-  &__toggle
+  &__button
     position: relative
     display: block
     width: 100%
@@ -126,7 +126,7 @@
       +fontSize(14px)
   input
     display: none
-  &__inversion
+  &__toggle--inversion
     display: block
     position: relative
     width: 30px
@@ -153,7 +153,7 @@
         +icon('inversion')
     &.tap-active
       transform: scale(0.9)
-  &__flip
+  &__toggle--flip
     display: block
     position: relative
     width: 30px

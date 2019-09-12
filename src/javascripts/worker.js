@@ -1,14 +1,14 @@
 self.onmessage = (e) => {
   const {
-    imageData, baseColor, drawingColor, inversion, contrast, contrastThreshold, CONTRAST_LENGTH,
+    imageData, base, drawing, inversion, contrast, contrastThreshold, CONTRAST_LENGTH,
     CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT, LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL
   } = e.data;
   const { round, max, min } = Math;
   const data = imageData.data;
   const luminanceData = [];
   const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
-  const baseColorValue = baseColor.value;
-  const drawingColorValue = drawingColor.value;
+  const baseColorValue = base.value;
+  const drawingColorValue = drawing.value;
   for (let i = 0; i < data.length; i += 4) {
     let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
       + data[i + 1] * LUMINANCE_COEFFICIENT[1]

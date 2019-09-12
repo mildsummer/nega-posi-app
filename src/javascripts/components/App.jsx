@@ -7,9 +7,36 @@ import SettingMenu from './SettingMenu';
 import Tap from './Tap';
 import ColorPicker from './ColorPicker';
 import Colors from '../constants/Colors';
+import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR } from '../constants/Options';
 import Storage from '../utils/Storage';
 import { createCustomColor } from '../utils/Utils';
-import { CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
+
+const defaultData = (() => {
+  const data = {};
+  try {
+    data.customColor = Storage.getItem('customColor') ? JSON.parse(Storage.getItem('customColor')) : {};
+  } catch (error) {
+    console.error(error);
+    data.customColor = {};
+  }
+  Options.forEach((option) => {
+    option.items.forEach((item) => {
+      switch (item.type) {
+        case OPTION_TYPE_COLOR:
+          data[item.name] = (Storage.getItem(item.name) ?
+            find(Colors[item.name].concat(data.customColor[item.name]), { name: Storage.getItem(item.name) })
+            : item.defaultValue) || item.defaultValue;
+          break;
+        case OPTION_TYPE_NUMBER:
+          data[item.name] = Storage.getItem(item.name) * 1 || item.defaultValue;
+          break;
+        case OPTION_TYPE_TOGGLE:
+          data[item.name] = Storage.getItem(item.name) || item.defaultValue
+      }
+    });
+  });
+  return data;
+})();
 
 export default class App extends Component {
   constructor(props) {
@@ -24,33 +51,10 @@ export default class App extends Component {
     this.onEditCustomColor = this.onEditCustomColor.bind(this);
     this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
-    this.onRemoveCustomColor = this.onRemoveCustomColor.bind(this);
-    let customColor = {};
-    try {
-      customColor = Storage.getItem('customColor') ? JSON.parse(Storage.getItem('customColor')) : {};
-    } catch (error) {
-      console.error(error);
-    }
     this.state = {
-      showSettingMenu: false,
-      baseColor: (Storage.getItem('baseColor') ?
-        find(Colors.base.concat(customColor.base), { name: Storage.getItem('baseColor') })
-        : Colors.base[0]) || Colors.base[0],
-      drawingColor: (Storage.getItem('drawingColor') ?
-        find(Colors.drawing.concat(customColor.drawing), { name: Storage.getItem('drawingColor') })
-        : Colors.drawing[0] || Colors.drawing[0]),
-      customColor,
-      matColor: (Storage.getItem('matColor') ?
-        find(Colors.mat.concat(customColor.mat), { name: Storage.getItem('matColor') }) || null
-        : null),
-      contrast: Storage.getItem('contrast') * 1 || 0,
-      contrastThreshold: Storage.getItem('contrastThreshold') * 1 || CONTRAST_THRESHOLD_LENGTH / 2,
-      inversion: Storage.getItem('inversion') || false,
-      flip: Storage.getItem('flip') || false,
-      clipSize: Storage.getItem('clipSize') * 1 || 0.5,
-      clipRatio: Storage.getItem('clipRatio') * 1 || 1,
-      matThickness: Storage.getItem('matThickness') * 1 || 10,
+      data: defaultData,
       luminanceData: null,
+      showSettingMenu: false,
       pause: false,
       colorPickerType: null
     };
@@ -65,18 +69,18 @@ export default class App extends Component {
     }
   }
 
-  onChange(key, value) {
-    this.setState({ [key]: value });
-    if (key === 'baseColor' || key === 'drawingColor' || key === 'matColor') {
+  onChange(value, optionItem) {
+    const { data } = this.state;
+    const isColor = optionItem.type === OPTION_TYPE_COLOR;
+    this.setState({ data: assign(data, { [optionItem.name]: value }) });
+    if (isColor) {
       if (value) {
-        Storage.setItem(key, value.name);
+        Storage.setItem(optionItem.name, value.name);
       } else {
-        Storage.removeItem(key);
+        Storage.removeItem(optionItem.name);
       }
-    } else if (key === 'customColor') {
-      Storage.setItem(key, JSON.stringify(value));
     } else {
-      Storage.setItem(key, value);
+      Storage.setItem(optionItem.name, value);
     }
   }
 
@@ -126,51 +130,56 @@ export default class App extends Component {
     this.setState({ pause: !pause });
   }
 
-  onEditCustomColor(type) {
-    this.setState({ colorPickerType: type });
+  onEditCustomColor(optionItem) {
+    this.setState({ colorPickerType: optionItem });
   }
 
   onChangeCustomColor(hsv) {
-    const { customColor, colorPickerType } = this.state;
-    const newCustomColor = assign({}, customColor, {
-      [colorPickerType]: createCustomColor(hsv)
-    });
-    this.setState({
-      colorPickerType: null
-    });
-    this.onChange(`${colorPickerType}Color`, newCustomColor[colorPickerType]);
-    this.onChange('customColor', newCustomColor);
+    const { data, colorPickerType } = this.state;
+    if (hsv) {
+      const newCustomColor = assign({}, data.customColor, {
+        [colorPickerType.name]: createCustomColor(hsv)
+      });
+      this.setState({
+        colorPickerType: null
+      });
+      this.setState({
+        data: assign({}, data, {
+          [colorPickerType.name]: newCustomColor[colorPickerType.name],
+          customColor: newCustomColor
+        })
+      });
+      Storage.setItem('customColor', JSON.stringify(newCustomColor));
+      Storage.setItem(colorPickerType.name, newCustomColor[colorPickerType.name].name);
+    } else {
+      const newCustomColor = assign({}, data.customColor);
+      delete newCustomColor[colorPickerType.name];
+      this.setState({
+        colorPickerType: null,
+        data: assign({}, data, {
+          [colorPickerType.name]: colorPickerType.defaultValue,
+          customColor: newCustomColor
+        })
+      });
+    }
   }
 
   onCancelCustomColor() {
     this.setState({ colorPickerType: null });
   }
 
-  onRemoveCustomColor() {
-    const { customColor, colorPickerType } = this.state;
-    const newCustomColor = assign({}, customColor);
-    delete newCustomColor[colorPickerType];
-    this.setState({
-      colorPickerType: null
-    });
-    if (this.state[`${colorPickerType}Color`] === customColor[colorPickerType]) {
-      this.onChange(`${colorPickerType}Color`, Colors[colorPickerType][0]);
-    }
-    this.onChange('customColor', newCustomColor);
-  }
-
   render() {
-    const { showSettingMenu, colorPickerType, customColor } = this.state;
+    const { showSettingMenu, colorPickerType, data, pause } = this.state;
+    const { customColor } = data;
     return (
       <div className='app-container'>
         <ColorPicker
           visible={!!colorPickerType}
           onChange={this.onChangeCustomColor}
           onCancel={this.onCancelCustomColor}
-          {...(colorPickerType && customColor[colorPickerType] ? {
-            rgb: customColor[colorPickerType].value
+          {...(colorPickerType && customColor[colorPickerType.name] ? {
+            value: customColor[colorPickerType.name].value
           } : null)}
-          onRemove={colorPickerType && customColor[colorPickerType] ? this.onRemoveCustomColor : null}
         />
         <div
           className={classNames('tools', {
@@ -190,7 +199,7 @@ export default class App extends Component {
             onChange={this.onChange}
             onToggle={this.toggleSettingMenu}
             onEditCustomColor={this.onEditCustomColor}
-            {...this.state}
+            data={data}
           />
         </div>
         <Camera
@@ -199,7 +208,8 @@ export default class App extends Component {
               this.camera = ref;
             }
           }}
-          {...this.state}
+          {...data}
+          pause={pause}
           onClick={this.onClickCamera}
           onUpdate={this.onUpdate}
         />

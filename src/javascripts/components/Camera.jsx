@@ -32,9 +32,9 @@ export default class Camera extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.baseColor !== this.props.baseColor
-      || nextProps.drawingColor !== this.props.drawingColor
-      || nextProps.matColor !== this.props.matColor
+    return nextProps.base !== this.props.base
+      || nextProps.drawing !== this.props.drawing
+      || nextProps.mat !== this.props.mat
       || nextProps.contrast !== this.props.contrast
       || nextProps.contrastThreshold !== this.props.contrastThreshold
       || nextProps.inversion !== this.props.inversion
@@ -78,7 +78,7 @@ export default class Camera extends Component {
   update() {
     if (!this.worker || !this.hasPostedToWorker) {
       const { width, height } = this.state;
-      const { baseColor, drawingColor, contrast, contrastThreshold, inversion, onUpdate } = this.props;
+      const { base, drawing, contrast, contrastThreshold, inversion, onUpdate } = this.props;
       const videoWidth = this.video.videoWidth;
       const videoHeight = this.video.videoHeight;
       const context = (this.dummyCanvas || this.canvas).getContext('2d');
@@ -94,8 +94,8 @@ export default class Camera extends Component {
         this.hasPostedToWorker = true;
         this.worker.postMessage({
           imageData,
-          baseColor,
-          drawingColor,
+          base,
+          drawing,
           inversion,
           contrast,
           contrastThreshold,
@@ -123,9 +123,9 @@ export default class Camera extends Component {
           luminance /= 255;
           luminance = Math.max(0, Math.min(1, luminance));
           luminance = inversion ? (1 - luminance) : luminance;
-          data[i] = Math.round(luminance * baseColor.value[0] + (1 - luminance) * drawingColor.value[0]);
-          data[i + 1] = Math.round(luminance * baseColor.value[1] + (1 - luminance) * drawingColor.value[1]);
-          data[i + 2] = Math.round(luminance * baseColor.value[2] + (1 - luminance) * drawingColor.value[2]);
+          data[i] = Math.round(luminance * base.value[0] + (1 - luminance) * drawing.value[0]);
+          data[i + 1] = Math.round(luminance * base.value[1] + (1 - luminance) * drawing.value[1]);
+          data[i + 2] = Math.round(luminance * base.value[2] + (1 - luminance) * drawing.value[2]);
         }
         context.putImageData(imageData, 0, 0);
         onUpdate(luminanceData);
@@ -162,14 +162,14 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
-    // window.setTimeout(() => {
-    //   this.pause();
-    // }, 2000);
+    window.setTimeout(() => {
+      this.pause();
+    }, 2000);
   }
 
   render() {
     const { init, width, height } = this.state;
-    const { onClick, pause, flip, matColor, clipSize, clipRatio, matThickness } = this.props;
+    const { onClick, pause, flip, mat, clipSize, clipRatio, matThickness } = this.props;
     return (
       <div
         className={classNames('camera', {
@@ -197,7 +197,7 @@ export default class Camera extends Component {
           clipSize={clipSize}
           clipRatio={clipRatio}
           thickness={matThickness}
-          color={matColor}
+          color={mat}
         >
           <canvas
             ref={(ref) => {
@@ -228,9 +228,9 @@ export default class Camera extends Component {
 }
 
 Camera.propTypes = {
-  baseColor: PropTypes.object.isRequired,
-  drawingColor: PropTypes.object.isRequired,
-  matColor: PropTypes.object,
+  base: PropTypes.object.isRequired,
+  drawing: PropTypes.object.isRequired,
+  mat: PropTypes.object,
   contrast: PropTypes.number.isRequired,
   contrastThreshold: PropTypes.number.isRequired,
   inversion: PropTypes.bool.isRequired,
