@@ -34,7 +34,8 @@ export default [
           ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
         ],
         max: 255,
-        min: 50
+        min: 50,
+        composite: 'overlay'
       },
       {
         value: [
@@ -44,7 +45,8 @@ export default [
           ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
         ],
         max: 50,
-        min: 0
+        min: 0,
+        composite: 'overlay'
       }
     ]
   },
@@ -59,7 +61,8 @@ export default [
           ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.4)']
         ],
         max: 255,
-        min: 50
+        min: 50,
+        composite: 'overlay',
       },
       {
         value: [
@@ -69,7 +72,8 @@ export default [
           ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.4)']
         ],
         max: 50,
-        min: 0
+        min: 0,
+        composite: 'overlay'
       }
     ]
   },
@@ -84,7 +88,8 @@ export default [
           ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)', 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.8)']
         ],
         max: 255,
-        min: 50
+        min: 50,
+        composite: 'hard-light'
       },
       {
         value: [
@@ -94,7 +99,8 @@ export default [
           ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.8)']
         ],
         max: 50,
-        min: 0
+        min: 0,
+        composite: 'hard-light'
       }
     ]
   }

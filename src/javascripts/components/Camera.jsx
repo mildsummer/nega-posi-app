@@ -157,9 +157,9 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
-    // window.setTimeout(() => {
-    //   this.pause();
-    // }, 2000);
+    window.setTimeout(() => {
+      this.pause();
+    }, 2000);
   }
 
   getImage(callback) {

@@ -191,6 +191,7 @@ export default class PictureFrame extends Component {
         );
       }
       if (bezel) {
+        context.globalCompositeOperation = bezel.composite || 'source-over';
         for (let i = 0; i < 4; i++) {
           const bezelGradient = context.createLinearGradient(
             [500, frameWidth, 0, 0][i],
@@ -212,8 +213,8 @@ export default class PictureFrame extends Component {
           );
         }
       }
-      context.globalCompositeOperation = 'source-over';
       if (gradientItem) {
+        context.globalCompositeOperation = gradientItem.composite || 'source-over';
         for (let i = 0; i < 4; i++) {
           const isVertical = i === 1 || i === 3;
           const gradient = context.createLinearGradient(0, 0, isVertical ? 0 : frameWidth, isVertical ? frameHeight : 0);
@@ -231,6 +232,7 @@ export default class PictureFrame extends Component {
           );
         }
       }
+      context.globalCompositeOperation = 'source-over';
     }
   }
 
