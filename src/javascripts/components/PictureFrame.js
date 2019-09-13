@@ -47,7 +47,7 @@ export default class PictureFrame extends Component {
   }
 
   get canvas() {
-    const { thickness, color } = this.props;
+    const { thickness, color, frame } = this.props;
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
@@ -95,7 +95,21 @@ export default class PictureFrame extends Component {
       context.closePath();
       context.fill();
       context.clearRect(leftTop[0], leftTop[1], clipWidth, clipHeight);
-    // } else {
+    }
+    if (frame) {
+      const frameBorderWidth = 25;
+      context.strokeStyle = `rgb(${frame.value.join(',')})`;
+      context.lineWidth = frameBorderWidth;
+      context.shadowOffsetX = 3;
+      context.shadowOffsetY = 5;
+      context.shadowBlur = 2;
+      context.shadowColor = 'rgba(20, 10, 0, 0.2)';
+      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 10;
+      context.shadowBlur = 5;
+      context.shadowColor = 'rgba(20, 10, 0, 0.1)';
+      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
     }
     return canvas;
   }
