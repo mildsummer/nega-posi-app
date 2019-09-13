@@ -44,7 +44,6 @@ export default class App extends Component {
     this.onChange = this.onChange.bind(this);
     this.toggleSettingMenu = this.toggleSettingMenu.bind(this);
     this.hideSettingMenu = this.hideSettingMenu.bind(this);
-    this.onUpdate = this.onUpdate.bind(this);
     this.takePhoto = this.takePhoto.bind(this);
     this.togglePause = this.togglePause.bind(this);
     this.onClickCamera = this.onClickCamera.bind(this);
@@ -53,7 +52,6 @@ export default class App extends Component {
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
     this.state = {
       data: defaultData,
-      luminanceData: null,
       showSettingMenu: false,
       pause: false,
       colorPickerType: null
@@ -72,7 +70,7 @@ export default class App extends Component {
   onChange(value, optionItem) {
     const { data } = this.state;
     const isColor = optionItem.type === OPTION_TYPE_COLOR;
-    this.setState({ data: assign(data, { [optionItem.name]: value }) });
+    this.setState({ data: assign({}, data, { [optionItem.name]: value }) });
     if (isColor) {
       if (value) {
         Storage.setItem(optionItem.name, value.name);
@@ -91,10 +89,6 @@ export default class App extends Component {
 
   hideSettingMenu() {
     this.setState({ showSettingMenu: false });
-  }
-
-  onUpdate(luminanceData) {
-    this.setState({ luminanceData });
   }
 
   takePhoto() {
@@ -208,10 +202,9 @@ export default class App extends Component {
               this.camera = ref;
             }
           }}
-          {...data}
+          data={data}
           pause={pause}
           onClick={this.onClickCamera}
-          onUpdate={this.onUpdate}
         />
       </div>
     );

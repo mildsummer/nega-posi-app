@@ -38,6 +38,7 @@
     "color-convert": "^2.0.1",
     "lodash.assign": "^4.2.0",
     "lodash.find": "^4.6.0",
+    "lodash.isequal": "^4.5.0",
     "lodash.max": "^4.0.1",
     "lodash.throttle": "^4.1.1",
     "prop-types": "^15.6.2",

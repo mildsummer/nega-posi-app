@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import assign from 'lodash.assign';
+import isEqual from 'lodash.isequal';
 
 // utils
 const { pow, sqrt } = Math;
@@ -34,6 +35,11 @@ class Tap extends Component {
       touchStartY: 0
     };
     this.timers = [];
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(nextProps, this.props)
+      || !isEqual(nextState, this.state)
   }
 
   /**

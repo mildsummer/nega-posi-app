@@ -9,6 +9,7 @@ const { min, max } = Math;
 const rgbToHsv = color.rgb.hsv;
 const hsvToRgb = color.hsv.rgb;
 const zeroToOne = (value) => (min(1, max(0, value)));
+const DEFAULT_VALUE = [0, 0, 0];
 
 export default class ColorPicker extends Component {
   constructor(props) {
@@ -23,7 +24,7 @@ export default class ColorPicker extends Component {
     this.onPanStartHue = this.onPanStartHue.bind(this);
     this.onPanHue = this.onPanHue.bind(this);
     this.onPanEndHue = this.onPanEndHue.bind(this);
-    const hsv = rgbToHsv(props.value);
+    const hsv = rgbToHsv(props.value || DEFAULT_VALUE);
     this.state = {
       h: zeroToOne(hsv[0]),
       s: zeroToOne(hsv[1]),
@@ -31,9 +32,20 @@ export default class ColorPicker extends Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.shouldUpdate(nextProps, nextState);
+  }
+
+  shouldUpdate(nextProps, nextState) {
+    return nextProps.visible !== this.props.visible
+    || nextState.h !== this.state.h
+    || nextState.s !== this.state.s
+    || nextState.v !== this.state.v;
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible && !this.props.visible) {
-      const hsv = rgbToHsv(nextProps.value);
+      const hsv = rgbToHsv(nextProps.value || DEFAULT_VALUE);
       this.setState({
         h: zeroToOne(hsv[0] / 360),
         s: zeroToOne(hsv[1] / 100),
@@ -234,10 +246,6 @@ export default class ColorPicker extends Component {
     );
   }
 }
-
-ColorPicker.defaultProps = {
-  value: [0, 0, 0]
-};
 
 ColorPicker.propTypes = {
   value: PropTypes.arrayOf(PropTypes.number),

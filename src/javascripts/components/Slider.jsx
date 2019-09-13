@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Hammer from 'react-hammerjs';
 import throttle from 'lodash.throttle';
+import Histogram from './Histogram';
 
 export default class Slider extends Component {
   constructor(props) {
@@ -15,6 +16,10 @@ export default class Slider extends Component {
     this.state = {
       panning: false
     };
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.value !== this.props.value;
   }
 
   onPanStart() {
@@ -60,7 +65,7 @@ export default class Slider extends Component {
 
   render() {
     const { panning } = this.state;
-    const { value, max, min } = this.props;
+    const { value, max, min, histogram } = this.props;
     return (
       <div className='slider__wrapper'>
         <Hammer
@@ -111,6 +116,7 @@ export default class Slider extends Component {
                   width: `${100 * (value - min) / (max - min)}%`
                 }}
               />
+              {histogram ? <Histogram /> : null}
             </div>
           </div>
         </Hammer>
@@ -123,5 +129,6 @@ Slider.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
-  min: PropTypes.number.isRequired
+  min: PropTypes.number.isRequired,
+  histogram: PropTypes.bool
 };

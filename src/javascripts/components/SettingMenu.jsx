@@ -5,8 +5,12 @@ import SettingMenuItem from './SettingMenuItem';
 import Options from '../constants/Options';
 
 export default class SettingMenu extends Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.visible !== this.props.visible
+      || nextProps.data !== this.props.data;
+  }
+
   render() {
-    // const { visible, data, onToggle, luminanceData } = this.props;
     const { visible, data, onToggle, onChange, onEditCustomColor } = this.props;
     return (
       <div
@@ -53,6 +57,5 @@ SettingMenu.propTypes = {
   data: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onToggle: PropTypes.func.isRequired,
-  onEditCustomColor: PropTypes.func.isRequired,
-  luminanceData: PropTypes.arrayOf(PropTypes.number)
+  onEditCustomColor: PropTypes.func.isRequired
 };

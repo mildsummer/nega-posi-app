@@ -66,7 +66,8 @@ export default [
         max: CONTRAST_THRESHOLD_LENGTH,
         min: 0,
         required: true,
-        defaultValue: CONTRAST_THRESHOLD_LENGTH / 2
+        defaultValue: CONTRAST_THRESHOLD_LENGTH / 2,
+        histogram: true
       }
     ],
     reset: true

@@ -6,6 +6,15 @@ import { LUMINANCE_COEFFICIENT } from '../constants/General';
 const { min } = Math;
 
 export default class Frame extends Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.width !== this.props.width
+      || nextProps.height !== this.props.height
+      || nextProps.clipSize !== this.props.clipSize
+      || nextProps.clipRatio !== this.props.clipRatio
+      || nextProps.thickness !== this.props.thickness
+      || nextProps.color !== this.props.color;
+  }
+
   render() {
     const { width, height, clipSize, clipRatio, thickness, color, children } = this.props;
     const luminance = color ? (color.value[0] * LUMINANCE_COEFFICIENT[0]

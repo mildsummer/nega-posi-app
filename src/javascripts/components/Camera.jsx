@@ -5,6 +5,7 @@ import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
   LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
 import { getDevice, getMediaManifest } from '../utils/Utils';
+import HistogramManager from '../utils/HistogramManager';
 import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
 import Frame from './Frame';
 
@@ -32,16 +33,7 @@ export default class Camera extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.base !== this.props.base
-      || nextProps.drawing !== this.props.drawing
-      || nextProps.mat !== this.props.mat
-      || nextProps.contrast !== this.props.contrast
-      || nextProps.contrastThreshold !== this.props.contrastThreshold
-      || nextProps.inversion !== this.props.inversion
-      || nextProps.flip !== this.props.flip
-      || nextProps.clipSize !== this.props.clipSize
-      || nextProps.clipRatio !== this.props.clipRatio
-      || nextProps.matThickness !== this.props.matThickness
+    return nextProps.data !== this.props.data
       || nextProps.pause !== this.props.pause
       || nextState.width !== this.state.width
       || nextState.height !== this.state.height
@@ -78,7 +70,7 @@ export default class Camera extends Component {
   update() {
     if (!this.worker || !this.hasPostedToWorker) {
       const { width, height } = this.state;
-      const { base, drawing, contrast, contrastThreshold, inversion, onUpdate } = this.props;
+      const { base, drawing, contrast, contrastThreshold, inversion } = this.props.data;
       const videoWidth = this.video.videoWidth;
       const videoHeight = this.video.videoHeight;
       const context = (this.dummyCanvas || this.canvas).getContext('2d');
@@ -128,16 +120,15 @@ export default class Camera extends Component {
           data[i + 2] = Math.round(luminance * base.value[2] + (1 - luminance) * drawing.value[2]);
         }
         context.putImageData(imageData, 0, 0);
-        onUpdate(luminanceData);
+        HistogramManager.update(luminanceData);
       }
     }
   }
 
   onWorkerMessage(e) {
-    const { onUpdate } = this.props;
     const context = this.canvas.getContext('2d');
     context.putImageData(e.data.imageData, 0, 0);
-    onUpdate(e.data.luminanceData);
+    HistogramManager.update(e.data.luminanceData);
     this.hasPostedToWorker = false;
   }
 
@@ -162,14 +153,15 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
-    window.setTimeout(() => {
-      this.pause();
-    }, 2000);
+    // window.setTimeout(() => {
+    //   this.pause();
+    // }, 2000);
   }
 
   render() {
     const { init, width, height } = this.state;
-    const { onClick, pause, flip, mat, clipSize, clipRatio, matThickness } = this.props;
+    const { data, onClick, pause } = this.props;
+    const { flip, mat, clipSize, clipRatio, matThickness } = data;
     return (
       <div
         className={classNames('camera', {
@@ -228,18 +220,8 @@ export default class Camera extends Component {
 }
 
 Camera.propTypes = {
-  base: PropTypes.object.isRequired,
-  drawing: PropTypes.object.isRequired,
-  mat: PropTypes.object,
-  contrast: PropTypes.number.isRequired,
-  contrastThreshold: PropTypes.number.isRequired,
-  inversion: PropTypes.bool.isRequired,
-  flip: PropTypes.bool.isRequired,
-  clipSize: PropTypes.number,
-  clipRatio: PropTypes.number,
-  matThickness: PropTypes.number,
+  data: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,

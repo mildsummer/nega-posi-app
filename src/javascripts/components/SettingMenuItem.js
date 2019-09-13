@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import colorConvert from 'color-convert';
 import find from 'lodash.find';
+import isEqual from 'lodash.isequal';
 import ColorList from './ColorList';
 import Slider from './Slider';
 import Tap from './Tap';
@@ -14,6 +15,11 @@ export default class SettingMenuItem extends Component {
     this.reset = this.reset.bind(this);
     this.renderItem = this.renderItem.bind(this);
     this.onEditCustomColor = this.onEditCustomColor.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return !isEqual(nextProps.values, this.props.values)
+      || nextProps.customValue !== this.props.customValue;
   }
 
   onChange(item) {
@@ -69,6 +75,7 @@ export default class SettingMenuItem extends Component {
             max={item.max}
             min={item.min}
             onChange={this.onChange(item)}
+            histogram={item.histogram}
           />
         );
         break;
