@@ -163,42 +163,53 @@ export default class Camera extends Component {
   }
 
   getImage(callback) {
-    const { width, height } = this.state;
+    const { width, height } = this.state
     const { data } = this.props;
-    const { flip, mat } = data;
+    const { flip, mat, frame } = data;
     const { clipWidth, clipHeight } = this.frame.clipSize;
-    if (flip || mat) {
+    const { frameWidth, frameHeight } = this.frame.frameSize;
+    if (flip || mat || frame) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      canvas.width = width;
-      canvas.height = height;
       const imageObject = new Image();
       imageObject.onload = () => {
         if (flip) {
-          context.translate(width, 0);
+          if (frame) {
+            canvas.width = frameWidth;
+            canvas.height = frameHeight;
+            context.translate(frameWidth, 0);
+          } else {
+            canvas.width = width;
+            canvas.height = height;
+            context.translate(width, 0);
+          }
           context.scale(-1, 1);
         }
-        if (width / height > clipWidth / clipHeight) {
-          const clipSize = width * (clipHeight / height);
-          context.drawImage(
-            imageObject,
-            (width - clipWidth) / 2 - (clipSize - clipWidth) / 2,
-            (height - clipHeight) / 2,
-            clipSize,
-            clipHeight
-          );
+        if (mat || frame) {
+          if (width / height > clipWidth / clipHeight) {
+            const clipSize = width * (clipHeight / height);
+            context.drawImage(
+              imageObject,
+              (frameWidth - clipWidth) / 2 - (clipSize - clipWidth) / 2,
+              (frameHeight - clipHeight) / 2,
+              clipSize,
+              clipHeight
+            );
+          } else {
+            const clipSize = height * (clipWidth / width);
+            context.drawImage(
+              imageObject,
+              (frameWidth - clipWidth) / 2,
+              (frameHeight - clipHeight) / 2 - (clipSize - clipHeight) / 2,
+              clipWidth,
+              clipSize
+            );
+          }
+          context.resetTransform();
+          context.drawImage(this.frame.canvas, 0, 0);
         } else {
-          const clipSize = height * (clipWidth / width);
-          context.drawImage(
-            imageObject,
-            (width - clipWidth) / 2,
-            (height - clipHeight) / 2 - (clipSize - clipHeight) / 2,
-            clipWidth,
-            clipSize
-          );
+          context.drawImage(imageObject, 0, 0);
         }
-        context.resetTransform();
-        context.drawImage(this.frame.canvas, 0, 0);
         callback(canvas.toDataURL('image/jpeg'));
       };
       imageObject.src = this.canvas.toDataURL();
@@ -210,7 +221,7 @@ export default class Camera extends Component {
   render() {
     const { init, width, height } = this.state;
     const { data, onClick, pause } = this.props;
-    const { flip, mat, clipWidth, clipHeight, matThickness } = data;
+    const { flip, mat, clipWidth, clipHeight, matThickness, frame, frameRatio } = data;
     return (
       <div
         className={classNames('camera', {
@@ -244,6 +255,8 @@ export default class Camera extends Component {
           clipHeight={clipHeight}
           thickness={matThickness}
           color={mat}
+          frame={frame}
+          frameRatio={frameRatio}
         >
           <canvas
             ref={(ref) => {

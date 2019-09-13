@@ -115,4 +115,31 @@ export default [
     ],
     reset: true
   },
+  {
+    name: 'Frame',
+    items: [
+      {
+        name: 'frame',
+        type: OPTION_TYPE_COLOR,
+        options: Colors.mat,
+        required: false,
+        defaultValue: null
+      }
+    ],
+    customColor: true
+  },
+  {
+    name: 'Frame ratio',
+    items: [
+      {
+        name: 'frameRatio',
+        type: OPTION_TYPE_NUMBER,
+        max: 2,
+        min: 0.5,
+        required: true,
+        defaultValue: (window.innerHeight / window.innerWidth)
+      }
+    ],
+    reset: true
+  }
 ];

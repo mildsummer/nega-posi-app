@@ -231,5 +231,6 @@ const Colors = {
 
 Colors.base = Colors.base.concat(Colors.drawing);
 Colors.mat = Colors.base.concat();
+Colors.frame = Colors.base.concat();
 
 export default Colors;
