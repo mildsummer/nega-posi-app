@@ -48,7 +48,9 @@ export default class PictureFrame extends Component {
       || nextProps.frameRatio !== this.props.frameRatio
       || nextProps.frame !== this.props.frame
       || nextProps.thickness !== this.props.thickness
-      || nextProps.color !== this.props.color;
+      || nextProps.color !== this.props.color
+      || nextProps.base !== this.props.base
+      || nextProps.margin !== this.props.margin;
   }
 
   componentDidMount() {
@@ -85,6 +87,15 @@ export default class PictureFrame extends Component {
     return {
       clipWidth: color ? frameWidth * clipWidth : frameWidth,
       clipHeight: color ? frameHeight * clipHeight : frameHeight
+    };
+  }
+
+  get marginedSize() {
+    const { margin } = this.props;
+    const { clipWidth, clipHeight } = this.clipSize;
+    return {
+      clipWidth: clipWidth - margin * 2,
+      clipHeight: clipHeight - margin * 2
     };
   }
 
@@ -133,7 +144,7 @@ export default class PictureFrame extends Component {
   }
 
   draw() {
-    const { thickness, color, frame } = this.props;
+    const { thickness, color, frame, base, margin } = this.props;
     const canvas = this.canvas;
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
@@ -155,7 +166,18 @@ export default class PictureFrame extends Component {
           1
         );
       }
-      context.clearRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+      if (margin) {
+        context.fillStyle = `rgb(${base.value.join(',')})`;
+        context.fillRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+        context.clearRect(
+          (frameWidth - clipWidth) / 2 + margin,
+          (frameHeight - clipHeight) / 2 + margin,
+          clipWidth - margin * 2,
+          clipHeight - margin * 2
+        );
+      } else {
+        context.clearRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+      }
     }
 
     // frame
@@ -225,9 +247,10 @@ export default class PictureFrame extends Component {
   }
 
   render() {
-    const { color, frame, children } = this.props;
+    const { color, frame, base, children, margin } = this.props;
     const { clipWidth, clipHeight } = this.clipSize;
     const { frameWidth, frameHeight } = this.frameSize;
+    const padding = frame && !color ? FRAME_BORDER_WIDTH : 0;
     return (
       <div className='frame__wrapper'>
         <div
@@ -253,7 +276,8 @@ export default class PictureFrame extends Component {
               style={{
                 width: `${clipWidth}px`,
                 height: `${clipHeight}px`,
-                padding: frame && !color ? FRAME_BORDER_WIDTH : 0
+                padding: padding + margin,
+                backgroundColor: `rgb(${base.value.join(',')})`
               }}
             >
               <div className='frame__inner'>
@@ -276,5 +300,7 @@ PictureFrame.propTypes = {
   frameRatio: PropTypes.number,
   thickness: PropTypes.number,
   color: PropTypes.object,
+  base: PropTypes.object,
+  margin: PropTypes.number.isRequired,
   children: PropTypes.any.isRequired
 };

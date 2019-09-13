@@ -116,6 +116,19 @@ export default [
     reset: true
   },
   {
+    name: 'Margin',
+    items: [
+      {
+        name: 'margin',
+        type: OPTION_TYPE_NUMBER,
+        max: 100,
+        min: 0,
+        required: true,
+        defaultValue: 0
+      }
+    ]
+  },
+  {
     name: 'Frame',
     items: [
       {

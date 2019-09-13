@@ -157,16 +157,16 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
-    window.setTimeout(() => {
-      this.pause();
-    }, 2000);
+    // window.setTimeout(() => {
+    //   this.pause();
+    // }, 2000);
   }
 
   getImage(callback) {
     const { width, height } = this.state;
     const { data } = this.props;
     const { flip, mat, frame } = data;
-    const { clipWidth, clipHeight } = this.frame.clipSize;
+    const { clipWidth, clipHeight } = this.frame.marginedSize;
     const { frameWidth, frameHeight } = this.frame.frameSize;
     if (flip || mat || frame) {
       const canvas = document.createElement('canvas');
@@ -215,7 +215,7 @@ export default class Camera extends Component {
   render() {
     const { init, width, height } = this.state;
     const { data, onClick, pause } = this.props;
-    const { flip, mat, clipWidth, clipHeight, matThickness, frame, frameRatio } = data;
+    const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin } = data;
     return (
       <div
         className={classNames('camera', {
@@ -251,6 +251,8 @@ export default class Camera extends Component {
           color={mat}
           frame={frame}
           frameRatio={frameRatio}
+          base={base}
+          margin={margin}
         >
           <canvas
             ref={(ref) => {
