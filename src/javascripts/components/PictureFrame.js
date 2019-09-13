@@ -141,6 +141,46 @@ export default class PictureFrame extends Component {
       if (margin) {
         context.fillStyle = `rgb(${base.value.join(',')})`;
         context.fillRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+
+        ///// plate mark
+        if (margin > 8) {
+          context.shadowOffsetX = 0;
+          context.shadowOffsetY = 0;
+          context.shadowBlur = 3;
+          context.shadowColor = 'rgba(0, 0, 0, 0.08)';
+          const gradient = context.createLinearGradient(
+            (frameWidth - clipWidth) / 2 + margin - 3,
+            (frameHeight - clipHeight) / 2 + margin - 3,
+            (frameWidth - clipWidth) / 2 + margin - 6 + clipWidth - margin * 2 + 6,
+            (frameHeight - clipHeight) / 2 + margin - 6 + clipHeight - margin * 2 + 6
+          );
+          context.fillRect(
+            (frameWidth - clipWidth) / 2 + margin - 3,
+            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipWidth - margin * 2 + 6,
+            clipHeight - margin * 2 + 6
+          );
+          gradient.addColorStop(0, 'rgba(0, 0, 0, 0.02)');
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          context.strokeStyle = gradient;
+          context.lineWidth = 2;
+          context.lineJoin = 'round';
+          context.strokeRect(
+            (frameWidth - clipWidth) / 2 + margin - 3,
+            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipWidth - margin * 2 + 6,
+            clipHeight - margin * 2 + 6
+          );
+          context.fillStyle = 'rgb(0, 0, 0, 0.02)';
+          context.fillRect(
+            (frameWidth - clipWidth) / 2 + margin - 3,
+            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipWidth - margin * 2 + 6,
+            clipHeight - margin * 2 + 6
+          );
+        }
+        /////
+
         context.clearRect(
           (frameWidth - clipWidth) / 2 + margin,
           (frameHeight - clipHeight) / 2 + margin,
@@ -240,7 +280,6 @@ export default class PictureFrame extends Component {
     const { color, frame, base, children, margin } = this.props;
     const { clipWidth, clipHeight } = this.clipSize;
     const { frameWidth, frameHeight } = this.frameSize;
-    const padding = frame ? FRAME_BORDER_WIDTH : 0;
     return (
       <div className='frame__wrapper'>
         <div
@@ -266,7 +305,7 @@ export default class PictureFrame extends Component {
               style={{
                 width: `${clipWidth}px`,
                 height: `${clipHeight}px`,
-                padding: padding + margin,
+                padding: margin,
                 backgroundColor: `rgb(${base.value.join(',')})`
               }}
             >
