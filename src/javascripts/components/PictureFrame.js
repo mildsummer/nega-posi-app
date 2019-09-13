@@ -190,7 +190,6 @@ export default class PictureFrame extends Component {
           1
         );
       }
-      context.globalCompositeOperation = 'overlay';
       if (bezel) {
         for (let i = 0; i < 4; i++) {
           const bezelGradient = context.createLinearGradient(
@@ -239,7 +238,7 @@ export default class PictureFrame extends Component {
     const { color, frame, base, children, margin } = this.props;
     const { clipWidth, clipHeight } = this.clipSize;
     const { frameWidth, frameHeight } = this.frameSize;
-    const padding = frame && !color ? FRAME_BORDER_WIDTH : 0;
+    const padding = frame ? FRAME_BORDER_WIDTH : 0;
     return (
       <div className='frame__wrapper'>
         <div
