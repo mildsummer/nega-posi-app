@@ -163,7 +163,7 @@ export default class Camera extends Component {
   }
 
   getImage(callback) {
-    const { width, height } = this.state
+    const { width, height } = this.state;
     const { data } = this.props;
     const { flip, mat, frame } = data;
     const { clipWidth, clipHeight } = this.frame.clipSize;
@@ -173,16 +173,10 @@ export default class Camera extends Component {
       const context = canvas.getContext('2d');
       const imageObject = new Image();
       imageObject.onload = () => {
+        canvas.width = frameWidth;
+        canvas.height = frameHeight;
         if (flip) {
-          if (frame) {
-            canvas.width = frameWidth;
-            canvas.height = frameHeight;
-            context.translate(frameWidth, 0);
-          } else {
-            canvas.width = width;
-            canvas.height = height;
-            context.translate(width, 0);
-          }
+          context.translate(frameWidth, 0);
           context.scale(-1, 1);
         }
         if (mat || frame) {

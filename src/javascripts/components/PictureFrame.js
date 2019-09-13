@@ -1,12 +1,43 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import assign from 'lodash.assign';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
 
 const BORDER_COLORS = {
-  light: ['rgba(0, 0, 0, 0.45)', 'rgba(0, 0, 0, 0.25)', 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0.25)'],
+  light: ['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.15)', 'rgba(0, 0, 0, 0.03)', 'rgba(0, 0, 0, 0.15)'],
   dark: ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.13)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.13)']
 };
+
+const FRAME_GRADIENTS = {
+  light: [
+    ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.03)'],
+    ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.08)'],
+    ['rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.13)'],
+    ['rgba(0, 0, 0, 0.03)', 'rgba(0, 0, 0, 0.06)']
+  ],
+  dark: [
+    ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.1)'],
+    ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.1)'],
+    ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.0)'],
+    ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.07)']
+  ]
+};
+
+const FRAME_BEZEL_GRADIENTS = {
+  light: [
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
+  ],
+  dark: [
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
+  ]
+};
+
+const FRAME_BORDER_WIDTH = 25;
 
 export default class PictureFrame extends Component {
   shouldComponentUpdate(nextProps) {
@@ -20,6 +51,14 @@ export default class PictureFrame extends Component {
       || nextProps.color !== this.props.color;
   }
 
+  componentDidMount() {
+    this.draw();
+  }
+
+  componentDidUpdate() {
+    this.draw();
+  }
+
   get color() {
     const { color } = this.props;
     return {
@@ -27,6 +66,16 @@ export default class PictureFrame extends Component {
       luminance: (color && (color.value[0] * LUMINANCE_COEFFICIENT[0]
         + color.value[1] * LUMINANCE_COEFFICIENT[1]
         + color.value[2] * LUMINANCE_COEFFICIENT[2])) < 50 ? 'dark' : 'light'
+    };
+  }
+
+  get frameColor() {
+    const { frame } = this.props;
+    return {
+      colorString: frame ? `rgb(${frame.value.join(',')})` : null,
+      luminance: (frame && (frame.value[0] * LUMINANCE_COEFFICIENT[0]
+        + frame.value[1] * LUMINANCE_COEFFICIENT[1]
+        + frame.value[2] * LUMINANCE_COEFFICIENT[2])) < 50 ? 'dark' : 'light'
     };
   }
 
@@ -46,9 +95,46 @@ export default class PictureFrame extends Component {
     return { frameWidth, frameHeight };
   }
 
-  get canvas() {
+  drawBorder(context, position, x, y, width, height, borderWidth, borderStyle, inset) {
+    const leftTop = [x, y];
+    const rightTop = [x + width, y];
+    const rightBottom = [x + width, y + height];
+    const leftBottom = [x, y + height];
+    context.fillStyle = borderStyle;
+    context.beginPath();
+    switch (position) {
+      case 0:
+        context.moveTo(leftTop[0] - borderWidth, leftTop[1] - borderWidth);
+        context.lineTo(rightTop[0] + borderWidth, rightTop[1] - borderWidth);
+        context.lineTo(rightTop[0] - inset, rightTop[1] + inset);
+        context.lineTo(leftTop[0] + inset, leftTop[1] + inset);
+        break;
+      case 1:
+        context.moveTo(rightTop[0] + borderWidth, rightTop[1] - borderWidth);
+        context.lineTo(rightBottom[0] + borderWidth, rightBottom[1] + borderWidth);
+        context.lineTo(rightBottom[0] - inset, rightBottom[1] - inset);
+        context.lineTo(rightTop[0] - inset, rightTop[1] + inset);
+        break;
+      case 2:
+        context.moveTo(rightBottom[0] + borderWidth, rightBottom[1] + borderWidth);
+        context.lineTo(leftBottom[0] - borderWidth, leftBottom[1] + borderWidth);
+        context.lineTo(leftBottom[0] + inset, leftBottom[1] - inset);
+        context.lineTo(rightBottom[0] - inset, rightBottom[1] - inset);
+        break;
+      case 3:
+        context.moveTo(leftBottom[0] - borderWidth, leftBottom[1] + borderWidth);
+        context.lineTo(leftBottom[0] + inset, leftBottom[1] - inset);
+        context.lineTo(leftTop[0] + inset, leftTop[1] + inset);
+        context.lineTo(leftTop[0] - borderWidth, leftTop[1] - borderWidth);
+        break;
+    }
+    context.closePath();
+    context.fill();
+  }
+
+  draw() {
     const { thickness, color, frame } = this.props;
-    const canvas = document.createElement('canvas');
+    const canvas = this.canvas;
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
     const { frameWidth, frameHeight } = this.frameSize;
@@ -56,93 +142,118 @@ export default class PictureFrame extends Component {
     canvas.width = frameWidth;
     canvas.height = frameHeight;
     if (color) {
-      const leftTop = [(frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2];
-      const rightTop = [(frameWidth - clipWidth) / 2 + clipWidth, (frameHeight - clipHeight) / 2];
-      const rightBottom = [(frameWidth - clipWidth) / 2 + clipWidth, (frameHeight - clipHeight) / 2 + clipHeight];
-      const leftBottom = [(frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2 + clipHeight];
       context.fillStyle = colorString;
       context.fillRect(0, 0, frameWidth, frameHeight);
-      context.fillStyle = BORDER_COLORS[luminance][0];
-      context.beginPath();
-      context.moveTo(leftTop[0] - thickness, leftTop[1] - thickness);
-      context.lineTo(rightTop[0] + thickness, rightTop[1] - thickness);
-      context.lineTo(rightTop[0] - 1, rightTop[1] + 1);
-      context.lineTo(leftTop[0] + 1, leftTop[1] + 1);
-      context.closePath();
-      context.fill();
-      context.fillStyle = BORDER_COLORS[luminance][1];
-      context.beginPath();
-      context.moveTo(rightTop[0] + thickness, rightTop[1] - thickness);
-      context.lineTo(rightBottom[0] + thickness, rightBottom[1] + thickness);
-      context.lineTo(rightBottom[0] - 1, rightBottom[1] - 1);
-      context.lineTo(rightTop[0] - 1, rightTop[1] + 1);
-      context.closePath();
-      context.fill();
-      context.fillStyle = BORDER_COLORS[luminance][2];
-      context.beginPath();
-      context.moveTo(rightBottom[0] + thickness, rightBottom[1] + thickness);
-      context.lineTo(leftBottom[0] - thickness, leftBottom[1] + thickness);
-      context.lineTo(leftBottom[0] + 1, leftBottom[1] - 1);
-      context.lineTo(rightBottom[0] - thickness, rightBottom[1] - thickness);
-      context.closePath();
-      context.fill();
-      context.fillStyle = BORDER_COLORS[luminance][3];
-      context.beginPath();
-      context.moveTo(leftBottom[0] - thickness, leftBottom[1] + thickness);
-      context.lineTo(leftBottom[0] + 1, leftBottom[1] - 1);
-      context.lineTo(leftTop[0] + 1, leftTop[1] + 1);
-      context.lineTo(leftTop[0] - thickness, leftTop[1] - thickness);
-      context.closePath();
-      context.fill();
-      context.clearRect(leftTop[0], leftTop[1], clipWidth, clipHeight);
+      for (let i = 0; i < 4; i++) {
+        this.drawBorder(
+          context,
+          i,
+          (frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2,
+          clipWidth, clipHeight,
+          thickness,
+          BORDER_COLORS[luminance][i],
+          1
+        );
+      }
+      context.clearRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
     }
+
+    // frame
     if (frame) {
-      const frameBorderWidth = 25;
-      context.strokeStyle = `rgb(${frame.value.join(',')})`;
-      context.lineWidth = frameBorderWidth;
+      const frameColor = this.frameColor;
+      context.strokeStyle = frameColor.colorString;
+      context.lineWidth = FRAME_BORDER_WIDTH;
       context.shadowOffsetX = 3;
       context.shadowOffsetY = 5;
       context.shadowBlur = 2;
       context.shadowColor = 'rgba(20, 10, 0, 0.2)';
-      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
+      context.strokeRect(FRAME_BORDER_WIDTH / 2, FRAME_BORDER_WIDTH / 2, frameWidth - FRAME_BORDER_WIDTH, frameHeight - FRAME_BORDER_WIDTH);
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 10;
       context.shadowBlur = 5;
       context.shadowColor = 'rgba(20, 10, 0, 0.1)';
-      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
+      context.strokeRect(FRAME_BORDER_WIDTH / 2, FRAME_BORDER_WIDTH / 2, frameWidth - FRAME_BORDER_WIDTH, frameHeight - FRAME_BORDER_WIDTH);
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
+      context.shadowColor = '';
+      for (let i = 0; i < 4; i++) {
+        this.drawBorder(
+          context,
+          i,
+          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
+          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
+          25,
+          frameColor.colorString,
+          1
+        );
+        // context.globalCompositeOperation = 'overlay';
+        const bezel = context.createLinearGradient(
+          [0, frameWidth, 0, 0][i],
+          [0, 0, frameHeight, 0][i],
+          [0, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
+          [FRAME_BORDER_WIDTH, 0, frameHeight - FRAME_BORDER_WIDTH, 0][i]
+        );
+        FRAME_BEZEL_GRADIENTS[frameColor.luminance][i].forEach((stopColor, index) => {
+          bezel.addColorStop(index / (FRAME_BEZEL_GRADIENTS[frameColor.luminance][i].length - 1), stopColor);
+        });
+        this.drawBorder(
+          context,
+          i,
+          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
+          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
+          25,
+          bezel,
+          1
+        );
+        // context.globalCompositeOperation = '';
+        const isVertical = i === 1 || i === 3;
+        const gradient = context.createLinearGradient(0, 0, isVertical ? 0 : frameWidth, isVertical ? frameHeight : 0);
+        gradient.addColorStop(0, FRAME_GRADIENTS[frameColor.luminance][i][0]);
+        gradient.addColorStop(1, FRAME_GRADIENTS[frameColor.luminance][i][1]);
+        this.drawBorder(
+          context,
+          i,
+          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
+          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
+          25,
+          gradient,
+          1
+        );
+      }
     }
-    return canvas;
   }
 
   render() {
-    const { thickness, color, frame, children } = this.props;
-    const { colorString, luminance } = this.color;
+    const { color, frame, children } = this.props;
     const { clipWidth, clipHeight } = this.clipSize;
     const { frameWidth, frameHeight } = this.frameSize;
     return (
       <div className='frame__wrapper'>
         <div
           className='frame'
-          style={assign({
+          style={{
             width: `${frameWidth}px`,
-            height: `${frameHeight}px`,
-            backgroundColor: colorString
-          }, frame ? {
-            border: `solid 25px rgb(${frame.value.join(',')})`
-          } : null)}
+            height: `${frameHeight}px`
+          }}
         >
+          <canvas
+            ref={(ref) => {
+              if (ref) {
+                this.canvas = ref;
+              }
+            }}
+            className='frame__canvas'
+            width={frameWidth}
+            height={frameHeight}
+          />
           {color || frame ? (
             <div
               className='frame__clip'
               style={{
                 width: `${clipWidth}px`,
                 height: `${clipHeight}px`,
-                borderWidth: `${thickness}px`,
-                borderTopColor: BORDER_COLORS[luminance][0],
-                borderRightColor: BORDER_COLORS[luminance][1],
-                borderBottomColor: BORDER_COLORS[luminance][2],
-                borderLeftColor: BORDER_COLORS[luminance][3],
-                border: color ? null : 'none'
+                padding: frame && !color ? FRAME_BORDER_WIDTH : 0
               }}
             >
               <div className='frame__inner'>
