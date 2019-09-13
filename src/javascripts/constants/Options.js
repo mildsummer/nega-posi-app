@@ -86,10 +86,10 @@ export default [
     customColor: true
   },
   {
-    name: 'Mat size / ratio / thickness',
+    name: 'Clipping size / Mat thickness',
     items: [
       {
-        name: 'clipSize',
+        name: 'clipWidth',
         type: OPTION_TYPE_NUMBER,
         max: 1,
         min: 0,
@@ -97,12 +97,12 @@ export default [
         defaultValue: 0.5
       },
       {
-        name: 'clipRatio',
+        name: 'clipHeight',
         type: OPTION_TYPE_NUMBER,
         max: 1,
-        min: -1,
+        min: 0,
         required: true,
-        defaultValue: 0
+        defaultValue: 0.5
       },
       {
         name: 'matThickness',

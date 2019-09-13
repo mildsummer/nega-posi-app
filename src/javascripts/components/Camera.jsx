@@ -7,7 +7,7 @@ import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
 import { getDevice, getMediaManifest } from '../utils/Utils';
 import HistogramManager from '../utils/HistogramManager';
 import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
-import Frame from './Frame';
+import PictureFrame from './PictureFrame';
 
 const INTERVAL = 80;
 
@@ -32,12 +32,16 @@ export default class Camera extends Component {
     };
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldUpdate(nextProps, nextState) {
     return nextProps.data !== this.props.data
-      || nextProps.pause !== this.props.pause
-      || nextState.width !== this.state.width
-      || nextState.height !== this.state.height
-      || nextState.init !== this.state.init;
+    || nextProps.pause !== this.props.pause
+    || nextState.width !== this.state.width
+    || nextState.height !== this.state.height
+    || nextState.init !== this.state.init;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.shouldUpdate(nextProps, nextState);
   }
 
   componentDidMount() {
@@ -153,15 +157,60 @@ export default class Camera extends Component {
       this.tick = window.setInterval(this.update, INTERVAL);
       this.update();
     }
-    // window.setTimeout(() => {
-    //   this.pause();
-    // }, 2000);
+    window.setTimeout(() => {
+      this.pause();
+    }, 2000);
+  }
+
+  getImage(callback) {
+    const { width, height } = this.state;
+    const { data } = this.props;
+    const { flip, mat } = data;
+    const { clipWidth, clipHeight } = this.frame.clipSize;
+    if (flip || mat) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      const imageObject = new Image();
+      imageObject.onload = () => {
+        if (flip) {
+          context.translate(width, 0);
+          context.scale(-1, 1);
+        }
+        if (width / height > clipWidth / clipHeight) {
+          const clipSize = width * (clipHeight / height);
+          context.drawImage(
+            imageObject,
+            (width - clipWidth) / 2 - (clipSize - clipWidth) / 2,
+            (height - clipHeight) / 2,
+            clipSize,
+            clipHeight
+          );
+        } else {
+          const clipSize = height * (clipWidth / width);
+          context.drawImage(
+            imageObject,
+            (width - clipWidth) / 2,
+            (height - clipHeight) / 2 - (clipSize - clipHeight) / 2,
+            clipWidth,
+            clipSize
+          );
+        }
+        context.resetTransform();
+        context.drawImage(this.frame.canvas, 0, 0);
+        callback(canvas.toDataURL('image/jpeg'));
+      };
+      imageObject.src = this.canvas.toDataURL();
+    } else {
+      callback(this.canvas.toDataURL('image/jpeg'));
+    }
   }
 
   render() {
     const { init, width, height } = this.state;
     const { data, onClick, pause } = this.props;
-    const { flip, mat, clipSize, clipRatio, matThickness } = data;
+    const { flip, mat, clipWidth, clipHeight, matThickness } = data;
     return (
       <div
         className={classNames('camera', {
@@ -183,11 +232,16 @@ export default class Camera extends Component {
           playsInline
           autoPlay
         />
-        <Frame
+        <PictureFrame
+          ref={(ref) => {
+            if (ref) {
+              this.frame = ref;
+            }
+          }}
           width={width}
           height={height}
-          clipSize={clipSize}
-          clipRatio={clipRatio}
+          clipWidth={clipWidth}
+          clipHeight={clipHeight}
           thickness={matThickness}
           color={mat}
         >
@@ -201,7 +255,7 @@ export default class Camera extends Component {
             width={width}
             height={height}
           />
-        </Frame>
+        </PictureFrame>
         {this.worker ? (
           <canvas
             ref={(ref) => {
@@ -223,7 +277,5 @@ Camera.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
-  width: PropTypes.number,
-  height: PropTypes.number,
   init: PropTypes.bool
 };
