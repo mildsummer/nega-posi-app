@@ -215,7 +215,7 @@ export default class Camera extends Component {
   render() {
     const { init, width, height } = this.state;
     const { data, onClick, pause } = this.props;
-    const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType } = data;
+    const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
       <div
         className={classNames('camera', {
@@ -251,6 +251,7 @@ export default class Camera extends Component {
           color={mat}
           frame={frame}
           frameRatio={frameRatio}
+          frameBorderWidth={frameBorderWidth}
           base={base}
           margin={margin}
           frameType={frameType}

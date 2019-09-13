@@ -8,8 +8,6 @@ const BORDER_COLORS = {
   dark: ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.13)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.13)']
 };
 
-const FRAME_BORDER_WIDTH = 25;
-
 export default class PictureFrame extends Component {
   shouldComponentUpdate(nextProps) {
     return nextProps.width !== this.props.width
@@ -19,6 +17,7 @@ export default class PictureFrame extends Component {
       || nextProps.frameRatio !== this.props.frameRatio
       || nextProps.frameType !== this.props.frameType
       || nextProps.frame !== this.props.frame
+      || nextProps.frameBorderWidth !== this.props.frameBorderWidth
       || nextProps.thickness !== this.props.thickness
       || nextProps.color !== this.props.color
       || nextProps.base !== this.props.base
@@ -116,7 +115,7 @@ export default class PictureFrame extends Component {
   }
 
   draw() {
-    const { thickness, color, frame, base, margin, frameType } = this.props;
+    const { thickness, color, frame, base, margin, frameType, frameBorderWidth } = this.props;
     const canvas = this.canvas;
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
@@ -196,17 +195,17 @@ export default class PictureFrame extends Component {
     if (frame) {
       const frameColor = this.frameColor;
       context.strokeStyle = frameColor.colorString;
-      context.lineWidth = FRAME_BORDER_WIDTH;
+      context.lineWidth = frameBorderWidth;
       context.shadowOffsetX = 3;
       context.shadowOffsetY = 5;
       context.shadowBlur = 2;
       context.shadowColor = 'rgba(20, 10, 0, 0.2)';
-      context.strokeRect(FRAME_BORDER_WIDTH / 2, FRAME_BORDER_WIDTH / 2, frameWidth - FRAME_BORDER_WIDTH, frameHeight - FRAME_BORDER_WIDTH);
+      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 10;
       context.shadowBlur = 5;
       context.shadowColor = 'rgba(20, 10, 0, 0.1)';
-      context.strokeRect(FRAME_BORDER_WIDTH / 2, FRAME_BORDER_WIDTH / 2, frameWidth - FRAME_BORDER_WIDTH, frameHeight - FRAME_BORDER_WIDTH);
+      context.strokeRect(frameBorderWidth / 2, frameBorderWidth / 2, frameWidth - frameBorderWidth, frameHeight - frameBorderWidth);
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 0;
       context.shadowBlur = 0;
@@ -223,9 +222,9 @@ export default class PictureFrame extends Component {
         this.drawBorder(
           context,
           i,
-          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
-          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-          25,
+          frameBorderWidth, frameBorderWidth,
+          frameWidth - frameBorderWidth * 2, frameHeight - frameBorderWidth * 2,
+          frameBorderWidth,
           frameColor.colorString,
           1
         );
@@ -236,8 +235,8 @@ export default class PictureFrame extends Component {
           const bezelGradient = context.createLinearGradient(
             [500, frameWidth, 0, 0][i],
             [0, 0, frameHeight, 0][i],
-            [500, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
-            [FRAME_BORDER_WIDTH, 0, frameHeight - FRAME_BORDER_WIDTH, 0][i]
+            [500, frameWidth - frameBorderWidth, 0, frameBorderWidth][i],
+            [frameBorderWidth, 0, frameHeight - frameBorderWidth, 0][i]
           );
           bezel.value[i].forEach((stopColor, index) => {
             bezelGradient.addColorStop(index / (bezel.value[i].length - 1), stopColor);
@@ -245,9 +244,9 @@ export default class PictureFrame extends Component {
           this.drawBorder(
             context,
             i,
-            FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
-            frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-            FRAME_BORDER_WIDTH,
+            frameBorderWidth, frameBorderWidth,
+            frameWidth - frameBorderWidth * 2, frameHeight - frameBorderWidth * 2,
+            frameBorderWidth,
             bezelGradient,
             1
           );
@@ -264,9 +263,9 @@ export default class PictureFrame extends Component {
           this.drawBorder(
             context,
             i,
-            FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
-            frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-            FRAME_BORDER_WIDTH,
+            frameBorderWidth, frameBorderWidth,
+            frameWidth - frameBorderWidth * 2, frameHeight - frameBorderWidth * 2,
+            frameBorderWidth,
             gradient,
             1
           );
@@ -328,6 +327,7 @@ PictureFrame.propTypes = {
   frame: PropTypes.object,
   frameRatio: PropTypes.number,
   frameType: PropTypes.object,
+  frameBorderWidth: PropTypes.number,
   thickness: PropTypes.number,
   color: PropTypes.object,
   base: PropTypes.object,

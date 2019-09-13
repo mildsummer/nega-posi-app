@@ -109,7 +109,7 @@ export default [
       {
         name: 'matThickness',
         type: OPTION_TYPE_NUMBER,
-        max: 20,
+        max: 10,
         min: 0,
         required: true,
         defaultValue: 10
@@ -156,7 +156,7 @@ export default [
     ]
   },
   {
-    name: 'Frame ratio',
+    name: 'Frame ratio / width',
     items: [
       {
         name: 'frameRatio',
@@ -165,6 +165,14 @@ export default [
         min: 0.5,
         required: true,
         defaultValue: (window.innerHeight / window.innerWidth)
+      },
+      {
+        name: 'frameBorderWidth',
+        type: OPTION_TYPE_NUMBER,
+        max: 80,
+        min: 5,
+        required: true,
+        defaultValue: 20
       }
     ],
     reset: true
