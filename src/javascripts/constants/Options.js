@@ -129,12 +129,12 @@ export default [
     ]
   },
   {
-    name: 'Frame',
+    name: 'Frame color',
     items: [
       {
         name: 'frame',
         type: OPTION_TYPE_COLOR,
-        options: Colors.mat,
+        options: Colors.frame,
         required: false,
         defaultValue: null
       }
