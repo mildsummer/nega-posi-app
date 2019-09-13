@@ -3,6 +3,8 @@
   width: 100%
   text-align: center
   box-sizing: border-box
+  opacity: 0.6
+  transition: opacity 600ms ease
   &::before
     content: ''
     display: block
@@ -30,6 +32,7 @@
     transform-origin: right center
     transition: transform 300ms ease
   &--visible
+    opacity: 1
     &::before
       transform: translateY(5px) rotate(-45deg)
     &::after
