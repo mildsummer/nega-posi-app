@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import assign from 'lodash.assign';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
 
 const BORDER_COLORS = {
@@ -108,11 +109,13 @@ export default class PictureFrame extends Component {
       <div className='frame__wrapper'>
         <div
           className='frame'
-          style={{
+          style={assign({
             width: `${frameWidth}px`,
             height: `${frameHeight}px`,
             backgroundColor: colorString
-          }}
+          }, frame ? {
+            border: `solid 20px rgb(${frame.value.join(',')})`
+          } : null)}
         >
           {color || frame ? (
             <div
