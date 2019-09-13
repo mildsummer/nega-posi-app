@@ -1,40 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import find from 'lodash.find';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
 
 const BORDER_COLORS = {
   light: ['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.15)', 'rgba(0, 0, 0, 0.03)', 'rgba(0, 0, 0, 0.15)'],
   dark: ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.13)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.13)']
-};
-
-const FRAME_GRADIENTS = {
-  light: [
-    ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.03)'],
-    ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.08)'],
-    ['rgba(0, 0, 0, 0.08)', 'rgba(0, 0, 0, 0.13)'],
-    ['rgba(0, 0, 0, 0.03)', 'rgba(0, 0, 0, 0.06)']
-  ],
-  dark: [
-    ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.1)'],
-    ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.1)'],
-    ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.0)'],
-    ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.07)']
-  ]
-};
-
-const FRAME_BEZEL_GRADIENTS = {
-  light: [
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
-  ],
-  dark: [
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)']
-  ]
 };
 
 const FRAME_BORDER_WIDTH = 25;
@@ -46,6 +17,7 @@ export default class PictureFrame extends Component {
       || nextProps.clipWidth !== this.props.clipWidth
       || nextProps.clipHeight !== this.props.clipHeight
       || nextProps.frameRatio !== this.props.frameRatio
+      || nextProps.frameType !== this.props.frameType
       || nextProps.frame !== this.props.frame
       || nextProps.thickness !== this.props.thickness
       || nextProps.color !== this.props.color
@@ -75,9 +47,9 @@ export default class PictureFrame extends Component {
     const { frame } = this.props;
     return {
       colorString: frame ? `rgb(${frame.value.join(',')})` : null,
-      luminance: (frame && (frame.value[0] * LUMINANCE_COEFFICIENT[0]
+      luminance: frame && (frame.value[0] * LUMINANCE_COEFFICIENT[0]
         + frame.value[1] * LUMINANCE_COEFFICIENT[1]
-        + frame.value[2] * LUMINANCE_COEFFICIENT[2])) < 50 ? 'dark' : 'light'
+        + frame.value[2] * LUMINANCE_COEFFICIENT[2])
     };
   }
 
@@ -144,7 +116,7 @@ export default class PictureFrame extends Component {
   }
 
   draw() {
-    const { thickness, color, frame, base, margin } = this.props;
+    const { thickness, color, frame, base, margin, frameType } = this.props;
     const canvas = this.canvas;
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
@@ -199,6 +171,14 @@ export default class PictureFrame extends Component {
       context.shadowOffsetY = 0;
       context.shadowBlur = 0;
       context.shadowColor = '';
+      let bezel = null;
+      if (frameType.bezels) {
+        bezel = find(frameType.bezels, (item) => (item.max >= frameColor.luminance && item.min < frameColor.luminance));
+      }
+      let gradientItem = null;
+      if (frameType.gradients) {
+        gradientItem = find(frameType.gradients, (item) => (item.max >= frameColor.luminance && item.min < frameColor.luminance));
+      }
       for (let i = 0; i < 4; i++) {
         this.drawBorder(
           context,
@@ -209,39 +189,45 @@ export default class PictureFrame extends Component {
           frameColor.colorString,
           1
         );
-        // context.globalCompositeOperation = 'overlay';
-        const bezel = context.createLinearGradient(
-          [0, frameWidth, 0, 0][i],
-          [0, 0, frameHeight, 0][i],
-          [0, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
-          [FRAME_BORDER_WIDTH, 0, frameHeight - FRAME_BORDER_WIDTH, 0][i]
-        );
-        FRAME_BEZEL_GRADIENTS[frameColor.luminance][i].forEach((stopColor, index) => {
-          bezel.addColorStop(index / (FRAME_BEZEL_GRADIENTS[frameColor.luminance][i].length - 1), stopColor);
-        });
-        this.drawBorder(
-          context,
-          i,
-          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
-          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-          25,
-          bezel,
-          1
-        );
+        console.log(bezel, 'bezelItem');
+        if (bezel) {
+          // context.globalCompositeOperation = 'overlay';
+          const bezelGradient = context.createLinearGradient(
+            [0, frameWidth, 0, 0][i],
+            [0, 0, frameHeight, 0][i],
+            [0, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
+            [FRAME_BORDER_WIDTH, 0, frameHeight - FRAME_BORDER_WIDTH, 0][i]
+          );
+          bezel.value[i].forEach((stopColor, index) => {
+            bezelGradient.addColorStop(index / (bezel.value[i].length - 1), stopColor);
+          });
+          this.drawBorder(
+            context,
+            i,
+            FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
+            frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
+            25,
+            bezelGradient,
+            1
+          );
+        }
         // context.globalCompositeOperation = '';
-        const isVertical = i === 1 || i === 3;
-        const gradient = context.createLinearGradient(0, 0, isVertical ? 0 : frameWidth, isVertical ? frameHeight : 0);
-        gradient.addColorStop(0, FRAME_GRADIENTS[frameColor.luminance][i][0]);
-        gradient.addColorStop(1, FRAME_GRADIENTS[frameColor.luminance][i][1]);
-        this.drawBorder(
-          context,
-          i,
-          FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
-          frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-          25,
-          gradient,
-          1
-        );
+        if (gradientItem) {
+          const isVertical = i === 1 || i === 3;
+          const gradient = context.createLinearGradient(0, 0, isVertical ? 0 : frameWidth, isVertical ? frameHeight : 0);
+          gradientItem.value[i].forEach((stopColor, index) => {
+            gradient.addColorStop(index / (gradientItem.value[i].length - 1), stopColor);
+          });
+          this.drawBorder(
+            context,
+            i,
+            FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
+            frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
+            25,
+            gradient,
+            1
+          );
+        }
       }
     }
   }
@@ -298,6 +284,7 @@ PictureFrame.propTypes = {
   clipHeight: PropTypes.number,
   frame: PropTypes.object,
   frameRatio: PropTypes.number,
+  frameType: PropTypes.object,
   thickness: PropTypes.number,
   color: PropTypes.object,
   base: PropTypes.object,

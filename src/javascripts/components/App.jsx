@@ -7,7 +7,8 @@ import SettingMenu from './SettingMenu';
 import Tap from './Tap';
 import ColorPicker from './ColorPicker';
 import Colors from '../constants/Colors';
-import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR } from '../constants/Options';
+import FrameTypes from '../constants/FrameTypes';
+import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR, OPTION_TYPE_FRAME } from '../constants/Options';
 import Storage from '../utils/Storage';
 import { createCustomColor } from '../utils/Utils';
 
@@ -27,6 +28,11 @@ const defaultData = (() => {
             find(Colors[item.name].concat(data.customColor[item.name]), { name: Storage.getItem(item.name) })
             : item.defaultValue) || item.defaultValue;
           break;
+        case OPTION_TYPE_FRAME:
+          data[item.name] = (Storage.getItem(item.name) ?
+            find(FrameTypes, { name: Storage.getItem(item.name) })
+            : item.defaultValue) || item.defaultValue;
+          break;
         case OPTION_TYPE_NUMBER:
           data[item.name] = Storage.getItem(item.name) * 1 || item.defaultValue;
           break;
@@ -35,6 +41,7 @@ const defaultData = (() => {
       }
     });
   });
+  console.log(data);
   return data;
 })();
 
@@ -69,9 +76,9 @@ export default class App extends Component {
 
   onChange(value, optionItem) {
     const { data } = this.state;
-    const isColor = optionItem.type === OPTION_TYPE_COLOR;
+    const isName = optionItem.type === OPTION_TYPE_COLOR || optionItem.type === OPTION_TYPE_FRAME;
     this.setState({ data: assign({}, data, { [optionItem.name]: value }) });
-    if (isColor) {
+    if (isName) {
       if (value) {
         Storage.setItem(optionItem.name, value.name);
       } else {

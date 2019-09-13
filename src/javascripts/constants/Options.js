@@ -1,9 +1,11 @@
 import Colors from './Colors';
+import FrameTypes from './FrameTypes';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH } from './General';
 
 export const OPTION_TYPE_TOGGLE = 'toggle';
 export const OPTION_TYPE_COLOR = 'color';
 export const OPTION_TYPE_NUMBER = 'number';
+export const OPTION_TYPE_FRAME = 'frame';
 
 export default [
   {
@@ -140,6 +142,18 @@ export default [
       }
     ],
     customColor: true
+  },
+  {
+    name: 'Frame type',
+    items: [
+      {
+        name: 'frameType',
+        type: OPTION_TYPE_FRAME,
+        options: FrameTypes,
+        required: true,
+        defaultValue: FrameTypes[0]
+      }
+    ]
   },
   {
     name: 'Frame ratio',

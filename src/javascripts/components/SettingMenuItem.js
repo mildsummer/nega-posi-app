@@ -4,9 +4,10 @@ import colorConvert from 'color-convert';
 import find from 'lodash.find';
 import isEqual from 'lodash.isequal';
 import ColorList from './ColorList';
+import FrameList from './FrameList';
 import Slider from './Slider';
 import Tap from './Tap';
-import { OPTION_TYPE_TOGGLE, OPTION_TYPE_COLOR, OPTION_TYPE_NUMBER } from '../constants/Options';
+import { OPTION_TYPE_TOGGLE, OPTION_TYPE_COLOR, OPTION_TYPE_NUMBER, OPTION_TYPE_FRAME } from '../constants/Options';
 
 export default class SettingMenuItem extends Component {
   constructor(props) {
@@ -91,6 +92,20 @@ export default class SettingMenuItem extends Component {
             <Tap component='label' className={`setting-menu__toggle setting-menu__toggle--${item.name}`} htmlFor={item.name}>
               {value ? `disable ${item.name}` : item.name}
             </Tap>
+          </Fragment>
+        );
+        break;
+      case OPTION_TYPE_FRAME:
+        element = (
+          <Fragment key={item.name}>
+            <FrameList
+              data={item.options}
+              selected={value}
+              onChange={this.onChange(item)}
+            />
+            <p className='setting-menu__selected'>
+              {value ? value.name : 'NONE'}
+            </p>
           </Fragment>
         );
         break;
