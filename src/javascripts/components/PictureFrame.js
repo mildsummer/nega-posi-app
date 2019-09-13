@@ -114,7 +114,7 @@ export default class PictureFrame extends Component {
             height: `${frameHeight}px`,
             backgroundColor: colorString
           }, frame ? {
-            border: `solid 20px rgb(${frame.value.join(',')})`
+            border: `solid 25px rgb(${frame.value.join(',')})`
           } : null)}
         >
           {color || frame ? (

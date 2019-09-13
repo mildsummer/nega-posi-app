@@ -15,13 +15,14 @@ export default class Histogram extends Component {
   }
 
   update(data) {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.fillStyle = '#eeeeee';
+    const context = this.canvas.getContext('2d');
+    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    context.fillStyle = '#eeeeee';
     const maxValue = max(data);
     data.forEach((value, index) => {
       if (value) {
         const length = this.canvas.height * value / maxValue;
-        this.context.fillRect(index, this.canvas.height - length, 1, length);
+        context.fillRect(index, this.canvas.height - length, 1, length);
       }
     });
   }
