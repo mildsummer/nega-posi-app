@@ -189,13 +189,14 @@ export default class PictureFrame extends Component {
           frameColor.colorString,
           1
         );
-        console.log(bezel, 'bezelItem');
-        if (bezel) {
-          // context.globalCompositeOperation = 'overlay';
+      }
+      context.globalCompositeOperation = 'overlay';
+      if (bezel) {
+        for (let i = 0; i < 4; i++) {
           const bezelGradient = context.createLinearGradient(
-            [0, frameWidth, 0, 0][i],
+            [500, frameWidth, 0, 0][i],
             [0, 0, frameHeight, 0][i],
-            [0, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
+            [500, frameWidth - FRAME_BORDER_WIDTH, 0, FRAME_BORDER_WIDTH][i],
             [FRAME_BORDER_WIDTH, 0, frameHeight - FRAME_BORDER_WIDTH, 0][i]
           );
           bezel.value[i].forEach((stopColor, index) => {
@@ -206,13 +207,15 @@ export default class PictureFrame extends Component {
             i,
             FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
             frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-            25,
+            FRAME_BORDER_WIDTH,
             bezelGradient,
             1
           );
         }
-        // context.globalCompositeOperation = '';
-        if (gradientItem) {
+      }
+      context.globalCompositeOperation = 'source-over';
+      if (gradientItem) {
+        for (let i = 0; i < 4; i++) {
           const isVertical = i === 1 || i === 3;
           const gradient = context.createLinearGradient(0, 0, isVertical ? 0 : frameWidth, isVertical ? frameHeight : 0);
           gradientItem.value[i].forEach((stopColor, index) => {
@@ -223,7 +226,7 @@ export default class PictureFrame extends Component {
             i,
             FRAME_BORDER_WIDTH, FRAME_BORDER_WIDTH,
             frameWidth - FRAME_BORDER_WIDTH * 2, frameHeight - FRAME_BORDER_WIDTH * 2,
-            25,
+            FRAME_BORDER_WIDTH,
             gradient,
             1
           );
