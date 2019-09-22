@@ -16,9 +16,11 @@ export default class ARMode extends Component {
     this.onResize = this.onResize.bind(this);
     this.startAr = this.startAr.bind(this);
     this.update = this.update.bind(this);
+    this.toggleBlend = this.toggleBlend.bind(this);
     this.timer = null;
     this.state = {
-      isLoading: false
+      isLoading: false,
+      isBlend: false
     };
   }
 
@@ -38,7 +40,8 @@ export default class ARMode extends Component {
   }
 
   checkUpdate(nextProps, nextState) {
-    return this.state.isLoading !== nextState.isLoading;
+    return this.state.isLoading !== nextState.isLoading
+      || this.state.isBlend !== nextState.isBlend;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -219,23 +222,46 @@ export default class ARMode extends Component {
     }
   }
 
+  toggleBlend() {
+    const { isBlend } = this.state;
+    this.setState({ isBlend: !isBlend });
+  }
+
   get domElement() {
     return renderer.domElement;
   }
 
+  get isBlend() {
+    return this.state.isBlend;
+  }
+
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, isBlend } = this.state;
     return (
       <div
         className={classNames('ar-layer__wrapper', {
-          'ar-layer__wrapper--loading': isLoading
+          'ar-layer__wrapper--loading': isLoading,
+          'ar-layer__wrapper--blend': isBlend
         })}
         ref={(ref) => {
           if (ref) {
             this.wrapper = ref;
           }
         }}
-      />
+      >
+        <input
+          id='checkbox-blend'
+          type='checkbox'
+          checked={isBlend}
+          onChange={this.toggleBlend}
+        />
+        <label
+          className='ar-layer__blend-button'
+          htmlFor='checkbox-blend'
+        >
+          Blend
+        </label>
+      </div>
     );
   }
 }

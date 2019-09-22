@@ -20,6 +20,7 @@ export default class Camera extends Component {
     this.getImage = this.getImage.bind(this);
     this.onResize = this.onResize.bind(this);
     this.start = this.start.bind(this);
+    this.onClick = this.onClick.bind(this);
     this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
     this.ratio = this.isSP ? window.devicePixelRatio : 1;
@@ -244,6 +245,9 @@ export default class Camera extends Component {
       const h = videoHeight * (width / videoWidth);
       context.drawImage(this.video, 0, (height - h) / 2, width, h);
     }
+    if (this.ar.isBlend) {
+      context.globalCompositeOperation = 'multiply';
+    }
     context.drawImage(this.ar.domElement, 0, 0, width, height);
     return canvas.toDataURL('image/jpeg');
   }
@@ -266,12 +270,19 @@ export default class Camera extends Component {
     this.cacheCanvas = cacheCanvas;
   }
 
+  onClick(e) {
+    if (e.target.classList.contains('camera')) {
+      const { onClick } = this.props;
+      onClick()
+    }
+  }
+
   render() {
     const { init, width, height } = this.state;
-    const { data, onClick, pause, isARMode } = this.props;
+    const { data, pause, isARMode } = this.props;
     const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
-      <Hammer onTap={onClick}>
+      <Hammer onTap={this.onClick}>
         <div
           className={classNames('camera', {
             'camera--paused': pause,
