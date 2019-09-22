@@ -11,12 +11,12 @@ export const getDevice = () => {
   return device;
 };
 
-export const getMediaManifest = () => {
+export const getMediaManifest = (isForcePC = false) => {
   const ua = window.navigator.userAgent.toLowerCase();
   let manifest = {
     video: true
   };
-  if (getDevice() === 'sp') {
+  if (getDevice() === 'sp' && !isForcePC) {
     console.log('SP');
     manifest = {
       video: {

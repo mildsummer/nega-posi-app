@@ -276,7 +276,7 @@ export default class PictureFrame extends Component {
   }
 
   render() {
-    const { color, frame, base, children, margin } = this.props;
+    const { color, frame, children, margin, pixelRatio } = this.props;
     const { clipWidth, clipHeight } = this.clipSize;
     const { frameWidth, frameHeight } = this.frameSize;
     return (
@@ -284,8 +284,8 @@ export default class PictureFrame extends Component {
         <div
           className='frame'
           style={{
-            width: `${frameWidth}px`,
-            height: `${frameHeight}px`
+            width: frameWidth / pixelRatio,
+            height: frameHeight / pixelRatio
           }}
         >
           <div className='frame__shadow' />
@@ -303,10 +303,9 @@ export default class PictureFrame extends Component {
             <div
               className='frame__clip'
               style={{
-                width: `${clipWidth}px`,
-                height: `${clipHeight}px`,
-                padding: margin,
-                backgroundColor: `rgb(${base.value.join(',')})`
+                width: `${clipWidth / pixelRatio}px`,
+                height: `${clipHeight / pixelRatio}px`,
+                padding: margin / pixelRatio
               }}
             >
               <div className='frame__inner'>
@@ -333,5 +332,6 @@ PictureFrame.propTypes = {
   color: PropTypes.object,
   base: PropTypes.object,
   margin: PropTypes.number.isRequired,
-  children: PropTypes.any.isRequired
+  children: PropTypes.any.isRequired,
+  pixelRatio: PropTypes.number.isRequired
 };

@@ -74,8 +74,15 @@ export default class Camera extends Component {
         this.video.srcObject = stream;
         this.setState({ init: true });
       })
-      .catch((error) => {
-        console.error(error);
+      .catch(() => {
+        window.navigator.mediaDevices.getUserMedia(getMediaManifest(true))
+          .then((stream) => {
+            this.video.srcObject = stream;
+            this.setState({ init: true });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       });
     this.video.onloadedmetadata = this.start;
   }
@@ -290,6 +297,7 @@ export default class Camera extends Component {
             base={base}
             margin={margin}
             frameType={frameType}
+            pixelRatio={this.ratio}
           >
             <canvas
               ref={(ref) => {
