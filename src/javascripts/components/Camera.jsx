@@ -229,6 +229,25 @@ export default class Camera extends Component {
     }
   }
 
+  getARImage() {
+    const { width, height } = this.state;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    const videoWidth = this.video.videoWidth;
+    const videoHeight = this.video.videoHeight;
+    if (videoWidth / videoHeight > width / height) {
+      const w = videoWidth * (height / videoHeight);
+      context.drawImage(this.video, (width - w) / 2, 0, w, height);
+    } else {
+      const h = videoHeight * (width / videoWidth);
+      context.drawImage(this.video, 0, (height - h) / 2, width, h);
+    }
+    context.drawImage(this.ar.domElement, 0, 0, width, height);
+    return canvas.toDataURL('image/jpeg');
+  }
+
   cacheSource() {
     const cacheCanvas = document.createElement('canvas');
     cacheCanvas.width = this.canvas.width;
@@ -266,6 +285,9 @@ export default class Camera extends Component {
           </p>
           {isARMode ? (
             <ARMode
+              ref={(ref) => {
+                this.ar = ref;
+              }}
               data={data}
               getImage={this.getImage}
             />

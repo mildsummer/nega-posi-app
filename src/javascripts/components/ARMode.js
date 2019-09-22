@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 const { THREE, THREEx } = window;
 
+let renderer = null;
+let scene = null;
+let camera = null;
+let controls = null;
+
 export default class ARMode extends Component {
   constructor(props) {
     super(props);
@@ -46,24 +51,34 @@ export default class ARMode extends Component {
     }
   }
 
+  componentWillUnmount() {
+    window.clearTimeout(this.timer);
+    this.contents.remove(this.mesh);
+    this.mesh.geometry.dispose();
+    this.mesh.material.forEach((material) => {
+      material.dispose()
+    });
+  }
+
   initScene() {
     const container = this.wrapper.parentNode;
-    this.scene = new THREE.Scene();
-    this.renderer = new THREE.WebGLRenderer({
+    scene = scene || new THREE.Scene();
+    renderer = renderer || new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
-      localClippingEnabled: true
+      localClippingEnabled: true,
+      preserveDrawingBuffer: true
     });
-    this.renderer.setClearColor(new THREE.Color('black'), 0);
-    this.renderer.setSize(640, 480);
-    this.renderer.domElement.classList.add('ar-layer');
-    this.wrapper.appendChild(this.renderer.domElement);
-    this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
-    this.camera.lookAt(0, 0, 0);
-    this.camera.position.set(0, 0, 10);
-    this.controls = new THREE.OrbitControls(this.camera, container);
-    this.controls.update();
-    this.scene.add(this.camera);
+    renderer.setClearColor(new THREE.Color('black'), 0);
+    renderer.setSize(640, 480);
+    renderer.domElement.classList.add('ar-layer');
+    this.wrapper.appendChild(renderer.domElement);
+    camera = camera || new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 0, 10);
+    controls = controls || new THREE.OrbitControls(camera, container);
+    controls.update();
+    scene.add(camera);
     container.addEventListener('mousewheel', (e) => {
       e.preventDefault();
     });
@@ -106,7 +121,7 @@ export default class ARMode extends Component {
     this.mesh = new THREE.Mesh(geometry, materials);
     this.mesh.position.set(0, 0, 0);
     this.contents.add(this.mesh);
-    this.scene.add(this.contents);
+    scene.add(this.contents);
   }
 
   updateTexture() {
@@ -131,7 +146,7 @@ export default class ARMode extends Component {
       canvasHeight: this.source.parameters.sourceHeight,
     });
     this.context.init(() => {
-      this.camera.projectionMatrix.copy(this.context.getProjectionMatrix());
+      camera.projectionMatrix.copy(this.context.getProjectionMatrix());
     });
   }
 
@@ -161,26 +176,26 @@ export default class ARMode extends Component {
   onResize() {
     if (this.source && this.contents) {
       this.source.onResizeElement();
-      this.source.copyElementSizeTo(this.renderer.domElement);
+      this.source.copyElementSizeTo(renderer.domElement);
       if(this.context.arController !== null){
         this.source.copyElementSizeTo(this.context.arController.canvas);
       }
     } else {
       const width = window.innerWidth || document.documentElement.clientWidth;
       const height = window.innerHeight || document.documentElement.clientHeight;
-      this.renderer.setPixelRatio(window.devicePixelRatio);
-      this.renderer.setSize(width, height);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
     }
     this.update();
   }
 
   startAr() {
-    this.controls.reset();
-    this.controls.dispose();
-    this.camera = new THREE.Camera();
-    this.scene.remove(this.camera);
+    controls.reset();
+    controls.dispose();
+    camera = new THREE.Camera();
+    scene.remove(camera);
     this.initArToolkit();
     this.initMarker();
     this.isAr = true;
@@ -189,7 +204,7 @@ export default class ARMode extends Component {
   start() {
     this.isStop = false;
     this.update();
-    this.controls.addEventListener('change', this.update);
+    controls.addEventListener('change', this.update);
   }
 
   update() {
@@ -200,8 +215,12 @@ export default class ARMode extends Component {
         }
         this.context.update(this.source.domElement);
       }
-      this.renderer.render(this.scene, this.camera);
+      renderer.render(scene, camera);
     }
+  }
+
+  get domElement() {
+    return renderer.domElement;
   }
 
   render() {

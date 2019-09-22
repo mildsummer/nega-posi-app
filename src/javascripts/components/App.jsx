@@ -100,14 +100,22 @@ export default class App extends Component {
   }
 
   takePhoto() {
+    const { isARMode } = this.state;
     const date = new Date();
     const a = document.createElement('a');
-    this.camera.getImage((imageURL) => {
-      a.href = imageURL;
+    if (isARMode) {
+      a.href = this.camera.getARImage();
       a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
       a.target = '_blank';
       a.click();
-    });
+    } else {
+      this.camera.getImage((imageURL) => {
+        a.href = imageURL;
+        a.download = `intaglio-simulator_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.jpg`;
+        a.target = '_blank';
+        a.click();
+      });
+    }
   }
 
   togglePause() {
