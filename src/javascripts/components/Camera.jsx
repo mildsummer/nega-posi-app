@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
@@ -8,6 +9,7 @@ import { getDevice, getMediaManifest } from '../utils/Utils';
 import HistogramManager from '../utils/HistogramManager';
 import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
 import PictureFrame from './PictureFrame';
+import ARMode from './ARMode';
 
 const INTERVAL = 80;
 
@@ -15,6 +17,7 @@ export default class Camera extends Component {
   constructor(props) {
     super(props);
     this.update = this.update.bind(this);
+    this.getImage = this.getImage.bind(this);
     this.onResize = this.onResize.bind(this);
     this.start = this.start.bind(this);
     this.isSP = getDevice() === 'sp';
@@ -37,6 +40,7 @@ export default class Camera extends Component {
     || nextProps.pause !== this.props.pause
     || nextState.width !== this.state.width
     || nextState.height !== this.state.height
+    || nextProps.isARMode !== this.props.isARMode
     || nextState.init !== this.state.init;
   }
 
@@ -48,8 +52,13 @@ export default class Camera extends Component {
     this.init();
   }
 
-  componentDidUpdate() {
-    const { pause } = this.props;
+  componentDidUpdate(prevProps) {
+    const { pause, isARMode } = this.props;
+    if (!prevProps.isARMode && isARMode) {
+      this.cacheSource();
+    } else if (!isARMode && prevProps.isARMode) {
+      delete this.cacheCanvas;
+    }
     if (pause && this.tick) {
       this.pause();
     } else if (!pause && !this.tick) {
@@ -78,12 +87,13 @@ export default class Camera extends Component {
       const videoWidth = this.video.videoWidth;
       const videoHeight = this.video.videoHeight;
       const context = (this.dummyCanvas || this.canvas).getContext('2d');
+      const source = this.cacheCanvas || this.video;
       if (videoWidth / videoHeight > width / height) {
         const w = videoWidth * (height / videoHeight);
-        context.drawImage(this.video, (width - w) / 2, 0, w, height);
+        context.drawImage(source, (width - w) / 2, 0, w, height);
       } else {
         const h = videoHeight * (width / videoWidth);
-        context.drawImage(this.video, 0, (height - h) / 2, width, h);
+        context.drawImage(source, 0, (height - h) / 2, width, h);
       }
       const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
       if (this.worker) {
@@ -204,82 +214,108 @@ export default class Camera extends Component {
         } else {
           context.drawImage(imageObject, 0, 0);
         }
-        callback(canvas.toDataURL('image/jpeg'));
+        callback(canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
       };
       imageObject.src = this.canvas.toDataURL();
     } else {
-      callback(this.canvas.toDataURL('image/jpeg'));
+      callback(this.canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
     }
+  }
+
+  cacheSource() {
+    const cacheCanvas = document.createElement('canvas');
+    cacheCanvas.width = this.canvas.width;
+    cacheCanvas.height = this.canvas.height;
+    const context = cacheCanvas.getContext('2d');
+    const { width, height } = this.state;
+    const videoWidth = this.video.videoWidth;
+    const videoHeight = this.video.videoHeight;
+    if (videoWidth / videoHeight > width / height) {
+      const w = videoWidth * (height / videoHeight);
+      context.drawImage(this.video, (width - w) / 2, 0, w, height);
+    } else {
+      const h = videoHeight * (width / videoWidth);
+      context.drawImage(this.video, 0, (height - h) / 2, width, h);
+    }
+    this.cacheCanvas = cacheCanvas;
   }
 
   render() {
     const { init, width, height } = this.state;
-    const { data, onClick, pause } = this.props;
+    const { data, onClick, pause, isARMode } = this.props;
     const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
-      <div
-        className={classNames('camera', {
-          'camera--paused': pause,
-          'camera--init': init,
-          'camera--flip': flip
-        })}
-        onClick={onClick}
-      >
-        <p className='camera__description'>
-          This app needs a permission of your camera &#x1f4f7;
-        </p>
-        <video
-          ref={(ref) => {
-            this.video = ref;
-          }}
-          className='camera__video'
-          muted
-          playsInline
-          autoPlay
-        />
-        <PictureFrame
-          ref={(ref) => {
-            if (ref) {
-              this.frame = ref;
-            }
-          }}
-          width={width}
-          height={height}
-          clipWidth={clipWidth}
-          clipHeight={clipHeight}
-          thickness={matThickness}
-          color={mat}
-          frame={frame}
-          frameRatio={frameRatio}
-          frameBorderWidth={frameBorderWidth}
-          base={base}
-          margin={margin}
-          frameType={frameType}
+      <Hammer onTap={onClick}>
+        <div
+          className={classNames('camera', {
+            'camera--paused': pause,
+            'camera--init': init,
+            'camera--flip': flip,
+            'camera--ar': isARMode
+          })}
         >
-          <canvas
+          <p className='camera__description'>
+            This app needs a permission of your camera &#x1f4f7;
+          </p>
+          {isARMode ? (
+            <ARMode
+              data={data}
+              getImage={this.getImage}
+            />
+          ) : null}
+          <video
+            ref={(ref) => {
+              this.video = ref;
+            }}
+            className='camera__video'
+            muted
+            playsInline
+            autoPlay
+          />
+          <PictureFrame
             ref={(ref) => {
               if (ref) {
-                this.canvas = ref;
+                this.frame = ref;
               }
             }}
-            className='camera__viewer'
             width={width}
             height={height}
-          />
-        </PictureFrame>
-        {this.worker ? (
-          <canvas
-            ref={(ref) => {
-              if (ref) {
-                this.dummyCanvas = ref;
-              }
-            }}
-            className='camera__dummy'
-            width={width}
-            height={height}
-          />
-        ) : null}
-      </div>
+            clipWidth={clipWidth}
+            clipHeight={clipHeight}
+            thickness={matThickness}
+            color={mat}
+            frame={frame}
+            frameRatio={frameRatio}
+            frameBorderWidth={frameBorderWidth}
+            base={base}
+            margin={margin}
+            frameType={frameType}
+          >
+            <canvas
+              ref={(ref) => {
+                if (ref) {
+                  this.canvas = ref;
+                }
+              }}
+              className='camera__viewer'
+              width={width}
+              height={height}
+            />
+          </PictureFrame>
+          {this.worker ? (
+            <canvas
+              ref={(ref) => {
+                if (ref) {
+                  this.dummyCanvas = ref;
+                }
+              }}
+              className='camera__dummy'
+              width={width}
+              height={height}
+            />
+          ) : null}
+        </div>
+      </Hammer>
     );
   }
 }
@@ -288,5 +324,6 @@ Camera.propTypes = {
   data: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
+  isARMode: PropTypes.bool.isRequired,
   init: PropTypes.bool
 };

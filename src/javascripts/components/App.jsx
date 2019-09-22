@@ -41,7 +41,6 @@ const defaultData = (() => {
       }
     });
   });
-  console.log(data);
   return data;
 })();
 
@@ -57,11 +56,13 @@ export default class App extends Component {
     this.onEditCustomColor = this.onEditCustomColor.bind(this);
     this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
+    this.toggleARMode = this.toggleARMode.bind(this);
     this.state = {
       data: defaultData,
       showSettingMenu: false,
       pause: false,
-      colorPickerType: null
+      colorPickerType: null,
+      isARMode: false
     };
   }
 
@@ -152,8 +153,13 @@ export default class App extends Component {
     this.setState({ colorPickerType: null });
   }
 
+  toggleARMode() {
+    const { isARMode } = this.state;
+    this.setState({ isARMode: !isARMode });
+  }
+
   render() {
-    const { showSettingMenu, colorPickerType, data, pause } = this.state;
+    const { showSettingMenu, colorPickerType, data, pause, isARMode } = this.state;
     const { customColor } = data;
     return (
       <div className='app-container'>
@@ -173,10 +179,30 @@ export default class App extends Component {
           <Tap
             component='button'
             type='button'
+            className={classNames('tools__capture-button', {
+              'tools__capture-button--disabled': !isARMode
+            })}
+            onClick={this.toggleARMode}
+          >
+            capture mode
+          </Tap>
+          <Tap
+            component='button'
+            type='button'
             className='tools__photo-button'
             onClick={this.takePhoto}
           >
             Take a photo
+          </Tap>
+          <Tap
+            component='button'
+            type='button'
+            className={classNames('tools__ar-button', {
+              'tools__ar-button--disabled': isARMode
+            })}
+            onClick={this.toggleARMode}
+          >
+            AR mode
           </Tap>
           <SettingMenu
             visible={showSettingMenu}
@@ -194,6 +220,7 @@ export default class App extends Component {
           }}
           data={data}
           pause={pause}
+          isARMode={isARMode}
           onClick={this.onClickCamera}
         />
       </div>

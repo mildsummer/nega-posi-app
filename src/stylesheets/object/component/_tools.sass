@@ -55,3 +55,71 @@
       transform: rotate(90deg) scale(0.9)
       &::after
         color: $color-light-gray
+  &__ar-button
+    position: absolute
+    display: block
+    width: 54px
+    height: 54px
+    top: -47px
+    left: 50%
+    margin: 0 0 0 32px
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 100%
+    flex-shrink: 0
+    cursor: pointer
+    transition: transform 100ms ease, opacity 300ms ease
+    &--disabled
+      opacity: 0.4
+      pointer-events: none
+    &::after
+      +icon('ar')
+      display: block
+      position: absolute
+      width: 40px
+      height: 40px
+      top: 7px
+      left: 7px
+      +fontSize(40px)
+      text-indent: 0
+      color: $color-white
+      text-shadow: 0 2px 4px rgba($color-black, 0.5)
+      transition: color 100ms ease
+    &.tap-active
+      transform: scale(0.9)
+      &::after
+        color: $color-light-gray
+  &__capture-button
+    position: absolute
+    display: block
+    width: 54px
+    height: 54px
+    top: -47px
+    left: 50%
+    margin: 0 0 0 -86px
+    overflow: hidden
+    white-space: nowrap
+    text-indent: 100%
+    flex-shrink: 0
+    cursor: pointer
+    transition: transform 100ms ease, opacity 300ms ease
+    &--disabled
+      opacity: 0.4
+      pointer-events: none
+    &::after
+      +icon('capture')
+      display: block
+      position: absolute
+      width: 40px
+      height: 40px
+      top: 7px
+      left: 7px
+      +fontSize(40px)
+      text-indent: 0
+      color: $color-white
+      text-shadow: 0 2px 4px rgba($color-black, 0.5)
+      transition: color 100ms ease
+    &.tap-active
+      transform: scale(0.9)
+      &::after
+        color: $color-light-gray
