@@ -288,6 +288,7 @@ export default class PictureFrame extends Component {
             height: `${frameHeight}px`
           }}
         >
+          <div className='frame__shadow' />
           <canvas
             ref={(ref) => {
               if (ref) {
