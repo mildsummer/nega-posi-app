@@ -20,7 +20,6 @@ export default class Camera extends Component {
     this.getImage = this.getImage.bind(this);
     this.onResize = this.onResize.bind(this);
     this.start = this.start.bind(this);
-    this.onClick = this.onClick.bind(this);
     this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
     this.ratio = this.isSP ? window.devicePixelRatio : 1;
@@ -42,6 +41,7 @@ export default class Camera extends Component {
     || nextState.width !== this.state.width
     || nextState.height !== this.state.height
     || nextProps.isARMode !== this.props.isARMode
+    || nextProps.isBlend !== this.props.isBlend
     || nextState.init !== this.state.init;
   }
 
@@ -231,6 +231,7 @@ export default class Camera extends Component {
   }
 
   getARImage() {
+    const { isBlend } = this.props;
     const { width, height } = this.state;
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -245,7 +246,7 @@ export default class Camera extends Component {
       const h = videoHeight * (width / videoWidth);
       context.drawImage(this.video, 0, (height - h) / 2, width, h);
     }
-    if (this.ar.isBlend) {
+    if (isBlend) {
       context.globalCompositeOperation = 'multiply';
     }
     context.drawImage(this.ar.domElement, 0, 0, width, height);
@@ -270,19 +271,12 @@ export default class Camera extends Component {
     this.cacheCanvas = cacheCanvas;
   }
 
-  onClick(e) {
-    if (e.target.classList.contains('camera')) {
-      const { onClick } = this.props;
-      onClick()
-    }
-  }
-
   render() {
     const { init, width, height } = this.state;
-    const { data, pause, isARMode } = this.props;
+    const { onClick, data, pause, isARMode, isBlend } = this.props;
     const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
-      <Hammer onTap={this.onClick}>
+      <Hammer onTap={onClick}>
         <div
           className={classNames('camera', {
             'camera--paused': pause,
@@ -301,6 +295,7 @@ export default class Camera extends Component {
               }}
               data={data}
               getImage={this.getImage}
+              isBlend={isBlend}
             />
           ) : null}
           <video
@@ -312,37 +307,37 @@ export default class Camera extends Component {
             playsInline
             autoPlay
           />
-          <PictureFrame
-            ref={(ref) => {
-              if (ref) {
-                this.frame = ref;
-              }
-            }}
-            width={width}
-            height={height}
-            clipWidth={clipWidth}
-            clipHeight={clipHeight}
-            thickness={matThickness}
-            color={mat}
-            frame={frame}
-            frameRatio={frameRatio}
-            frameBorderWidth={frameBorderWidth}
-            base={base}
-            margin={margin}
-            frameType={frameType}
-            pixelRatio={this.ratio}
-          >
-            <canvas
+            <PictureFrame
               ref={(ref) => {
                 if (ref) {
-                  this.canvas = ref;
+                  this.frame = ref;
                 }
               }}
-              className='camera__viewer'
               width={width}
               height={height}
-            />
-          </PictureFrame>
+              clipWidth={clipWidth}
+              clipHeight={clipHeight}
+              thickness={matThickness}
+              color={mat}
+              frame={frame}
+              frameRatio={frameRatio}
+              frameBorderWidth={frameBorderWidth}
+              base={base}
+              margin={margin}
+              frameType={frameType}
+              pixelRatio={this.ratio}
+            >
+              <canvas
+                ref={(ref) => {
+                  if (ref) {
+                    this.canvas = ref;
+                  }
+                }}
+                className='camera__viewer'
+                width={width}
+                height={height}
+              />
+            </PictureFrame>
           {this.worker ? (
             <canvas
               ref={(ref) => {
@@ -366,5 +361,6 @@ Camera.propTypes = {
   onClick: PropTypes.func.isRequired,
   pause: PropTypes.bool.isRequired,
   isARMode: PropTypes.bool.isRequired,
+  isBlend: PropTypes.bool.isRequired,
   init: PropTypes.bool
 };

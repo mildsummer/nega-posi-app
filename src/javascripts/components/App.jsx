@@ -57,12 +57,14 @@ export default class App extends Component {
     this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
     this.toggleARMode = this.toggleARMode.bind(this);
+    this.toggleBlend = this.toggleBlend.bind(this);
     this.state = {
       data: defaultData,
       showSettingMenu: false,
       pause: false,
       colorPickerType: null,
-      isARMode: false
+      isARMode: false,
+      isBlend: false
     };
   }
 
@@ -166,8 +168,13 @@ export default class App extends Component {
     this.setState({ isARMode: !isARMode });
   }
 
+  toggleBlend() {
+    const { isBlend } = this.state;
+    this.setState({ isBlend: !isBlend });
+  }
+
   render() {
-    const { showSettingMenu, colorPickerType, data, pause, isARMode } = this.state;
+    const { showSettingMenu, colorPickerType, data, pause, isARMode, isBlend } = this.state;
     const { customColor } = data;
     return (
       <div className='app-container'>
@@ -179,6 +186,17 @@ export default class App extends Component {
             value: customColor[colorPickerType.name].value
           } : null)}
         />
+        {isARMode ? (
+          <button
+            type='button'
+            className={classNames('blend-button', {
+              'blend-button--checked': isBlend
+            })}
+            onClick={this.toggleBlend}
+          >
+            Blend
+          </button>
+        ) : null}
         <div
           className={classNames('tools', {
             'tools--show-menu': showSettingMenu
@@ -229,6 +247,7 @@ export default class App extends Component {
           data={data}
           pause={pause}
           isARMode={isARMode}
+          isBlend={isBlend}
           onClick={this.onClickCamera}
         />
       </div>
