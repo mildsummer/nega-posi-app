@@ -20,7 +20,8 @@ export default class SettingMenuItem extends Component {
 
   shouldComponentUpdate(nextProps) {
     return !isEqual(nextProps.values, this.props.values)
-      || nextProps.customValue !== this.props.customValue;
+      || nextProps.customValue !== this.props.customValue
+      || nextProps.frameColor !== this.props.frameColor;
   }
 
   onChange(item) {
@@ -46,7 +47,7 @@ export default class SettingMenuItem extends Component {
   }
 
   renderItem(item) {
-    const { data, values, customValue } = this.props;
+    const { data, values, customValue, frameColor } = this.props;
     let element = null;
     const value = values[data.items.indexOf(item)];
     switch (item.type) {
@@ -100,6 +101,7 @@ export default class SettingMenuItem extends Component {
           <Fragment key={item.name}>
             <FrameList
               data={item.options}
+              frameColor={frameColor}
               selected={value}
               onChange={this.onChange(item)}
             />
@@ -159,6 +161,7 @@ SettingMenuItem.propTypes = {
   data: PropTypes.object.isRequired,
   values: PropTypes.arrayOf(PropTypes.any).isRequired,
   customValue: PropTypes.any,
+  frameColor: PropTypes.object,
   onChange: PropTypes.func,
   onEditCustomColor: PropTypes.func
 };

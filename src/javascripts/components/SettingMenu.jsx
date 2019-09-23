@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import SettingMenuItem from './SettingMenuItem';
-import Options from '../constants/Options';
+import Options, { OPTION_TYPE_FRAME } from '../constants/Options';
 
 export default class SettingMenu extends Component {
   shouldComponentUpdate(nextProps) {
@@ -36,6 +36,7 @@ export default class SettingMenu extends Component {
                   customValue={option.customColor ? data.customColor[option.items[0].name] : null}
                   onEditCustomColor={option.customColor ? onEditCustomColor : null}
                   onChange={onChange}
+                  frameColor={option.items[0].type === OPTION_TYPE_FRAME ? data.frame : null}
                 />
               ))}
             </div>
