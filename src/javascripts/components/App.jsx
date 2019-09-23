@@ -7,6 +7,7 @@ import SettingMenu from './SettingMenu';
 import Tap from './Tap';
 import ColorPicker from './ColorPicker';
 import AngleSlider from './AngleSlider';
+import OffsetController from './OffsetController';
 import Colors from '../constants/Colors';
 import FrameTypes from '../constants/FrameTypes';
 import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR, OPTION_TYPE_FRAME } from '../constants/Options';
@@ -58,6 +59,7 @@ export default class App extends Component {
     this.onChangeCustomColor = this.onChangeCustomColor.bind(this);
     this.onCancelCustomColor = this.onCancelCustomColor.bind(this);
     this.onChangeShadeAngle = this.onChangeShadeAngle.bind(this);
+    this.onChangeOffset = this.onChangeOffset.bind(this);
     this.toggleARMode = this.toggleARMode.bind(this);
     this.toggleBlend = this.toggleBlend.bind(this);
     this.state = {
@@ -67,7 +69,9 @@ export default class App extends Component {
       colorPickerType: null,
       isARMode: false,
       isBlend: false,
-      shadeAngle: Math.PI * 1.75
+      shadeAngle: Math.PI * 1.75,
+      offsetX: 0,
+      offsetY: 0
     };
   }
 
@@ -180,8 +184,12 @@ export default class App extends Component {
     this.setState({ shadeAngle });
   }
 
+  onChangeOffset(offsetX, offsetY) {
+    this.setState({ offsetX, offsetY })
+  }
+
   render() {
-    const { showSettingMenu, colorPickerType, data, pause, isARMode, isBlend, shadeAngle } = this.state;
+    const { showSettingMenu, colorPickerType, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.state;
     const { customColor } = data;
     return (
       <div className='app-container'>
@@ -206,6 +214,9 @@ export default class App extends Component {
         ) : null}
         {isARMode ? (
           <AngleSlider value={shadeAngle} onChange={this.onChangeShadeAngle} />
+        ) : null}
+        {isARMode ? (
+          <OffsetController x={offsetX} y={offsetY} onChange={this.onChangeOffset} />
         ) : null}
         <div
           className={classNames('tools', {
@@ -260,6 +271,8 @@ export default class App extends Component {
           isBlend={isBlend}
           onClick={this.onClickCamera}
           shadeAngle={shadeAngle}
+          offsetX={offsetX}
+          offsetY={offsetY}
         />
       </div>
     );

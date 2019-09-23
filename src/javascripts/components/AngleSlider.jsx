@@ -5,14 +5,8 @@ import PropTypes from 'prop-types';
 export default class AngleSlider extends Component {
   constructor(props) {
     super(props);
-    this.onPanStart = this.onPanStart.bind(this);
     this.onPan = this.onPan.bind(this);
     this.onPanEnd = this.onPanEnd.bind(this);
-  }
-
-  onPanStart() {
-    const { value } = this.props;
-    this.panStartValue = value;
   }
 
   onPan(e) {
@@ -36,7 +30,7 @@ export default class AngleSlider extends Component {
     const { value } = this.props;
     return (
       <Hammer
-        onPanStart={this.onPanStart}
+        onPanStart={this.onPan}
         onPan={this.onPan}
         onPanEnd={this.onPanEnd}
         onPanCancel={this.onPanEnd}

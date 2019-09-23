@@ -1,0 +1,53 @@
+.offset-controller
+  position: absolute
+  width: 80px
+  height: 80px
+  top: 60px
+  right: 10px
+  z-index: 3
+  background-color: rgba($color-white, 0.3)
+  border-radius: 50%
+  &__button
+    position: absolute
+    width: 0
+    height: 0
+    top: 0
+    left: 50%
+    margin: 0 0 0 -10px
+    border-top: solid 10px transparent
+    border-right: solid 10px transparent
+    border-bottom: solid 10px $color-white
+    border-left: solid 10px transparent
+    box-sizing: border-box
+    text-indent: 100%
+    white-space: nowrap
+    //overflow: hidden
+    cursor: pointer
+    transition: border-bottom-color 200ms ease
+    &::before
+      content: ''
+      display: block
+      position: absolute
+      width: 20px
+      height: 20px
+      top: -10px
+      left: -20px
+      padding: 5px 10px
+      border-radius: 50%
+    &.tap-active
+      border-bottom-color: rgba($color-white, 0.5)
+    &:nth-child(2)
+      transform: rotate(90deg)
+      top: 50%
+      left: auto
+      right: 0
+      margin: -10px 0 0 0
+    &:nth-child(3)
+      transform: rotate(180deg)
+      top: auto
+      bottom: 0
+    &:nth-child(4)
+      transform: rotate(-90deg)
+      top: 50%
+      left: 0
+      margin: -10px 0 0 0

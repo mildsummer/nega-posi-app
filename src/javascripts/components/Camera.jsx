@@ -43,6 +43,8 @@ export default class Camera extends Component {
     || nextProps.isARMode !== this.props.isARMode
     || nextProps.isBlend !== this.props.isBlend
     || nextProps.shadeAngle !== this.props.shadeAngle
+    || nextProps.offsetX !== this.props.offsetX
+    || nextProps.offsetY !== this.props.offsetY
     || nextState.init !== this.state.init;
   }
 
@@ -232,7 +234,7 @@ export default class Camera extends Component {
   }
 
   getARImage() {
-    const { isBlend } = this.props;
+    const { isBlend, offsetX, offsetY } = this.props;
     const { width, height } = this.state;
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -250,7 +252,7 @@ export default class Camera extends Component {
     if (isBlend) {
       context.globalCompositeOperation = 'multiply';
     }
-    context.drawImage(this.ar.domElement, 0, 0, width, height);
+    context.drawImage(this.ar.domElement, offsetX, offsetY, width, height);
     return canvas.toDataURL('image/jpeg');
   }
 
@@ -274,7 +276,7 @@ export default class Camera extends Component {
 
   render() {
     const { init, width, height } = this.state;
-    const { onClick, data, pause, isARMode, isBlend, shadeAngle } = this.props;
+    const { onClick, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.props;
     const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
       <Hammer onTap={onClick}>
@@ -298,6 +300,8 @@ export default class Camera extends Component {
               getImage={this.getImage}
               isBlend={isBlend}
               shadeAngle={shadeAngle}
+              offsetX={offsetX}
+              offsetY={offsetY}
             />
           ) : null}
           <video
@@ -365,5 +369,7 @@ Camera.propTypes = {
   isARMode: PropTypes.bool.isRequired,
   isBlend: PropTypes.bool.isRequired,
   shadeAngle: PropTypes.number.isRequired,
+  offsetX: PropTypes.number.isRequired,
+  offsetY: PropTypes.number.isRequired,
   init: PropTypes.bool
 };

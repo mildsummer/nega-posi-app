@@ -39,8 +39,7 @@ export default class ARMode extends Component {
 
   checkUpdate(nextProps, nextState) {
     return this.state.isLoading !== nextState.isLoading
-      || this.props.isBlend !== nextProps.isBlend
-      || this.props.shadeAngle !== nextProps.shadeAngle;
+      || this.props.isBlend !== nextProps.isBlend;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -50,6 +49,9 @@ export default class ARMode extends Component {
       this.setState({
         isLoading: true
       });
+    }
+    if (this.props.offsetX !== nextProps.offsetX || this.props.offsetY !== nextProps.offsetY) {
+      this.translate(nextProps.offsetX, nextProps.offsetY);
     }
   }
 
@@ -85,6 +87,7 @@ export default class ARMode extends Component {
     camera.lookAt(0, 0, 0);
     camera.position.set(0, 0, 10);
     controls = controls || new THREE.OrbitControls(camera, container);
+    controls.enablePan = false;
     controls.update();
     scene.add(camera);
     container.addEventListener('mousewheel', (e) => {
@@ -314,6 +317,10 @@ export default class ARMode extends Component {
     }
   }
 
+  translate(x, y) {
+    renderer.domElement.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
   get domElement() {
     return renderer.domElement;
   }
@@ -341,5 +348,7 @@ ARMode.propTypes = {
   data: PropTypes.object.isRequired,
   getImage: PropTypes.func.isRequired,
   isBlend: PropTypes.bool.isRequired,
-  shadeAngle: PropTypes.number.isRequired
+  shadeAngle: PropTypes.number.isRequired,
+  offsetX: PropTypes.number.isRequired,
+  offsetY: PropTypes.number.isRequired
 };
