@@ -83,7 +83,6 @@ export default class FrameList extends Component {
   }
 
   drawFrames() {
-    console.log('frame drwa');
     const { data } = this.props;
     this.canvasArray.forEach((canvas, index) => {
       this.drawFrame(data[index], canvas);
