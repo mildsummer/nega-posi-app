@@ -51,6 +51,7 @@ export default class AngleSlider extends Component {
           style={{
             transform: `rotate(${-Math.round(value * 180 / Math.PI)}deg)`
           }}
+          draggable={false}
         />
       </Hammer>
     );
