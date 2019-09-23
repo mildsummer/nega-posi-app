@@ -229,7 +229,7 @@ export default class App extends Component {
             className={classNames('tools__capture-button', {
               'tools__capture-button--disabled': !isARMode
             })}
-            onClick={this.toggleARMode}
+            onClick={isARMode ? this.toggleARMode : null}
           >
             capture mode
           </Tap>
@@ -247,7 +247,7 @@ export default class App extends Component {
             className={classNames('tools__ar-button', {
               'tools__ar-button--disabled': isARMode
             })}
-            onClick={this.toggleARMode}
+            onClick={isARMode ? null : this.toggleARMode}
           >
             AR mode
           </Tap>
