@@ -1,0 +1,67 @@
+import React, { Component } from 'react';
+import Hammer from 'react-hammerjs';
+import PropTypes from 'prop-types';
+
+export default class AngleSlider extends Component {
+  constructor(props) {
+    super(props);
+    this.onPanStart = this.onPanStart.bind(this);
+    this.onPan = this.onPan.bind(this);
+    this.onPanEnd = this.onPanEnd.bind(this);
+  }
+
+  onPanStart() {
+    const { value } = this.props;
+    this.panStartValue = value;
+  }
+
+  onPan(e) {
+    const { onChange } = this.props;
+    const node = e.target;
+    const rect = node.getBoundingClientRect();
+    const center = [rect.left + rect.width / 2, rect.top + rect.height / 2];
+    const current = [(e.center.x - center[0]), center[1] - e.center.y];
+    let angle = Math.atan2(current[1], current[0]);
+    if (angle < 0) {
+      angle = Math.PI * 2 + angle;
+    }
+    onChange((Math.PI + angle) % (Math.PI * 2));
+  }
+
+  onPanEnd() {
+    delete this.panStartValue;
+  }
+
+  render() {
+    const { value } = this.props;
+    return (
+      <Hammer
+        onPanStart={this.onPanStart}
+        onPan={this.onPan}
+        onPanEnd={this.onPanEnd}
+        onPanCancel={this.onPanEnd}
+        options={
+          {
+            recognizers: {
+              pan: {
+                threshold: 0
+              }
+            }
+          }
+        }
+      >
+        <div
+          className='angle-slider'
+          style={{
+            transform: `rotate(${-Math.round(value * 180 / Math.PI)}deg)`
+          }}
+        />
+      </Hammer>
+    );
+  }
+}
+
+AngleSlider.propTypes = {
+  value: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired
+};
