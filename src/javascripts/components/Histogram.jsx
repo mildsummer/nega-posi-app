@@ -17,7 +17,7 @@ export default class Histogram extends Component {
   update(data) {
     const context = this.canvas.getContext('2d');
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    context.fillStyle = '#eeeeee';
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
     const maxValue = max(data);
     data.forEach((value, index) => {
       if (value) {
