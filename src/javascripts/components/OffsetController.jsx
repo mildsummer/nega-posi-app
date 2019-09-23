@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Tap from './Tap';
+import Hammer from 'react-hammerjs';
 
 const OFFSET_UNIT = 10;
 
@@ -34,28 +34,45 @@ export default class OffsetController extends Component {
   }
 
   render() {
+    const isTouch = window.ontouchstart === null;
     return (
       <div className='offset-controller'>
-        <Tap
-          className='offset-controller__button'
-          onClick={this.up}
+        <Hammer
+          {...{ [isTouch ? 'onTouchStart' : 'onMouseDown'] :this.up}}
           draggable={false}
-        />
-        <Tap
+        >
+          <div
+            className='offset-controller__button'
+            draggable={false}
+          />
+        </Hammer>
+        <Hammer
           className='offset-controller__button'
-          onClick={this.right}
-          draggable={false}
-        />
-        <Tap
+          {...{ [isTouch ? 'onTouchStart' : 'onMouseDown'] :this.right}}
+        >
+          <div
+            className='offset-controller__button'
+            draggable={false}
+          />
+        </Hammer>
+        <Hammer
           className='offset-controller__button'
-          onClick={this.down}
-          draggable={false}
-        />
-        <Tap
+          {...{ [isTouch ? 'onTouchStart' : 'onMouseDown'] :this.down}}
+        >
+          <div
+            className='offset-controller__button'
+            draggable={false}
+          />
+        </Hammer>
+        <Hammer
           className='offset-controller__button'
-          onClick={this.left}
-          draggable={false}
-        />
+          {...{ [isTouch ? 'onTouchStart' : 'onMouseDown'] :this.left}}
+        >
+          <div
+            className='offset-controller__button'
+            draggable={false}
+          />
+        </Hammer>
       </div>
     );
   }

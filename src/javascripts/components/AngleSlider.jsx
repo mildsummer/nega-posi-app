@@ -10,16 +10,18 @@ export default class AngleSlider extends Component {
   }
 
   onPan(e) {
-    const { onChange } = this.props;
-    const node = e.target;
-    const rect = node.getBoundingClientRect();
-    const center = [rect.left + rect.width / 2, rect.top + rect.height / 2];
-    const current = [(e.center.x - center[0]), center[1] - e.center.y];
-    let angle = Math.atan2(current[1], current[0]);
-    if (angle < 0) {
-      angle = Math.PI * 2 + angle;
+    if (e.center.x && e.center.y) {
+      const { onChange } = this.props;
+      const node = e.target;
+      const rect = node.getBoundingClientRect();
+      const center = [rect.left + rect.width / 2, rect.top + rect.height / 2];
+      const current = [(e.center.x - center[0]), center[1] - e.center.y];
+      let angle = Math.atan2(current[1], current[0]);
+      if (angle < 0) {
+        angle = Math.PI * 2 + angle;
+      }
+      onChange((Math.PI + angle) % (Math.PI * 2));
     }
-    onChange((Math.PI + angle) % (Math.PI * 2));
   }
 
   onPanEnd() {

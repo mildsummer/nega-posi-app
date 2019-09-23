@@ -31,11 +31,14 @@ export default class Slider extends Component {
   }
 
   onPan(e) {
-    const { onChange, max, min } = this.props;
-    onChange(
-      Math.min(max,
-        Math.max(min, this.panStartValue + (e.deltaX / this.base.clientWidth) * (max - min)))
-    );
+    if (e.center.x && e.center.y) {
+      e.preventDefault();
+      const { onChange, max, min } = this.props;
+      onChange(
+        Math.min(max,
+          Math.max(min, this.panStartValue + (e.deltaX / this.base.clientWidth) * (max - min)))
+      );
+    }
   }
 
   onPanEnd() {
@@ -73,7 +76,7 @@ export default class Slider extends Component {
           onPanStart={this.onPanStart}
           onPanEnd={this.onPanEnd}
           onPanCancel={this.onPanEnd}
-          onTouchStart={this.onTouchStart}
+          // onTouchStart={this.onTouchStart}
           onMouseDown={this.onTouchStart}
           onTouchEnd={this.onTouchEnd}
           onMouseUp={this.onTouchEnd}
@@ -81,7 +84,7 @@ export default class Slider extends Component {
             {
               recognizers: {
                 pan: {
-                  threshold: 0
+                  threshold: 10
                 }
               }
             }
