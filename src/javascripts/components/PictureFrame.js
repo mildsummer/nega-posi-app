@@ -12,8 +12,8 @@ export default class PictureFrame extends Component {
   shouldComponentUpdate(nextProps) {
     return nextProps.width !== this.props.width
       || nextProps.height !== this.props.height
-      || nextProps.clipWidth !== this.props.clipWidth
-      || nextProps.clipHeight !== this.props.clipHeight
+      || nextProps.clipSize !== this.props.clipSize
+      || nextProps.clipRatio !== this.props.clipRatio
       || nextProps.frameRatio !== this.props.frameRatio
       || nextProps.frameType !== this.props.frameType
       || nextProps.frame !== this.props.frame
@@ -54,10 +54,13 @@ export default class PictureFrame extends Component {
 
   get clipSize() {
     const { frameWidth, frameHeight } = this.frameSize;
-    const { color, clipWidth, clipHeight } = this.props;
+    const { color, clipSize, clipRatio } = this.props;
+    const clipMax = Math.min(frameWidth, frameHeight) * clipSize;
+    const clipWidth = clipRatio > 0 ? clipMax / (clipRatio + 1) : clipMax;
+    const clipHeight = clipRatio > 0 ? clipMax : clipMax / (-clipRatio + 1);
     return {
-      clipWidth: color ? frameWidth * clipWidth : frameWidth,
-      clipHeight: color ? frameHeight * clipHeight : frameHeight
+      clipWidth: color ? clipWidth : frameWidth,
+      clipHeight: color ? clipHeight : frameHeight
     };
   }
 
@@ -322,8 +325,8 @@ export default class PictureFrame extends Component {
 PictureFrame.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  clipWidth: PropTypes.number,
-  clipHeight: PropTypes.number,
+  clipSize: PropTypes.number,
+  clipRatio: PropTypes.number,
   frame: PropTypes.object,
   frameRatio: PropTypes.number,
   frameType: PropTypes.object,

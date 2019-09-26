@@ -288,7 +288,7 @@ export default class Camera extends Component {
   render() {
     const { init, width, height } = this.state;
     const { onClick, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.props;
-    const { flip, base, mat, clipWidth, clipHeight, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
+    const { flip, base, mat, clipSize, clipRatio, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
       <Hammer onTap={onClick}>
         <div
@@ -332,8 +332,8 @@ export default class Camera extends Component {
               }}
               width={width}
               height={height}
-              clipWidth={clipWidth}
-              clipHeight={clipHeight}
+              clipSize={clipSize}
+              clipRatio={clipRatio}
               thickness={matThickness}
               color={mat}
               frame={frame}

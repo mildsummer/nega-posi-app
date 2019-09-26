@@ -88,10 +88,10 @@ export default [
     customColor: true
   },
   {
-    name: 'Clipping size',
+    name: 'Clipping size / ratio',
     items: [
       {
-        name: 'clipWidth',
+        name: 'clipSize',
         type: OPTION_TYPE_NUMBER,
         max: 1,
         min: 0,
@@ -99,12 +99,12 @@ export default [
         defaultValue: 0.5
       },
       {
-        name: 'clipHeight',
+        name: 'clipRatio',
         type: OPTION_TYPE_NUMBER,
-        max: 1,
-        min: 0,
+        max: 9,
+        min: -9,
         required: true,
-        defaultValue: 0.5
+        defaultValue: 0
       }
     ],
     reset: true
