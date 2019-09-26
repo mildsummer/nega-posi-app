@@ -70,7 +70,7 @@ export default class Slider extends Component {
 
   render() {
     const { panning } = this.state;
-    const { value, max, min, histogram } = this.props;
+    const { value, max, min, histogram, isRatio } = this.props;
     return (
       <div className='slider__wrapper'>
         <Hammer
@@ -95,7 +95,8 @@ export default class Slider extends Component {
           <div
             className={classNames('slider', {
               'slider--active': panning,
-              'slider--origin': max > 0 && min < 0
+              'slider--origin': max > 0 && min < 0,
+              'slider--ratio': isRatio
             })}
             role='slider'
           >
@@ -135,5 +136,6 @@ Slider.propTypes = {
   value: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
   min: PropTypes.number.isRequired,
-  histogram: PropTypes.bool
+  histogram: PropTypes.bool,
+  isRatio: PropTypes.bool
 };

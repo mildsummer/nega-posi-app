@@ -74,6 +74,7 @@
     color: rgba($color-black, 0.2)
     box-sizing: border-box
     &-item:first-child
+      display: block
       transform: scaleX(2)
   &--threshold &__value
     background: none
@@ -82,3 +83,17 @@
       transform: scale(1.2)
     &::before
       transform: scale(1.1)
+  &--ratio &__direction
+    color: red
+    align-items: center
+    &-item
+      width: 8px
+      height: 16px
+      background-color: rgba($color-black, 0.2)
+      white-space: nowrap
+      overflow: hidden
+      text-indent: 100%
+      &:first-child
+        width: 16px
+        height: 8px
+        transform: none

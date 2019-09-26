@@ -75,8 +75,9 @@ export default class PictureFrame extends Component {
 
   get frameSize() {
     const { width, height, frameRatio } = this.props;
-    const frameWidth = frameRatio > height / width ? height / frameRatio : width;
-    const frameHeight = frameRatio < height / width ? width * frameRatio : height;
+    const ratio = frameRatio > 0 ? frameRatio + 1 : 1 / (-frameRatio + 1);
+    const frameWidth = ratio > height / width ? height / ratio : width;
+    const frameHeight = ratio < height / width ? width * ratio : height;
     return { frameWidth, frameHeight };
   }
 

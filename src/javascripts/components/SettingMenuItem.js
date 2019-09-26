@@ -76,6 +76,7 @@ export default class SettingMenuItem extends Component {
             min={item.min}
             onChange={this.onChange(item)}
             histogram={item.histogram}
+            isRatio={item.ratio}
           />
         );
         break;

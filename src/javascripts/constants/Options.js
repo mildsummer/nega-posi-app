@@ -101,10 +101,11 @@ export default [
       {
         name: 'clipRatio',
         type: OPTION_TYPE_NUMBER,
-        max: 9,
-        min: -9,
+        max: 4,
+        min: -4,
         required: true,
-        defaultValue: 0
+        defaultValue: 0,
+        ratio: true
       }
     ],
     reset: true
@@ -167,10 +168,11 @@ export default [
       {
         name: 'frameRatio',
         type: OPTION_TYPE_NUMBER,
-        max: 2,
-        min: 0.5,
+        max: 1,
+        min: -1,
         required: true,
-        defaultValue: (window.innerHeight / window.innerWidth)
+        defaultValue: 0,
+        ratio: true
       },
       {
         name: 'frameBorderWidth',
