@@ -215,21 +215,19 @@ export default class App extends Component {
           } : null)}
         />
         {isARMode ? (
-          <button
-            type='button'
-            className={classNames('blend-button', {
-              'blend-button--checked': isBlend
-            })}
-            onClick={this.toggleBlend}
-          >
-            Blend
-          </button>
-        ) : null}
-        {isARMode ? (
-          <AngleSlider value={shadeAngle} onChange={this.onChangeShadeAngle} />
-        ) : null}
-        {isARMode ? (
-          <OffsetController x={offsetX} y={offsetY} onChange={this.onChangeOffset} />
+          <div className='ar-controller'>
+            <button
+              type='button'
+              className={classNames('blend-button', {
+                'blend-button--checked': isBlend
+              })}
+              onClick={this.toggleBlend}
+            >
+              Blend
+            </button>
+            <AngleSlider value={shadeAngle} onChange={this.onChangeShadeAngle} />
+            <OffsetController x={offsetX} y={offsetY} onChange={this.onChangeOffset} />
+          </div>
         ) : null}
         <div
           className={classNames('tools', {
