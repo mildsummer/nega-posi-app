@@ -287,7 +287,7 @@ export default class PictureFrame extends Component {
   }
 
   render() {
-    const { color, frame, children, margin, pixelRatio } = this.props;
+    const { color, frame, children, margin, pixelRatio, base } = this.props;
     const { clipWidth, clipHeight, clipTop, clipLeft } = this.clipRect;
     const { frameWidth, frameHeight } = this.frameSize;
     return (
@@ -296,7 +296,8 @@ export default class PictureFrame extends Component {
           className='frame'
           style={{
             width: frameWidth / pixelRatio,
-            height: frameHeight / pixelRatio
+            height: frameHeight / pixelRatio,
+            backgroundColor: `rgb(${base.value.join(',')})`
           }}
         >
           <div className='frame__shadow' />
