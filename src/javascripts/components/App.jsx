@@ -88,6 +88,10 @@ export default class App extends Component {
     };
   }
 
+  componentDidMount() {
+    document.querySelector('.splash').classList.add('splash--hidden');
+  }
+
   onClickCamera() {
     const { showSettingMenu } = this.state;
     if (showSettingMenu) {
