@@ -22,7 +22,8 @@ export default class Slider extends Component {
     return nextProps.value !== this.props.value;
   }
 
-  onPanStart() {
+  onPanStart(e) {
+    e.preventDefault();
     const { value } = this.props;
     this.panStartValue = value;
     this.setState({
@@ -31,8 +32,8 @@ export default class Slider extends Component {
   }
 
   onPan(e) {
+    e.preventDefault();
     if (e.center.x && e.center.y) {
-      e.preventDefault();
       const { onChange, max, min } = this.props;
       onChange(
         Math.min(max,
@@ -50,6 +51,7 @@ export default class Slider extends Component {
   onTouchStart(e) {
     const { onChange, max, min } = this.props;
     const x = e.nativeEvent.clientX || e.nativeEvent.touches[0].clientX || 0;
+    e.nativeEvent.preventDefault();
     onChange(
       Math.min(max,
         Math.max(min,
