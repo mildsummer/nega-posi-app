@@ -57,7 +57,6 @@ export default class ARMode extends Component {
 
   componentWillUnmount() {
     window.clearTimeout(this.timer);
-    controls.dispose();
     this.contents.children.forEach((mesh) => {
       this.contents.remove(mesh);
       mesh.geometry.dispose();
@@ -84,10 +83,12 @@ export default class ARMode extends Component {
     renderer.setSize(640, 480);
     renderer.domElement.classList.add('ar-layer');
     this.wrapper.appendChild(renderer.domElement);
-    camera = camera || new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.lookAt(0, 0, 0);
-    camera.position.set(0, 0, 10);
-    controls = new THREE.OrbitControls(camera, container);
+    if (!camera) {
+      camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.lookAt(0, 0, 0);
+      camera.position.set(0, 0, 10);
+    }
+    controls = controls || new THREE.OrbitControls(camera, container);
     controls.enablePan = false;
     controls.update();
     scene.add(camera);
