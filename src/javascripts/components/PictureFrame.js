@@ -317,8 +317,8 @@ export default class PictureFrame extends Component {
               style={{
                 width: `${clipWidth / pixelRatio}px`,
                 height: `${clipHeight / pixelRatio}px`,
-                top: clipTop,
-                left: clipLeft,
+                top: clipTop / pixelRatio,
+                left: clipLeft / pixelRatio,
                 padding: margin / pixelRatio
               }}
             >
