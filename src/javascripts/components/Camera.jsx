@@ -198,7 +198,7 @@ export default class Camera extends Component {
     const { width, height } = this.state;
     const { data } = this.props;
     const { flip, mat, frame } = data;
-    const { clipWidth, clipHeight } = this.frame.marginedSize;
+    const { clipWidth, clipHeight, clipTop, clipLeft } = this.frame.marginedRect;
     const { frameWidth, frameHeight } = this.frame.frameSize;
     if (flip || mat || frame) {
       const canvas = document.createElement('canvas');
@@ -216,8 +216,8 @@ export default class Camera extends Component {
             const clipSize = width * (clipHeight / height);
             context.drawImage(
               imageObject,
-              (frameWidth - clipWidth) / 2 - (clipSize - clipWidth) / 2,
-              (frameHeight - clipHeight) / 2,
+              clipLeft - (clipSize - clipWidth) / 2,
+              clipTop,
               clipSize,
               clipHeight
             );
@@ -225,8 +225,8 @@ export default class Camera extends Component {
             const clipSize = height * (clipWidth / width);
             context.drawImage(
               imageObject,
-              (frameWidth - clipWidth) / 2,
-              (frameHeight - clipHeight) / 2 - (clipSize - clipHeight) / 2,
+              clipLeft,
+              clipTop - (clipSize - clipHeight) / 2,
               clipWidth,
               clipSize
             );
@@ -288,7 +288,7 @@ export default class Camera extends Component {
   render() {
     const { init, width, height } = this.state;
     const { onClick, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.props;
-    const { flip, base, mat, clipSize, clipRatio, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
+    const { flip, base, mat, clipSize, clipRatio, clipVerticalPosition, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
       <Hammer onTap={onClick}>
         <div
@@ -334,6 +334,7 @@ export default class Camera extends Component {
               height={height}
               clipSize={clipSize}
               clipRatio={clipRatio}
+              clipVerticalPosition={clipVerticalPosition}
               thickness={matThickness}
               color={mat}
               frame={frame}

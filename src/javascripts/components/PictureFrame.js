@@ -14,6 +14,7 @@ export default class PictureFrame extends Component {
       || nextProps.height !== this.props.height
       || nextProps.clipSize !== this.props.clipSize
       || nextProps.clipRatio !== this.props.clipRatio
+      || nextProps.clipVerticalPosition !== this.props.clipVerticalPosition
       || nextProps.frameRatio !== this.props.frameRatio
       || nextProps.frameType !== this.props.frameType
       || nextProps.frame !== this.props.frame
@@ -52,22 +53,28 @@ export default class PictureFrame extends Component {
     };
   }
 
-  get clipSize() {
+  get clipRect() {
     const { frameWidth, frameHeight } = this.frameSize;
-    const { color, clipSize, clipRatio } = this.props;
+    const { color, clipSize, clipRatio, clipVerticalPosition } = this.props;
     const clipMax = Math.min(frameWidth, frameHeight) * clipSize;
     const clipWidth = clipRatio > 0 ? clipMax / (clipRatio + 1) : clipMax;
     const clipHeight = clipRatio > 0 ? clipMax : clipMax / (-clipRatio + 1);
+    const clipTop = (frameHeight - clipHeight) / 2 * (1 - clipVerticalPosition);
+    const clipLeft = (frameWidth - clipWidth) / 2;
     return {
+      clipTop: color ? clipTop : 0,
+      clipLeft : color ? clipLeft : 0,
       clipWidth: color ? clipWidth : frameWidth,
       clipHeight: color ? clipHeight : frameHeight
     };
   }
 
-  get marginedSize() {
+  get marginedRect() {
     const { margin } = this.props;
-    const { clipWidth, clipHeight } = this.clipSize;
+    const { clipWidth, clipHeight, clipTop, clipLeft } = this.clipRect;
     return {
+      clipTop: clipTop + margin,
+      clipLeft: clipLeft + margin,
       clipWidth: clipWidth - margin * 2,
       clipHeight: clipHeight - margin * 2
     };
@@ -124,7 +131,7 @@ export default class PictureFrame extends Component {
     const context = canvas.getContext('2d');
     const { colorString, luminance } = this.color;
     const { frameWidth, frameHeight } = this.frameSize;
-    const { clipWidth, clipHeight } = this.clipSize;
+    const { clipWidth, clipHeight, clipTop, clipLeft } = this.clipRect;
     canvas.width = frameWidth;
     canvas.height = frameHeight;
     if (color) {
@@ -134,7 +141,7 @@ export default class PictureFrame extends Component {
         this.drawBorder(
           context,
           i,
-          (frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2,
+          clipLeft, clipTop,
           clipWidth, clipHeight,
           thickness,
           BORDER_COLORS[luminance][i],
@@ -143,7 +150,7 @@ export default class PictureFrame extends Component {
       }
       if (margin) {
         context.fillStyle = `rgb(${base.value.join(',')})`;
-        context.fillRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+        context.fillRect(clipLeft, clipTop, clipWidth, clipHeight);
 
         ///// plate mark
         if (margin > 8) {
@@ -152,14 +159,14 @@ export default class PictureFrame extends Component {
           context.shadowBlur = 3;
           context.shadowColor = 'rgba(0, 0, 0, 0.08)';
           const gradient = context.createLinearGradient(
-            (frameWidth - clipWidth) / 2 + margin - 3,
-            (frameHeight - clipHeight) / 2 + margin - 3,
-            (frameWidth - clipWidth) / 2 + margin - 6 + clipWidth - margin * 2 + 6,
-            (frameHeight - clipHeight) / 2 + margin - 6 + clipHeight - margin * 2 + 6
+            clipLeft + margin - 3,
+            clipTop + margin - 3,
+            clipLeft + margin - 6 + clipWidth - margin * 2 + 6,
+            clipTop + margin - 6 + clipHeight - margin * 2 + 6
           );
           context.fillRect(
-            (frameWidth - clipWidth) / 2 + margin - 3,
-            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipLeft + margin - 3,
+            clipTop + margin - 3,
             clipWidth - margin * 2 + 6,
             clipHeight - margin * 2 + 6
           );
@@ -169,15 +176,15 @@ export default class PictureFrame extends Component {
           context.lineWidth = 2;
           context.lineJoin = 'round';
           context.strokeRect(
-            (frameWidth - clipWidth) / 2 + margin - 3,
-            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipLeft + margin - 3,
+            clipTop + margin - 3,
             clipWidth - margin * 2 + 6,
             clipHeight - margin * 2 + 6
           );
           context.fillStyle = 'rgb(0, 0, 0, 0.02)';
           context.fillRect(
-            (frameWidth - clipWidth) / 2 + margin - 3,
-            (frameHeight - clipHeight) / 2 + margin - 3,
+            clipLeft + margin - 3,
+            clipTop + margin - 3,
             clipWidth - margin * 2 + 6,
             clipHeight - margin * 2 + 6
           );
@@ -185,13 +192,13 @@ export default class PictureFrame extends Component {
         /////
 
         context.clearRect(
-          (frameWidth - clipWidth) / 2 + margin,
-          (frameHeight - clipHeight) / 2 + margin,
+          clipLeft + margin,
+          clipTop + margin,
           clipWidth - margin * 2,
           clipHeight - margin * 2
         );
       } else {
-        context.clearRect((frameWidth - clipWidth) / 2, (frameHeight - clipHeight) / 2, clipWidth, clipHeight);
+        context.clearRect(clipLeft, clipTop, clipWidth, clipHeight);
       }
     }
 
@@ -281,7 +288,7 @@ export default class PictureFrame extends Component {
 
   render() {
     const { color, frame, children, margin, pixelRatio } = this.props;
-    const { clipWidth, clipHeight } = this.clipSize;
+    const { clipWidth, clipHeight, clipTop, clipLeft } = this.clipRect;
     const { frameWidth, frameHeight } = this.frameSize;
     return (
       <div className='frame__wrapper'>
@@ -309,6 +316,8 @@ export default class PictureFrame extends Component {
               style={{
                 width: `${clipWidth / pixelRatio}px`,
                 height: `${clipHeight / pixelRatio}px`,
+                top: clipTop,
+                left: clipLeft,
                 padding: margin / pixelRatio
               }}
             >
@@ -328,6 +337,7 @@ PictureFrame.propTypes = {
   height: PropTypes.number.isRequired,
   clipSize: PropTypes.number,
   clipRatio: PropTypes.number,
+  clipVerticalPosition: PropTypes.number,
   frame: PropTypes.object,
   frameRatio: PropTypes.number,
   frameType: PropTypes.object,
