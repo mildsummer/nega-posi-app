@@ -172,7 +172,7 @@ export default class App extends Component {
 
   toggleARMode() {
     const { isARMode } = this.state;
-    this.setState({ isARMode: !isARMode });
+    this.setState({ isARMode: !isARMode, pause: isARMode });
   }
 
   toggleBlend() {

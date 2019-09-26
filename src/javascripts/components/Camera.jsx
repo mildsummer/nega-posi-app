@@ -11,7 +11,7 @@ import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
 import PictureFrame from './PictureFrame';
 import ARMode from './ARMode';
 
-const INTERVAL = 80;
+// const INTERVAL = 80;
 
 export default class Camera extends Component {
   constructor(props) {
@@ -58,15 +58,17 @@ export default class Camera extends Component {
 
   componentDidUpdate(prevProps) {
     const { pause, isARMode } = this.props;
-    if (!prevProps.isARMode && isARMode) {
-      this.cacheSource();
-    } else if (!isARMode && prevProps.isARMode) {
-      delete this.cacheCanvas;
-    }
-    if (pause && this.tick) {
-      this.pause();
-    } else if (!pause && !this.tick) {
-      this.start();
+    if (prevProps.isARMode !== isARMode || prevProps.pause !== pause) {
+      if (!prevProps.isARMode && isARMode) {
+        this.cacheSource();
+      } else if (!isARMode && prevProps.isARMode) {
+        delete this.cacheCanvas;
+      }
+      if (pause) {
+        this.pause();
+      } else if (!pause) {
+        this.start();
+      }
     } else {
       this.update();
     }
@@ -148,6 +150,12 @@ export default class Camera extends Component {
         HistogramManager.update(luminanceData);
       }
     }
+    const { pause, isARMode } = this.props;
+    if (!pause && !isARMode) {
+      this.tick = window.requestAnimationFrame(this.update);
+    } else {
+      delete this.tick;
+    }
   }
 
   onWorkerMessage(e) {
@@ -165,18 +173,21 @@ export default class Camera extends Component {
   }
 
   pause() {
-    window.clearInterval(this.tick);
+    window.cancelAnimationFrame(this.tick);
     delete this.tick;
     this.video.pause();
   }
 
   start() {
-    if (!this.tick && this.video.paused) {
+    if (this.video.paused) {
       this.video.play().catch((error) => {
         console.error(error);
       });
-      this.tick = window.setInterval(this.update, INTERVAL);
+    }
+    const { isARMode } = this.props;
+    if (!isARMode) {
       this.update();
+      this.tick = window.requestAnimationFrame(this.update);
     }
     // window.setTimeout(() => {
     //   this.pause();
