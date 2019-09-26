@@ -9,6 +9,10 @@ export default class AngleSlider extends Component {
     this.onPanEnd = this.onPanEnd.bind(this);
   }
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.value !== this.props.value;
+  }
+
   onPan(e) {
     if (e.center.x && e.center.y) {
       const { onChange } = this.props;

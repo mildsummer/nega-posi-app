@@ -13,6 +13,10 @@ export default class OffsetController extends Component {
     this.left = this.left.bind(this);
   }
 
+  shouldComponentUpdate() {
+    return false;
+  }
+
   up() {
     const { x, y, onChange } = this.props;
     onChange(x, y - OFFSET_UNIT);
