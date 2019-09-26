@@ -32,10 +32,8 @@ export default class SettingMenuItem extends Component {
   }
 
   reset() {
-    const { data } = this.props;
-    data.items.forEach((item) => {
-      this.onChange(item)(item.defaultValue);
-    });
+    const { data, onChange } = this.props;
+    onChange(data.items.map((item) => ({ value: item.defaultValue, optionItem: item })));
   }
 
   onEditCustomColor() {

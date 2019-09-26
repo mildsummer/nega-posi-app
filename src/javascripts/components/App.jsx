@@ -46,6 +46,19 @@ const defaultData = (() => {
   return data;
 })();
 
+const setValue = (value, optionItem) => {
+  const isName = optionItem.type === OPTION_TYPE_COLOR || optionItem.type === OPTION_TYPE_FRAME;
+  if (isName) {
+    if (value) {
+      Storage.setItem(optionItem.name, value.name);
+    } else {
+      Storage.removeItem(optionItem.name);
+    }
+  } else {
+    Storage.setItem(optionItem.name, value);
+  }
+};
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -84,18 +97,18 @@ export default class App extends Component {
     }
   }
 
-  onChange(value, optionItem) {
+  onChange(value, optionItem = null) {
     const { data } = this.state;
-    const isName = optionItem.type === OPTION_TYPE_COLOR || optionItem.type === OPTION_TYPE_FRAME;
-    this.setState({ data: assign({}, data, { [optionItem.name]: value }) });
-    if (isName) {
-      if (value) {
-        Storage.setItem(optionItem.name, value.name);
-      } else {
-        Storage.removeItem(optionItem.name);
-      }
+    const newData = assign({}, data);
+    if (Array.isArray(value)) {
+      value.forEach((arg) => {
+        newData[arg.optionItem.name] = arg.value;
+        setValue(arg.value, arg.optionItem);
+      });
+      this.setState({ data: newData });
     } else {
-      Storage.setItem(optionItem.name, value);
+      this.setState({ data: assign({}, data, { [optionItem.name]: value }) });
+      setValue(value, optionItem);
     }
   }
 
