@@ -168,10 +168,10 @@ export default [
       {
         name: 'frameRatio',
         type: OPTION_TYPE_NUMBER,
-        max: 1,
-        min: -1,
+        max: 2,
+        min: -2,
         required: true,
-        defaultValue: 0,
+        defaultValue: window.innerWidth > window.innerHeight ? -(window.innerWidth / window.innerHeight) + 1 : window.innerHeight / window.innerWidth - 1,
         ratio: true
       },
       {
