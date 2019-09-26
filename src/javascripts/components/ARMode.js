@@ -57,6 +57,7 @@ export default class ARMode extends Component {
 
   componentWillUnmount() {
     window.clearTimeout(this.timer);
+    controls.enabled = false;
     this.contents.children.forEach((mesh) => {
       this.contents.remove(mesh);
       mesh.geometry.dispose();
@@ -90,6 +91,7 @@ export default class ARMode extends Component {
     }
     controls = controls || new THREE.OrbitControls(camera, container);
     controls.enablePan = false;
+    controls.enabled = true;
     controls.update();
     scene.add(camera);
     container.addEventListener('mousewheel', (e) => {
