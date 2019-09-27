@@ -3,6 +3,7 @@ const path = require('path');
 const RemoveSourceMapUrlWebpackPlugin = require('./remove-source-map-url-webpack-plugin.js');
 const LicenseInfoWebpackPlugin = require('license-info-webpack-plugin').default;
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const StatsPlugin = require('stats-webpack-plugin');
 
 module.exports = (env, argv) => {
   const PROD = argv.mode === 'production';
@@ -109,14 +110,20 @@ module.exports = (env, argv) => {
       new webpack.optimize.OccurrenceOrderPlugin(), // コンパイルするファイルの順番を調整
       new webpack.ProgressPlugin((percentage, msg) => {
         process.stdout.write('progress ' + Math.floor(percentage * 100) + '% ' + msg + '\r');
-      })
+      }),
+      new StatsPlugin('../../stats.json', {
+        chunkModules: true,
+      }, null)
     ] : [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"development"'
       }),
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
+      new StatsPlugin('stats.json', {
+        chunkModules: true,
+      }, null)
     ]
   };
 };

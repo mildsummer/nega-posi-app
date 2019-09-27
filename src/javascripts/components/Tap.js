@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import assign from 'lodash.assign';
+import { assign } from '../utils/Utils';
 import isEqual from 'lodash.isequal';
 
 // utils

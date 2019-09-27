@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import find from 'lodash.find';
+import { find } from '../utils/Utils';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
 
 const BORDER_COLORS = {

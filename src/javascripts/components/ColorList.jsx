@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import find from 'lodash.find';
+import { find } from '../utils/Utils';
 import Tap from './Tap';
 
 export default class ColorList extends Component {

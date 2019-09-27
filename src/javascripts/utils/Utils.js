@@ -56,3 +56,64 @@ export const createCustomColor = (hsv) => ({
   value: color.hsv.rgb(hsv[0] === 1 ? 0 : hsv[0] * 360, hsv[1] * 100, hsv[2] * 100),
   isCustom: true
 });
+
+export const find = (array, iterator) => {
+  let result = null;
+  if (typeof iterator === 'function') {
+    for (let i = 0; i < array.length; i += 1) {
+      const item = array[i];
+      if (iterator(item)) {
+        result = item;
+        break;
+      }
+    }
+  } else if (typeof iterator === 'object') {
+    for (let i = 0; i < array.length; i += 1) {
+      const item = array[i];
+      if (item) {
+        let flag = true;
+        const keys = Object.keys(iterator);
+        for (let j = 0; j < keys.length; j += 1) {
+          const key = keys[j];
+          if (item[key] !== iterator[key]) {
+            flag = false;
+            break;
+          }
+        }
+        if (flag) {
+          result = item;
+          break;
+        }
+      }
+    }
+  } else {
+    for (let i = 0; i < array.length; i += 1) {
+      const item = array[i];
+      if (item === iterator) {
+        result = item;
+        break;
+      }
+    }
+  }
+  return result;
+};
+
+export const assign = Object.assign || function(target) {
+  const to = Object(target);
+  for (let i = 1; i < arguments.length; i++) {
+    let nextSource = arguments[i];
+    if (nextSource === undefined || nextSource === null) {
+      continue;
+    }
+    nextSource = Object(nextSource);
+    let keysArray = Object.keys(Object(nextSource));
+    for (let nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+      const nextKey = keysArray[nextIndex];
+      const desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+      if (typeof desc !== 'undefined' && desc.enumerable) {
+        to[nextKey] = nextSource[nextKey];
+      }
+    }
+  }
+  return to;
+};

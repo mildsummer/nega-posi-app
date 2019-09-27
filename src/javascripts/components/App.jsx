@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import find from 'lodash.find';
-import assign from 'lodash.assign';
 import Camera from './Camera';
 import SettingMenu from './SettingMenu';
 import Tap from './Tap';
@@ -12,6 +10,7 @@ import Colors from '../constants/Colors';
 import FrameTypes from '../constants/FrameTypes';
 import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR, OPTION_TYPE_FRAME } from '../constants/Options';
 import Storage from '../utils/Storage';
+import { assign, find } from '../utils/Utils';
 import { createCustomColor } from '../utils/Utils';
 
 const defaultData = (() => {

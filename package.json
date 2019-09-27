@@ -4,7 +4,7 @@
   "author": "Nodoka Yamamoto",
   "scripts": {
     "start": "NODE_ENV=development && webpack-dev-server --config webpack.config.js --content-base dist/ --mode=development -d",
-    "production": "NODE_ENV=production && webpack --config webpack.config.js --mode=production -d"
+    "production": "NODE_ENV=production && webpack --config webpack.config.js --mode=production -d && webpack-bundle-analyzer stats.json --port 8765"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -25,10 +25,12 @@
     "node-sass": "^4.11.0",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.1.0",
+    "stats-webpack-plugin": "^0.7.0",
     "style-loader": "^0.23.1",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "url-loader": "^2.1.0",
     "webpack": "^4.27.1",
+    "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "worker-loader": "^2.0.0"
@@ -36,8 +38,6 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "color-convert": "^2.0.1",
-    "lodash.assign": "^4.2.0",
-    "lodash.find": "^4.6.0",
     "lodash.isequal": "^4.5.0",
     "lodash.max": "^4.0.1",
     "lodash.throttle": "^4.1.1",

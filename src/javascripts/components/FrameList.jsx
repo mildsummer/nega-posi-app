@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import find from 'lodash.find';
 import Tap from './Tap';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
+import { find } from '../utils/Utils';
 
 export default class FrameList extends Component {
   constructor(props) {
