@@ -160,58 +160,59 @@ export default class PictureFrame extends Component {
           1
         );
       }
-      if (margin) {
-        context.fillStyle = `rgb(${base.value.join(',')})`;
-        context.fillRect(clipLeft, clipTop, clipWidth, clipHeight);
+    }
 
-        ///// plate mark
-        if (margin > 8) {
-          context.shadowOffsetX = 0;
-          context.shadowOffsetY = 0;
-          context.shadowBlur = 3;
-          context.shadowColor = 'rgba(0, 0, 0, 0.08)';
-          const gradient = context.createLinearGradient(
-            clipLeft + margin - 3,
-            clipTop + margin - 3,
-            clipLeft + margin - 6 + clipWidth - margin * 2 + 6,
-            clipTop + margin - 6 + clipHeight - margin * 2 + 6
-          );
-          context.fillRect(
-            clipLeft + margin - 3,
-            clipTop + margin - 3,
-            clipWidth - margin * 2 + 6,
-            clipHeight - margin * 2 + 6
-          );
-          gradient.addColorStop(0, 'rgba(0, 0, 0, 0.02)');
-          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-          context.strokeStyle = gradient;
-          context.lineWidth = 2;
-          context.lineJoin = 'round';
-          context.strokeRect(
-            clipLeft + margin - 3,
-            clipTop + margin - 3,
-            clipWidth - margin * 2 + 6,
-            clipHeight - margin * 2 + 6
-          );
-          context.fillStyle = 'rgb(0, 0, 0, 0.02)';
-          context.fillRect(
-            clipLeft + margin - 3,
-            clipTop + margin - 3,
-            clipWidth - margin * 2 + 6,
-            clipHeight - margin * 2 + 6
-          );
-        }
-        /////
+    if (margin) {
+      context.fillStyle = `rgb(${base.value.join(',')})`;
+      context.fillRect(clipLeft, clipTop, clipWidth, clipHeight);
 
-        context.clearRect(
-          clipLeft + margin,
-          clipTop + margin,
-          clipWidth - margin * 2,
-          clipHeight - margin * 2
+      ///// plate mark
+      if (margin > 8) {
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 3;
+        context.shadowColor = 'rgba(0, 0, 0, 0.08)';
+        const gradient = context.createLinearGradient(
+          clipLeft + margin - 3,
+          clipTop + margin - 3,
+          clipLeft + margin - 6 + clipWidth - margin * 2 + 6,
+          clipTop + margin - 6 + clipHeight - margin * 2 + 6
         );
-      } else {
-        context.clearRect(clipLeft, clipTop, clipWidth, clipHeight);
+        context.fillRect(
+          clipLeft + margin - 3,
+          clipTop + margin - 3,
+          clipWidth - margin * 2 + 6,
+          clipHeight - margin * 2 + 6
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.02)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        context.strokeStyle = gradient;
+        context.lineWidth = 2;
+        context.lineJoin = 'round';
+        context.strokeRect(
+          clipLeft + margin - 3,
+          clipTop + margin - 3,
+          clipWidth - margin * 2 + 6,
+          clipHeight - margin * 2 + 6
+        );
+        context.fillStyle = 'rgb(0, 0, 0, 0.02)';
+        context.fillRect(
+          clipLeft + margin - 3,
+          clipTop + margin - 3,
+          clipWidth - margin * 2 + 6,
+          clipHeight - margin * 2 + 6
+        );
       }
+      /////
+
+      context.clearRect(
+        clipLeft + margin,
+        clipTop + margin,
+        clipWidth - margin * 2,
+        clipHeight - margin * 2
+      );
+    } else {
+      context.clearRect(clipLeft, clipTop, clipWidth, clipHeight);
     }
 
     // frame

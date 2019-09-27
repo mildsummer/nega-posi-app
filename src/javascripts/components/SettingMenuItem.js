@@ -46,7 +46,6 @@ export default class SettingMenuItem extends Component {
     const { data, values, customValue, frameColor } = this.props;
     let element = null;
     const value = values[data.items.indexOf(item)];
-    console.log(value);
     switch (item.type) {
       case OPTION_TYPE_COLOR:
         element = (
