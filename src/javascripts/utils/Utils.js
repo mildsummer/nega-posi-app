@@ -117,3 +117,35 @@ export const assign = Object.assign || function(target) {
   }
   return to;
 };
+
+export const isEqual = (a, b) => {
+  let result = true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      result = false;
+    } else {
+      for (let i = 0; i < a.length; i += 1) {
+        if (a[i] !== b[i]) {
+          result = false;
+          break;
+        }
+      }
+    }
+  } else if (typeof a === 'object' && typeof b === 'object') {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length !== keysB.length) {
+      result = false;
+    } else {
+      for (let i = 0; i < keysA.length; i += 1) {
+        if (a[keysA[i]] !== b[keysA[i]]) {
+          result = false;
+          break;
+        }
+      }
+    }
+  } else {
+    result = a === b;
+  }
+  return result;
+};

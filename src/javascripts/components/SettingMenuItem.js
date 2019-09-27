@@ -1,12 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import colorConvert from 'color-convert';
-import isEqual from 'lodash.isequal';
 import ColorList from './ColorList';
 import FrameList from './FrameList';
 import Slider from './Slider';
 import Tap from './Tap';
-import { find } from '../utils/Utils';
+import { find, isEqual } from '../utils/Utils';
 import { OPTION_TYPE_TOGGLE, OPTION_TYPE_COLOR, OPTION_TYPE_NUMBER, OPTION_TYPE_FRAME } from '../constants/Options';
 
 export default class SettingMenuItem extends Component {
