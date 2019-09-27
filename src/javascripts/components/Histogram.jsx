@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import max from 'lodash.max';
 import HistogramManager from '../utils/HistogramManager';
 import { LUMINANCE_DATA_UNIT } from '../constants/General';
+import { max } from '../utils/Utils';
 
 export default class Histogram extends Component {
   constructor(props) {

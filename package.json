@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "classnames": "^2.2.6",
-    "color-convert": "^2.0.1",
     "lodash.max": "^4.0.1",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",

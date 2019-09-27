@@ -158,6 +158,7 @@ export default class App extends Component {
       const newCustomColor = assign({}, data.customColor, {
         [colorPickerType.name]: createCustomColor(hsv)
       });
+      console.log(hsv, newCustomColor);
       this.setState({
         colorPickerType: null
       });

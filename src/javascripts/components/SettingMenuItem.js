@@ -1,11 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import colorConvert from 'color-convert';
 import ColorList from './ColorList';
 import FrameList from './FrameList';
 import Slider from './Slider';
 import Tap from './Tap';
-import { find, isEqual } from '../utils/Utils';
+import { find, isEqual, rgbToHex } from '../utils/Utils';
 import { OPTION_TYPE_TOGGLE, OPTION_TYPE_COLOR, OPTION_TYPE_NUMBER, OPTION_TYPE_FRAME } from '../constants/Options';
 
 export default class SettingMenuItem extends Component {
@@ -47,6 +46,7 @@ export default class SettingMenuItem extends Component {
     const { data, values, customValue, frameColor } = this.props;
     let element = null;
     const value = values[data.items.indexOf(item)];
+    console.log(value);
     switch (item.type) {
       case OPTION_TYPE_COLOR:
         element = (
@@ -61,7 +61,7 @@ export default class SettingMenuItem extends Component {
             />
             <p className='setting-menu__selected'>
               {value ? value.name : 'NONE'}
-              {value && value.isCustom ? ` / rgb(${value.value.join(', ')}) / #${colorConvert.rgb.hex(value.value)}` : ''}
+              {value && value.isCustom ? ` / rgb(${value.value.join(', ')}) / #${rgbToHex(value.value)}` : ''}
             </p>
           </Fragment>
         );

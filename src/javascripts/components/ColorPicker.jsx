@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import Hammer from 'react-hammerjs';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import color from 'color-convert';
 import Tap from './Tap';
+import { rgbToHsv, hsvToRgb } from '../utils/Utils';
 
 const { min, max } = Math;
-const rgbToHsv = color.rgb.hsv;
-const hsvToRgb = color.hsv.rgb;
 const zeroToOne = (value) => (min(1, max(0, value)));
 const DEFAULT_VALUE = [0, 0, 0];
 
@@ -118,7 +116,7 @@ export default class ColorPicker extends Component {
   render() {
     const { visible, value, onCancel } = this.props;
     const { h, s, v } = this.state;
-    const rgb = hsvToRgb(h === 1 ? 0 : h * 360, s * 100, v * 100);
+    const rgb = hsvToRgb([h === 1 ? 0 : h * 360, s * 100, v * 100]);
     return (
       <div
         className={classNames('color-picker', {
