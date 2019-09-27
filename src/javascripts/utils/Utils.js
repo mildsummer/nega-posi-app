@@ -149,3 +149,15 @@ export const isEqual = (a, b) => {
   }
   return result;
 };
+
+export const throttle = (func, wait = 100) => {
+  let timer = null;
+  return function(...args) {
+    if (timer === null) {
+      timer = window.setTimeout(() => {
+        func.apply(this, args);
+        timer = null;
+      }, wait);
+    }
+  };
+};

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Hammer from 'react-hammerjs';
-import throttle from 'lodash.throttle';
 import Histogram from './Histogram';
+import { throttle } from '../utils/Utils';
 
 export default class Slider extends Component {
   constructor(props) {

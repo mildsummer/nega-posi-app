@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
-import throttle from 'lodash.throttle';
 import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
   LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
-import { getDevice, getMediaManifest } from '../utils/Utils';
+import { getDevice, getMediaManifest, throttle } from '../utils/Utils';
 import HistogramManager from '../utils/HistogramManager';
 import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
 import PictureFrame from './PictureFrame';
