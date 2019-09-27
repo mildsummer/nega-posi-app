@@ -55,31 +55,33 @@ export default class PictureFrame extends Component {
 
   get clipRect() {
     const { frameWidth, frameHeight } = this.frameSize;
-    const { color, clipSize, clipRatio, clipVerticalPosition, frameBorderWidth, thickness } = this.props;
+    const { color, clipSize, clipRatio, clipVerticalPosition, frame, frameBorderWidth, thickness } = this.props;
     const normalizedClipRatio = clipRatio > 0 ? (clipRatio + 1) : 1 / (-clipRatio + 1);
-    const frameInnerWidth = color ? frameWidth - (frameBorderWidth + thickness) * 2 : frameWidth;
-    const frameInnerHeight = color ? frameHeight - (frameBorderWidth + thickness) * 2 : frameHeight;
+    const innerOffset = (frame ? frameBorderWidth : 0) + (color ? thickness : 0);
+    console.log(innerOffset);
+    const frameInnerWidth = frameWidth - innerOffset * 2;
+    const frameInnerHeight = frameHeight - innerOffset * 2;
     // const clipMax = normalizedClipRatio > frameHeight / frameWidth
     //   ? frameHeight * clipSize : frameWidth * clipSize;
     let clipWidth = 0;
     let clipHeight = 0;
-    if (normalizedClipRatio > frameInnerHeight / frameInnerWidth) { // 切り抜き枠の方が縦長の場合
-      clipHeight = frameInnerHeight;
-      clipWidth = clipRatio > 0 ? frameInnerHeight / (clipRatio + 1) : frameInnerHeight * (-clipRatio + 1);
-    } else { // 切り抜き枠の方が横長の場合
+    if (color) {
+      if (normalizedClipRatio > frameInnerHeight / frameInnerWidth) { // 切り抜き枠の方が縦長の場合
+        clipHeight = frameInnerHeight;
+        clipWidth = clipRatio > 0 ? frameInnerHeight / (clipRatio + 1) : frameInnerHeight * (-clipRatio + 1);
+      } else { // 切り抜き枠の方が横長の場合
+        clipWidth = frameInnerWidth;
+        clipHeight = clipRatio > 0 ? frameInnerWidth * (clipRatio + 1) : frameInnerWidth / (-clipRatio + 1);
+      }
+      clipWidth = clipWidth * clipSize;
+      clipHeight = clipHeight * clipSize;
+    } else {
       clipWidth = frameInnerWidth;
-      clipHeight = clipRatio > 0 ? frameInnerWidth * (clipRatio + 1) : frameInnerWidth / (-clipRatio + 1);
+      clipHeight = frameInnerHeight;
     }
-    clipWidth = clipWidth * clipSize;
-    clipHeight = clipHeight * clipSize;
-    const clipTop = (frameInnerHeight - clipHeight) / 2 * (1 - clipVerticalPosition) + frameBorderWidth + thickness;
-    const clipLeft = (frameInnerWidth - clipWidth) / 2 + frameBorderWidth + thickness;
-    return {
-      clipTop: color ? clipTop : 0,
-      clipLeft : color ? clipLeft : 0,
-      clipWidth: color ? clipWidth : frameInnerWidth,
-      clipHeight: color ? clipHeight : frameInnerHeight
-    };
+    const clipTop = (frameInnerHeight - clipHeight) / 2 * (1 - clipVerticalPosition) + innerOffset;
+    const clipLeft = (frameInnerWidth - clipWidth) / 2 + innerOffset;
+    return { clipTop, clipLeft, clipWidth, clipHeight };
   }
 
   get marginedRect() {
