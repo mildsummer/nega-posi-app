@@ -106,7 +106,8 @@ module.exports = (env, argv) => {
       ),
       new RemoveSourceMapUrlWebpackPlugin({}),
       new LicenseInfoWebpackPlugin({
-        glob: '{LICENSE,license,License}*'
+        glob: '{LICENSE,license,License}*',
+        includeLicenseFile: false
       }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
