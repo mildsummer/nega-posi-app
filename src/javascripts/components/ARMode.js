@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-const { THREE, THREEx } = window;
+import loadThreeJS from '../utils/loadThreeJS';
 
+let THREE = null;
+let THREEx = null;
 let renderer = null;
 let scene = null;
 let camera = null;
@@ -23,14 +25,17 @@ export default class ARMode extends Component {
   }
 
   componentDidMount() {
-    const { getImage } = this.props;
-    this.initScene();
-    getImage(this.initContents);
-    // this.initStartButton();
-    // this.initStopButton();
-    this.start();
-    window.addEventListener('resize', this.onResize);
-    this.onResize();
+    loadThreeJS(() => {
+      THREE = window.THREE;
+      const { getImage } = this.props;
+      this.initScene();
+      getImage(this.initContents);
+      // this.initStartButton();
+      // this.initStopButton();
+      this.start();
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
+    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {

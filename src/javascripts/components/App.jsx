@@ -12,6 +12,7 @@ import Options, { OPTION_TYPE_TOGGLE, OPTION_TYPE_NUMBER, OPTION_TYPE_COLOR, OPT
 import Storage from '../utils/Storage';
 import { assign, find } from '../utils/Utils';
 import { createCustomColor } from '../utils/Utils';
+import loadThreeJS from '../utils/loadThreeJS';
 
 const defaultData = (() => {
   const data = {};
@@ -89,6 +90,7 @@ export default class App extends Component {
 
   componentDidMount() {
     document.querySelector('.splash').classList.add('splash--hidden');
+    loadThreeJS();
   }
 
   onClickCamera() {
@@ -158,7 +160,6 @@ export default class App extends Component {
       const newCustomColor = assign({}, data.customColor, {
         [colorPickerType.name]: createCustomColor(hsv)
       });
-      console.log(hsv, newCustomColor);
       this.setState({
         colorPickerType: null
       });

@@ -6,6 +6,13 @@
     "start": "NODE_ENV=development && webpack-dev-server --config webpack.config.js --content-base dist/ --mode=development -d",
     "production": "NODE_ENV=production && webpack --config webpack.config.js --mode=production -d && webpack-bundle-analyzer stats.json --port 8765"
   },
+  "browserslist": [
+    "> 1%",
+    "last 1 version",
+    "maintained node versions",
+    "not OperaMini >= 0",
+    "not dead"
+  ],
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
