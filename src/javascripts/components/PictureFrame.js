@@ -58,11 +58,8 @@ export default class PictureFrame extends Component {
     const { color, clipSize, clipRatio, clipVerticalPosition, frame, frameBorderWidth, thickness } = this.props;
     const normalizedClipRatio = clipRatio > 0 ? (clipRatio + 1) : 1 / (-clipRatio + 1);
     const innerOffset = (frame ? frameBorderWidth : 0) + (color ? thickness : 0);
-    console.log(innerOffset);
     const frameInnerWidth = frameWidth - innerOffset * 2;
     const frameInnerHeight = frameHeight - innerOffset * 2;
-    // const clipMax = normalizedClipRatio > frameHeight / frameWidth
-    //   ? frameHeight * clipSize : frameWidth * clipSize;
     let clipWidth = 0;
     let clipHeight = 0;
     if (color) {
