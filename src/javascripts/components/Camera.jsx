@@ -2,11 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
-import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
-  LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
 import { getDevice, getMediaManifest, throttle } from '../utils/Utils';
-import HistogramManager from '../utils/HistogramManager';
-import CameraWorker from 'worker-loader?inline&fallback&name=worker.js!../worker';
+import Renderer from './Renderer';
 import PictureFrame from './PictureFrame';
 import ARMode from './ARMode';
 
@@ -20,9 +17,6 @@ export default class Camera extends PureComponent {
     this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
     this.ratio = this.isSP ? window.devicePixelRatio : 1;
-    this.worker = new CameraWorker;
-    this.worker.onmessage = this.onWorkerMessage.bind(this);
-    this.hasPostedToWorker = false;
     this.state = {
       init: false,
       width: window.innerWidth * this.ratio,
@@ -68,42 +62,13 @@ export default class Camera extends PureComponent {
             console.error(error);
           });
       });
+    this.renderer = new Renderer(this.canvas, this.video);
     this.video.onloadedmetadata = this.start;
   }
 
   update() {
     const { pause, isARMode, data } = this.props;
-    if (!this.worker || !this.hasPostedToWorker) {
-      const { width, height } = this.state;
-      const { base, drawing, contrast, contrastThreshold, inversion } = data;
-      const videoWidth = this.video.videoWidth;
-      const videoHeight = this.video.videoHeight;
-      const context = (this.dummyCanvas || this.canvas).getContext('2d');
-      const source = this.cacheCanvas || this.video;
-      if (videoWidth / videoHeight > width / height) {
-        const w = videoWidth * (height / videoHeight);
-        context.drawImage(source, (width - w) / 2, 0, w, height);
-      } else {
-        const h = videoHeight * (width / videoWidth);
-        context.drawImage(source, 0, (height - h) / 2, width, h);
-      }
-      const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-      this.hasPostedToWorker = true;
-      this.worker.postMessage({
-        imageData,
-        base,
-        drawing,
-        inversion,
-        contrast,
-        contrastThreshold,
-        CONTRAST_LENGTH,
-        CONTRAST_THRESHOLD_LENGTH,
-        LUMINANCE_COEFFICIENT,
-        LUMINANCE_DATA_INTERVAL,
-        LUMINANCE_DATA_UNIT
-      // }, [imageData.data.buffer]);
-      });
-    }
+    this.renderer.render(data, this.cacheCanvas || null);
     if (!pause && !isARMode) {
       this.tick = window.requestAnimationFrame(this.update);
     } else {
@@ -111,18 +76,11 @@ export default class Camera extends PureComponent {
     }
   }
 
-  onWorkerMessage(e) {
-    const context = this.canvas.getContext('2d');
-    context.putImageData(e.data.imageData, 0, 0);
-    HistogramManager.update(e.data.luminanceData);
-    this.hasPostedToWorker = false;
-  }
-
   onResize() {
-    this.setState({
-      width: window.innerWidth * this.ratio,
-      height: window.innerHeight * this.ratio
-    });
+    const width = window.innerWidth * this.ratio;
+    const height = window.innerHeight * this.ratio;
+    this.setState({ width, height });
+    this.renderer.resize(width, height);
   }
 
   pause() {
@@ -309,18 +267,6 @@ export default class Camera extends PureComponent {
                 height={height}
               />
             </PictureFrame>
-          {this.worker ? (
-            <canvas
-              ref={(ref) => {
-                if (ref) {
-                  this.dummyCanvas = ref;
-                }
-              }}
-              className='camera__dummy'
-              width={width}
-              height={height}
-            />
-          ) : null}
         </div>
       </Hammer>
     );
