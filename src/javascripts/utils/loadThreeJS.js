@@ -1,11 +1,5 @@
 const dir = './assets/vendor';
-const vendors = [{
-  url: `${dir}/three.min.js`,
-  key: 'THREE'
-}, {
-  url: `${dir}/OrbitControls.js`,
-  key: ['THREE', 'OrbitControls']
-}];
+const vendors = [`${dir}/three.min.js`, `${dir}/OrbitControls.min.js`];
 let hasRequested = false;
 let requestNum = 0;
 let callbacks = [];
@@ -33,7 +27,7 @@ function load() {
       cb(false);
     });
   };
-  script.src = vendors[requestNum].url;
+  script.src = vendors[requestNum];
   document.body.appendChild(script);
 }
 

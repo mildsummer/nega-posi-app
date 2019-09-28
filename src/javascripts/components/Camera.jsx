@@ -20,7 +20,9 @@ export default class Camera extends PureComponent {
     this.state = {
       init: false,
       width: window.innerWidth * this.ratio,
-      height: window.innerHeight * this.ratio
+      height: window.innerHeight * this.ratio,
+      videoWidth: 0,
+      videoHeight: 0
     };
   }
 
@@ -64,8 +66,13 @@ export default class Camera extends PureComponent {
           });
       });
     this.video.onloadedmetadata = () => {
-      this.renderer = new Renderer(this.canvas, this.video, data);
-      this.start();
+      this.setState({
+        videoWidth: this.video.videoWidth,
+        videoHeight: this.video.videoHeight
+      }, () => {
+        this.renderer = new Renderer(this.canvas, this.video, data);
+        this.start();
+      });
     };
   }
 
@@ -193,7 +200,7 @@ export default class Camera extends PureComponent {
   }
 
   render() {
-    const { init, width, height } = this.state;
+    const { init, width, height, videoWidth, videoHeight } = this.state;
     const { onClick, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.props;
     const { base, mat, clipSize, clipRatio, clipVerticalPosition, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
@@ -258,8 +265,8 @@ export default class Camera extends PureComponent {
                   }
                 }}
                 className='camera__viewer'
-                width={width}
-                height={height}
+                width={videoWidth}
+                height={videoHeight}
               />
             </PictureFrame>
         </div>

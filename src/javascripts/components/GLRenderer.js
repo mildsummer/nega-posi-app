@@ -22,9 +22,7 @@ export default class GLRenderer {
       depth: false
     });
     this.renderer.autoClear = false;
-    this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
-    this.camera.lookAt(0, 0, 0);
-    this.camera.position.set(0, 0, 1);
+    this.camera = new THREE.Camera();
     this.scene.add(this.camera);
     this.texture = new THREE.Texture(this.source);
     this.texture.needsUpdate = true;
@@ -111,12 +109,9 @@ export default class GLRenderer {
     }
   }
 
-  resize(width, height) {
+  resize() {
     if (this.inited) {
-      this.renderer.setPixelRatio(window.devicePixelRatio);
-      this.renderer.setSize(width, height, false);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(this.source.videoWidth, this.source.videoHeight, false);
       this.render();
     }
   }
