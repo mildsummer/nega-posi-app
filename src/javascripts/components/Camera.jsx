@@ -42,7 +42,7 @@ export default class Camera extends PureComponent {
         this.start();
       }
     } else {
-      this.update();
+      this.update(false);
     }
   }
 
@@ -63,14 +63,18 @@ export default class Camera extends PureComponent {
             console.error(error);
           });
       });
-    this.renderer = new Renderer(this.canvas, this.video, data);
-    this.video.onloadedmetadata = this.start;
+    this.video.onloadedmetadata = () => {
+      this.renderer = new Renderer(this.canvas, this.video, data);
+      this.start();
+    };
   }
 
-  update() {
+  update(af = true) {
     const { pause, isARMode, data } = this.props;
-    this.renderer.render(data, this.cacheCanvas || null);
-    if (!pause && !isARMode) {
+    if (this.renderer) {
+      this.renderer.render(data, this.cacheCanvas || null);
+    }
+    if (!pause && !isARMode && af) {
       this.tick = window.requestAnimationFrame(this.update);
     } else {
       delete this.tick;
@@ -97,9 +101,8 @@ export default class Camera extends PureComponent {
       });
     }
     const { isARMode } = this.props;
-    if (!isARMode) {
-      this.update();
-      this.tick = window.requestAnimationFrame(this.update);
+    if (!isARMode && !this.tick) {
+      this.update(true);
     }
     // window.setTimeout(() => {
     //   this.pause();

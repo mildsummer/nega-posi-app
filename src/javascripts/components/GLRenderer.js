@@ -53,6 +53,7 @@ export default class GLRenderer {
 			  vec4 color = texture2D(texture, vUv);
         float luminance = (color.x * LUMINANCE_COEFFICIENT.x) + (color.y * LUMINANCE_COEFFICIENT.y) + (color.z * LUMINANCE_COEFFICIENT.z);
         luminance = (luminance - contrastThresholdValue) * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
+        luminance = clamp(luminance, 0.0, 1.0);
         luminance = abs(inversion - luminance);
         color.x = (luminance * base.x + (1.0 - luminance) * drawing.x) / 255.0;
         color.y = (luminance * base.y + (1.0 - luminance) * drawing.y) / 255.0;
@@ -86,9 +87,19 @@ export default class GLRenderer {
     this.inited = true;
   }
 
-  render(data = this.data) {
+  render(data = this.data, cacheSource = null) {
     this.data = data;
     if (this.inited) {
+      if (cacheSource && this.cacheSource !== cacheSource) {
+        this.cacheSource = cacheSource;
+        const cacheTexture = new THREE.Texture(cacheSource);
+        cacheTexture.needsUpdate = true;
+        cacheTexture.minFilter = THREE.NearestFilter;
+        this.uniforms.texture.value = cacheTexture;
+      } else if (!cacheSource && this.cacheSource) {
+        delete this.cacheSource;
+        this.uniforms.texture.value = this.texture;
+      }
       this.uniforms.base.value = data.base.value;
       this.uniforms.drawing.value = data.drawing.value;
       this.uniforms.contrast.value = data.contrast;
