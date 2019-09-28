@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Hammer from 'react-hammerjs';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -9,7 +9,7 @@ const { min, max } = Math;
 const zeroToOne = (value) => (min(1, max(0, value)));
 const DEFAULT_VALUE = [0, 0, 0];
 
-export default class ColorPicker extends Component {
+export default class ColorPicker extends PureComponent {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
@@ -17,28 +17,15 @@ export default class ColorPicker extends Component {
     this.onTouchStartSV = this.onTouchStartSV.bind(this);
     this.onPanStartSV = this.onPanStartSV.bind(this);
     this.onPanSV = this.onPanSV.bind(this);
-    this.onPanEndSV = this.onPanEndSV.bind(this);
     this.onTouchStartHue = this.onTouchStartHue.bind(this);
     this.onPanStartHue = this.onPanStartHue.bind(this);
     this.onPanHue = this.onPanHue.bind(this);
-    this.onPanEndHue = this.onPanEndHue.bind(this);
     const hsv = rgbToHsv(props.value || DEFAULT_VALUE);
     this.state = {
       h: zeroToOne(hsv[0]),
       s: zeroToOne(hsv[1]),
       v: zeroToOne(hsv[2])
     };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.shouldUpdate(nextProps, nextState);
-  }
-
-  shouldUpdate(nextProps, nextState) {
-    return nextProps.visible !== this.props.visible
-    || nextState.h !== this.state.h
-    || nextState.s !== this.state.s
-    || nextState.v !== this.state.v;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -86,10 +73,6 @@ export default class ColorPicker extends Component {
     this.setState({ s, v });
   }
 
-  onPanEndSV() {
-    // console.log('sv end');
-  }
-
   onTouchStartHue(e) {
     e.nativeEvent.preventDefault();
     const h = zeroToOne(((e.nativeEvent.clientY || e.nativeEvent.touches[0].clientY || 0)
@@ -107,10 +90,6 @@ export default class ColorPicker extends Component {
     e.preventDefault();
     const h = zeroToOne(this.panStartHue + e.deltaY / this.hueField.clientHeight);
     this.setState({ h });
-  }
-
-  onPanEndHue() {
-    // console.log('Hue end');
   }
 
   render() {
@@ -146,8 +125,6 @@ export default class ColorPicker extends Component {
                 onMouseDown={this.onTouchStartSV}
                 onPanStart={this.onPanStartSV}
                 onPan={this.onPanSV}
-                onPanEnd={this.onPanEndSV}
-                onPanCancel={this.onPanEndSV}
                 options={
                   {
                     recognizers: {

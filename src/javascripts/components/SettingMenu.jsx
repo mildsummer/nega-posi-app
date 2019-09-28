@@ -1,15 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import SettingMenuItem from './SettingMenuItem';
 import Options, { OPTION_TYPE_FRAME } from '../constants/Options';
 
-export default class SettingMenu extends Component {
-  shouldComponentUpdate(nextProps) {
-    return nextProps.visible !== this.props.visible
-      || nextProps.data !== this.props.data;
-  }
-
+export default class SettingMenu extends PureComponent {
   render() {
     const { visible, data, onToggle, onChange, onEditCustomColor } = this.props;
     return (

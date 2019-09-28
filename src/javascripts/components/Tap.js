@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { assign, isEqual } from '../utils/Utils';
+import { assign } from '../utils/Utils';
 
 // utils
 const { pow, sqrt } = Math;
@@ -20,7 +20,7 @@ const TOUCH_ACTIVE_END_DURATION = 0;
 /**
  * タップ時のクラス切り替え
  */
-class Tap extends Component {
+class Tap extends PureComponent {
   constructor(props) {
     super(props);
     this.onTouchMove = this.onTouchMove.bind(this);
@@ -34,11 +34,6 @@ class Tap extends Component {
       touchStartY: 0
     };
     this.timers = [];
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !isEqual(nextProps, this.props)
-      || !isEqual(nextState, this.state)
   }
 
   /**

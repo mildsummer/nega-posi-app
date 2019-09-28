@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
@@ -6,13 +6,11 @@ import { CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT,
   LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL } from '../constants/General';
 import { getDevice, getMediaManifest, throttle } from '../utils/Utils';
 import HistogramManager from '../utils/HistogramManager';
-import CameraWorker from 'worker-loader?inline&name=worker.js!../worker';
+import CameraWorker from 'worker-loader?inline&fallback&name=worker.js!../worker';
 import PictureFrame from './PictureFrame';
 import ARMode from './ARMode';
 
-// const INTERVAL = 80;
-
-export default class Camera extends Component {
+export default class Camera extends PureComponent {
   constructor(props) {
     super(props);
     this.update = this.update.bind(this);
@@ -22,33 +20,14 @@ export default class Camera extends Component {
     this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
     this.ratio = this.isSP ? window.devicePixelRatio : 1;
-    if (window.Worker) {
-      this.worker = new CameraWorker;
-      this.worker.onmessage = this.onWorkerMessage.bind(this);
-      this.hasPostedToWorker = false;
-    }
+    this.worker = new CameraWorker;
+    this.worker.onmessage = this.onWorkerMessage.bind(this);
+    this.hasPostedToWorker = false;
     this.state = {
       init: false,
       width: window.innerWidth * this.ratio,
       height: window.innerHeight * this.ratio
     };
-  }
-
-  shouldUpdate(nextProps, nextState) {
-    return nextProps.data !== this.props.data
-    || nextProps.pause !== this.props.pause
-    || nextState.width !== this.state.width
-    || nextState.height !== this.state.height
-    || nextProps.isARMode !== this.props.isARMode
-    || nextProps.isBlend !== this.props.isBlend
-    || nextProps.shadeAngle !== this.props.shadeAngle
-    || nextProps.offsetX !== this.props.offsetX
-    || nextProps.offsetY !== this.props.offsetY
-    || nextState.init !== this.state.init;
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.shouldUpdate(nextProps, nextState);
   }
 
   componentDidMount() {
@@ -93,9 +72,10 @@ export default class Camera extends Component {
   }
 
   update() {
+    const { pause, isARMode, data } = this.props;
     if (!this.worker || !this.hasPostedToWorker) {
       const { width, height } = this.state;
-      const { base, drawing, contrast, contrastThreshold, inversion } = this.props.data;
+      const { base, drawing, contrast, contrastThreshold, inversion } = data;
       const videoWidth = this.video.videoWidth;
       const videoHeight = this.video.videoHeight;
       const context = (this.dummyCanvas || this.canvas).getContext('2d');
@@ -108,48 +88,22 @@ export default class Camera extends Component {
         context.drawImage(source, 0, (height - h) / 2, width, h);
       }
       const imageData = context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-      if (this.worker) {
-        this.hasPostedToWorker = true;
-        this.worker.postMessage({
-          imageData,
-          base,
-          drawing,
-          inversion,
-          contrast,
-          contrastThreshold,
-          CONTRAST_LENGTH,
-          CONTRAST_THRESHOLD_LENGTH,
-          LUMINANCE_COEFFICIENT,
-          LUMINANCE_DATA_INTERVAL,
-          LUMINANCE_DATA_UNIT
-        // }, [imageData.data.buffer]);
-        });
-      } else {
-        const data = imageData.data;
-        const luminanceData = [];
-        const contrastThresholdValue = 255 * contrastThreshold / CONTRAST_THRESHOLD_LENGTH;
-        for (let i = 0; i < data.length; i += 4) {
-          let luminance = (data[i] * LUMINANCE_COEFFICIENT[0]
-            + data[i + 1] * LUMINANCE_COEFFICIENT[1]
-            + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
-          if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
-            const luminanceIndex = Math.round(luminance / LUMINANCE_DATA_UNIT);
-            luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
-          }
-          luminance = (luminance - contrastThresholdValue)
-            * (CONTRAST_LENGTH + contrast) / CONTRAST_LENGTH + contrastThresholdValue;
-          luminance /= 255;
-          luminance = Math.max(0, Math.min(1, luminance));
-          luminance = inversion ? (1 - luminance) : luminance;
-          data[i] = Math.round(luminance * base.value[0] + (1 - luminance) * drawing.value[0]);
-          data[i + 1] = Math.round(luminance * base.value[1] + (1 - luminance) * drawing.value[1]);
-          data[i + 2] = Math.round(luminance * base.value[2] + (1 - luminance) * drawing.value[2]);
-        }
-        context.putImageData(imageData, 0, 0);
-        HistogramManager.update(luminanceData);
-      }
+      this.hasPostedToWorker = true;
+      this.worker.postMessage({
+        imageData,
+        base,
+        drawing,
+        inversion,
+        contrast,
+        contrastThreshold,
+        CONTRAST_LENGTH,
+        CONTRAST_THRESHOLD_LENGTH,
+        LUMINANCE_COEFFICIENT,
+        LUMINANCE_DATA_INTERVAL,
+        LUMINANCE_DATA_UNIT
+      // }, [imageData.data.buffer]);
+      });
     }
-    const { pause, isARMode } = this.props;
     if (!pause && !isARMode) {
       this.tick = window.requestAnimationFrame(this.update);
     } else {

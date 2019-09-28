@@ -1,20 +1,15 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Tap from './Tap';
 import { LUMINANCE_COEFFICIENT } from '../constants/General';
 import { find } from '../utils/Utils';
 
-export default class FrameList extends Component {
+export default class FrameList extends PureComponent {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
     this.canvasArray = [];
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return nextProps.selected !== this.props.selected
-      || nextProps.frameColor !== this.props.frameColor;
   }
 
   componentDidMount() {

@@ -34,11 +34,12 @@ export default class Slider extends Component {
   onPan(e) {
     e.preventDefault();
     if (e.center.x && e.center.y) {
-      const { onChange, max, min } = this.props;
-      onChange(
-        Math.min(max,
-          Math.max(min, this.panStartValue + (e.deltaX / this.base.clientWidth) * (max - min)))
-      );
+      const { onChange, value, max, min } = this.props;
+      const newValue = Math.min(max,
+        Math.max(min, this.panStartValue + (e.deltaX / this.base.clientWidth) * (max - min)));
+      if (newValue !== value) {
+        onChange(newValue);
+      }
     }
   }
 
@@ -49,14 +50,14 @@ export default class Slider extends Component {
   }
 
   onTouchStart(e) {
-    const { onChange, max, min } = this.props;
+    const { onChange, value, max, min } = this.props;
     const x = e.nativeEvent.clientX || e.nativeEvent.touches[0].clientX || 0;
     e.nativeEvent.preventDefault();
-    onChange(
-      Math.min(max,
-        Math.max(min,
-          (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * (max - min) + min))
-    );
+    const newValue = Math.min(max, Math.max(min,
+      (x - this.base.getBoundingClientRect().left) / this.base.clientWidth * (max - min) + min));
+    if (newValue !== value) {
+      onChange(newValue);
+    }
     this.setState({
       panning: true
     });

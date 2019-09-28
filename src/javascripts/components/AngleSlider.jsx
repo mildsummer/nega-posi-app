@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Hammer from 'react-hammerjs';
 import PropTypes from 'prop-types';
 
-export default class AngleSlider extends Component {
+export default class AngleSlider extends PureComponent {
   constructor(props) {
     super(props);
     this.onPan = this.onPan.bind(this);
     this.onPanEnd = this.onPanEnd.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return nextProps.value !== this.props.value;
   }
 
   onPan(e) {

@@ -42,7 +42,12 @@ module.exports = (env, argv) => {
             options: {
               presets: ['@babel/preset-env', '@babel/preset-react'],
               shouldPrintComment: PROD ? (value) => (value.match(printedCommentRegExp)) : () => (true),
-              plugins: PROD ? ['transform-react-remove-prop-types'] : null,
+              plugins: PROD ? [[
+                'transform-react-remove-prop-types',
+                {
+                  removeImport: true
+                }
+              ]] : null,
               compact: true
             }
           }]

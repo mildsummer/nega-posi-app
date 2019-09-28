@@ -9,22 +9,6 @@ const BORDER_COLORS = {
 };
 
 export default class PictureFrame extends Component {
-  shouldComponentUpdate(nextProps) {
-    return nextProps.width !== this.props.width
-      || nextProps.height !== this.props.height
-      || nextProps.clipSize !== this.props.clipSize
-      || nextProps.clipRatio !== this.props.clipRatio
-      || nextProps.clipVerticalPosition !== this.props.clipVerticalPosition
-      || nextProps.frameRatio !== this.props.frameRatio
-      || nextProps.frameType !== this.props.frameType
-      || nextProps.frame !== this.props.frame
-      || nextProps.frameBorderWidth !== this.props.frameBorderWidth
-      || nextProps.thickness !== this.props.thickness
-      || nextProps.color !== this.props.color
-      || nextProps.base !== this.props.base
-      || nextProps.margin !== this.props.margin;
-  }
-
   componentDidMount() {
     this.draw();
   }

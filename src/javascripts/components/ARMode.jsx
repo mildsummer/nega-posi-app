@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import loadThreeJS from '../utils/loadThreeJS';
 
 let THREE = null;
-let THREEx = null;
 let renderer = null;
 let scene = null;
 let camera = null;
@@ -16,7 +15,6 @@ export default class ARMode extends Component {
     this.initContents = this.initContents.bind(this);
     this.updateTexture = this.updateTexture.bind(this);
     this.onResize = this.onResize.bind(this);
-    this.startAr = this.startAr.bind(this);
     this.update = this.update.bind(this);
     this.timer = null;
     this.state = {
@@ -30,9 +28,8 @@ export default class ARMode extends Component {
       const { getImage } = this.props;
       this.initScene();
       getImage(this.initContents);
-      // this.initStartButton();
-      // this.initStopButton();
-      this.start();
+      this.update();
+      controls.addEventListener('change', this.update);
       window.addEventListener('resize', this.onResize);
       this.onResize();
     });
@@ -237,93 +234,18 @@ export default class ARMode extends Component {
     delete this.timer;
   }
 
-  initArToolkit() {
-    this.source = new THREEx.ArToolkitSource({
-      sourceType: 'webcam',
-    });
-    this.source.init(this.onResize);
-
-    this.context = new THREEx.ArToolkitContext({
-      debug: false,
-      cameraParametersUrl: './assets/vendor/camera_para.dat',
-      detectionMode: 'mono',
-      imageSmoothingEnabled: true,
-      maxDetectionRate: 60,
-      canvasWidth: this.source.parameters.sourceWidth,
-      canvasHeight: this.source.parameters.sourceHeight,
-    });
-    this.context.init(() => {
-      camera.projectionMatrix.copy(this.context.getProjectionMatrix());
-    });
-  }
-
-  initMarker() {
-    new THREEx.ArMarkerControls(this.context, this.contents, {
-      type: 'pattern',
-      patternUrl: './assets/vendor/patt.hiro'
-    });
-  }
-
-  initStartButton() {
-    document.getElementById('start-button').addEventListener('click', this.startAr);
-  }
-
-  initStopButton() {
-    document.getElementById('stop-button').addEventListener('click', () => {
-      this.isStop = true;
-      if (this.source) {
-        this.source.domElement.srcObject.getTracks().forEach((track) => {
-          track.stop();
-        });
-        this.source.domElement.srcObject = null;
-      }
-    });
-  }
-
   onResize() {
-    if (this.source && this.contents) {
-      this.source.onResizeElement();
-      this.source.copyElementSizeTo(renderer.domElement);
-      if(this.context.arController !== null){
-        this.source.copyElementSizeTo(this.context.arController.canvas);
-      }
-    } else {
-      const width = window.innerWidth || document.documentElement.clientWidth;
-      const height = window.innerHeight || document.documentElement.clientHeight;
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    }
+    const width = window.innerWidth || document.documentElement.clientWidth;
+    const height = window.innerHeight || document.documentElement.clientHeight;
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
     this.update();
-  }
-
-  startAr() {
-    controls.reset();
-    controls.dispose();
-    camera = new THREE.Camera();
-    scene.remove(camera);
-    this.initArToolkit();
-    this.initMarker();
-    this.isAr = true;
-  }
-
-  start() {
-    this.isStop = false;
-    this.update();
-    controls.addEventListener('change', this.update);
   }
 
   update() {
-    if (!this.isStop) {
-      if (this.isAr) {
-        if (this.source.ready === false) {
-          return;
-        }
-        this.context.update(this.source.domElement);
-      }
-      renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
   }
 
   translate(x, y) {
