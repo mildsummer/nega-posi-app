@@ -8,33 +8,44 @@ const vendors = [{
 }];
 let hasRequested = false;
 let requestNum = 0;
-let cb = null;
+let callbacks = [];
+let ended = false;
+let hasSuccessed = false;
+
+function load() {
+  const script = document.createElement('script');
+  script.onload = () => {
+    requestNum += 1;
+    if (requestNum === vendors.length) {
+      ended = true;
+      hasSuccessed = true;
+      callbacks.forEach((cb) => {
+        cb(true);
+      });
+    } else {
+      load();
+    }
+  };
+  script.onerror = () => {
+    requestNum += 1;
+    ended = true;
+    callbacks.forEach((cb) => {
+      cb(false);
+    });
+  };
+  script.src = vendors[requestNum].url;
+  document.body.appendChild(script);
+}
 
 export default (callback = null) => {
-  cb = callback || function(){};
-  function load() {
-    const script = document.createElement('script');
-    script.onload = () => {
-      requestNum += 1;
-      if (requestNum === vendors.length) {
-        cb(true);
-      } else {
-        load();
-      }
-    };
-    script.onerror = () => {
-      requestNum += 1;
-      cb(false);
-    };
-    script.src = vendors[requestNum].url;
-    document.body.appendChild(script);
+  if (callback) {
+    callbacks.push(callback);
   }
-  if (hasRequested) {
-    if (requestNum === vendors.length) {
-      cb(true);
-    }
-  } else {
+  if (!hasRequested) {
     hasRequested = true;
     load();
+  }
+  if (ended) {
+    callback(hasSuccessed);
   }
 };

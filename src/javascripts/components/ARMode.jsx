@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import loadThreeJS from '../utils/loadThreeJS';
-import { LUMINANCE_COEFFICIENT } from '../constants/General';
 
 let THREE = null;
 let renderer = null;
@@ -226,60 +225,6 @@ export default class ARMode extends Component {
       });
     };
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(canvasSize / frameWidth, canvasSize / frameWidth), new THREE.MeshBasicMaterial({ map: shadeTexture }));
-    this.contents.add(plane);
-    this.practiceGL(width, height);
-  }
-
-  practiceGL() {
-    const { data } = this.props;
-    const { base, drawing } = data;
-    const video = document.querySelector('video');
-    const texture = new THREE.Texture(video);
-    texture.needsUpdate = true;
-    texture.minFilter = THREE.NearestFilter;
-    video.addEventListener('timeupdate', () => {
-      texture.needsUpdate = true;
-      this.update();
-    });
-    const vertexShader = `
-      varying vec2 vUv;
-			void main() {
-			  vUv = uv;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `;
-    const fragmentShader = `
-      precision mediump float;
-      varying vec2 vUv;
-      uniform sampler2D texture;
-      uniform vec3 LUMINANCE_COEFFICIENT;
-      uniform vec3 base;
-      uniform vec3 drawing;
-			void main() {
-			  vec4 color = texture2D(texture, vUv);
-        float luminance = (color.x * LUMINANCE_COEFFICIENT.x) + (color.y * LUMINANCE_COEFFICIENT.y) + (color.z * LUMINANCE_COEFFICIENT.z);
-        color.x = (luminance * base.x + (1.0 - luminance) * drawing.x) / 255.0;
-        color.y = (luminance * base.y + (1.0 - luminance) * drawing.y) / 255.0;
-        color.z = (luminance * base.z + (1.0 - luminance) * drawing.z) / 255.0;
-				gl_FragColor = color;
-			}
-    `;
-    const shaderMaterial = new THREE.ShaderMaterial({
-      uniforms: {
-        texture: { value: texture },
-        LUMINANCE_COEFFICIENT: { value: LUMINANCE_COEFFICIENT, type: 'v3' },
-        base: { value: base.value, type: 'v3' },
-        drawing: { value: drawing.value, type: 'v3' }
-      },
-      vertexShader,
-      fragmentShader,
-      depthTest: false
-    });
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(2, 2 * video.videoHeight / video.videoWidth),
-      shaderMaterial
-    );
-    plane.position.set(0, 0, 3);
     this.contents.add(plane);
   }
 

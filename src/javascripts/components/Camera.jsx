@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
 import { getDevice, getMediaManifest, throttle } from '../utils/Utils';
-import Renderer from './Renderer';
+import Renderer from './GLRenderer';
 import PictureFrame from './PictureFrame';
 import ARMode from './ARMode';
 
@@ -47,6 +47,7 @@ export default class Camera extends PureComponent {
   }
 
   init() {
+    const { data } = this.props;
     window.navigator.mediaDevices.getUserMedia(getMediaManifest())
       .then((stream) => {
         this.video.srcObject = stream;
@@ -62,7 +63,7 @@ export default class Camera extends PureComponent {
             console.error(error);
           });
       });
-    this.renderer = new Renderer(this.canvas, this.video);
+    this.renderer = new Renderer(this.canvas, this.video, data);
     this.video.onloadedmetadata = this.start;
   }
 
@@ -108,48 +109,40 @@ export default class Camera extends PureComponent {
   getImage(callback) {
     const { width, height } = this.state;
     const { data } = this.props;
-    const { flip, mat, frame } = data;
+    const { mat, frame } = data;
     const { clipWidth, clipHeight, clipTop, clipLeft } = this.frame.marginedRect;
     const { frameWidth, frameHeight } = this.frame.frameSize;
-    if (flip || mat || frame) {
+    if (mat || frame) {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      const imageObject = new Image();
-      imageObject.onload = () => {
-        canvas.width = frameWidth;
-        canvas.height = frameHeight;
-        if (flip) {
-          context.translate(frameWidth, 0);
-          context.scale(-1, 1);
-        }
-        if (mat || frame) {
-          if (width / height > clipWidth / clipHeight) {
-            const clipSize = width * (clipHeight / height);
-            context.drawImage(
-              imageObject,
-              clipLeft - (clipSize - clipWidth) / 2,
-              clipTop,
-              clipSize,
-              clipHeight
-            );
-          } else {
-            const clipSize = height * (clipWidth / width);
-            context.drawImage(
-              imageObject,
-              clipLeft,
-              clipTop - (clipSize - clipHeight) / 2,
-              clipWidth,
-              clipSize
-            );
-          }
-          context.resetTransform();
-          context.drawImage(this.frame.canvas, 0, 0);
+      canvas.width = frameWidth;
+      canvas.height = frameHeight;
+      if (mat || frame) {
+        if (width / height > clipWidth / clipHeight) {
+          const clipSize = width * (clipHeight / height);
+          context.drawImage(
+            this.canvas,
+            clipLeft - (clipSize - clipWidth) / 2,
+            clipTop,
+            clipSize,
+            clipHeight
+          );
         } else {
-          context.drawImage(imageObject, 0, 0);
+          const clipSize = height * (clipWidth / width);
+          context.drawImage(
+            this.canvas,
+            clipLeft,
+            clipTop - (clipSize - clipHeight) / 2,
+            clipWidth,
+            clipSize
+          );
         }
-        callback(canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
-      };
-      imageObject.src = this.canvas.toDataURL();
+        context.resetTransform();
+        context.drawImage(this.frame.canvas, 0, 0);
+      } else {
+        context.drawImage(this.canvas, 0, 0);
+      }
+      callback(canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
     } else {
       callback(this.canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
     }
@@ -199,14 +192,13 @@ export default class Camera extends PureComponent {
   render() {
     const { init, width, height } = this.state;
     const { onClick, data, pause, isARMode, isBlend, shadeAngle, offsetX, offsetY } = this.props;
-    const { flip, base, mat, clipSize, clipRatio, clipVerticalPosition, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
+    const { base, mat, clipSize, clipRatio, clipVerticalPosition, matThickness, frame, frameRatio, margin, frameType, frameBorderWidth } = data;
     return (
       <Hammer onTap={onClick}>
         <div
           className={classNames('camera', {
             'camera--paused': pause,
             'camera--init': init,
-            'camera--flip': flip,
             'camera--ar': isARMode
           })}
         >
