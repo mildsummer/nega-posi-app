@@ -1,5 +1,6 @@
 import { LUMINANCE_COEFFICIENT, CONTRAST_LENGTH, CONTRAST_THRESHOLD_LENGTH } from '../constants/General';
 import loadThreeJS from '../utils/loadThreeJS';
+import HistogramManager from '../utils/HistogramManager';
 
 let THREE = null;
 
@@ -114,13 +115,7 @@ export default class GLRenderer {
       this.uniforms.flip.value = data.flip * 1;
       this.texture.needsUpdate = true;
       this.renderer.render(this.scene, this.camera);
-    }
-  }
-
-  resize() {
-    if (this.inited) {
-      this.renderer.setSize(this.source.videoWidth, this.source.videoHeight, false);
-      this.render();
+      HistogramManager.update(this.source);
     }
   }
 }

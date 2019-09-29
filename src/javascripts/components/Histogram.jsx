@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import HistogramManager from '../utils/HistogramManager';
-import { LUMINANCE_DATA_UNIT } from '../constants/General';
 import { max } from '../utils/Utils';
 
 export default class Histogram extends Component {
@@ -37,7 +36,7 @@ export default class Histogram extends Component {
           }
         }}
         className='histogram'
-        width={255 / LUMINANCE_DATA_UNIT}
+        width={255}
         height={20}
       />
     );

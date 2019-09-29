@@ -1,7 +1,7 @@
 self.onmessage = (e) => {
   const {
     imageData, base, drawing, inversion, contrast, contrastThreshold, CONTRAST_LENGTH,
-    CONTRAST_THRESHOLD_LENGTH, LUMINANCE_DATA_UNIT, LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL
+    CONTRAST_THRESHOLD_LENGTH, LUMINANCE_COEFFICIENT, LUMINANCE_DATA_INTERVAL
   } = e.data;
   const { round, max, min } = Math;
   const data = imageData.data;
@@ -14,7 +14,7 @@ self.onmessage = (e) => {
       + data[i + 1] * LUMINANCE_COEFFICIENT[1]
       + data[i + 2] * LUMINANCE_COEFFICIENT[2]);
     if (i / 4 % LUMINANCE_DATA_INTERVAL === 0) {
-      const luminanceIndex = round(luminance / LUMINANCE_DATA_UNIT);
+      const luminanceIndex = round(luminance);
       luminanceData[luminanceIndex] = (luminanceData[luminanceIndex] || 0) + 1;
     }
     luminance = (luminance - contrastThresholdValue)
