@@ -89,7 +89,7 @@ export default class ARMode extends Component {
     if (!camera) {
       camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
       camera.lookAt(0, 0, 0);
-      camera.position.set(0, 0, 10);
+      camera.position.set(0, 0, 3);
     }
     controls = controls || new THREE.OrbitControls(camera, container);
     controls.enablePan = false;

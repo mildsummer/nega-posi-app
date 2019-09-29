@@ -4,12 +4,20 @@ import loadThreeJS from '../utils/loadThreeJS';
 let THREE = null;
 
 export default class GLRenderer {
-  constructor(canvas, source, data) {
-    this.canvas = canvas;
-    this.source = source;
+  constructor(canvasRef, sourceRef, data) {
+    this.canvasRef = canvasRef;
+    this.sourceRef = sourceRef;
     this.data = data;
     this.inited = false;
     loadThreeJS(this.init.bind(this));
+  }
+
+  get canvas() {
+    return this.canvasRef.current;
+  }
+
+  get source() {
+    return this.sourceRef.current;
   }
 
   init() {

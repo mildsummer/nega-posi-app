@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, createRef } from 'react';
 import PropTypes from 'prop-types';
 import Hammer from 'react-hammerjs';
 import classNames from 'classnames';
@@ -17,6 +17,8 @@ export default class Camera extends PureComponent {
     this.isSP = getDevice() === 'sp';
     window.addEventListener('resize', throttle(this.onResize, 500));
     this.ratio = this.isSP ? window.devicePixelRatio : 1;
+    this.canvasRef = createRef();
+    this.videoRef = createRef();
     this.state = {
       init: false,
       width: window.innerWidth * this.ratio,
@@ -24,6 +26,14 @@ export default class Camera extends PureComponent {
       videoWidth: 0,
       videoHeight: 0
     };
+  }
+
+  get canvas() {
+    return this.canvasRef.current;
+  }
+
+  get video() {
+    return this.videoRef.current;
   }
 
   componentDidMount() {
@@ -70,7 +80,7 @@ export default class Camera extends PureComponent {
         videoWidth: this.video.videoWidth,
         videoHeight: this.video.videoHeight
       }, () => {
-        this.renderer = new Renderer(this.canvas, this.video, data);
+        this.renderer = new Renderer(this.canvasRef, this.videoRef, data);
         this.start();
       });
     };
@@ -92,7 +102,6 @@ export default class Camera extends PureComponent {
     const width = window.innerWidth * this.ratio;
     const height = window.innerHeight * this.ratio;
     this.setState({ width, height });
-    this.renderer.resize(width, height);
   }
 
   pause() {
@@ -117,56 +126,50 @@ export default class Camera extends PureComponent {
   }
 
   getImage(callback) {
-    const { width, height } = this.state;
+    const { videoWidth, videoHeight } = this.state;
     const { data } = this.props;
     const { mat, frame } = data;
     const { clipWidth, clipHeight, clipTop, clipLeft } = this.frame.marginedRect;
     const { frameWidth, frameHeight } = this.frame.frameSize;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = frameWidth;
+    canvas.height = frameHeight;
     if (mat || frame) {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = frameWidth;
-      canvas.height = frameHeight;
-      if (mat || frame) {
-        if (width / height > clipWidth / clipHeight) {
-          const clipSize = width * (clipHeight / height);
-          context.drawImage(
-            this.canvas,
-            clipLeft - (clipSize - clipWidth) / 2,
-            clipTop,
-            clipSize,
-            clipHeight
-          );
-        } else {
-          const clipSize = height * (clipWidth / width);
-          context.drawImage(
-            this.canvas,
-            clipLeft,
-            clipTop - (clipSize - clipHeight) / 2,
-            clipWidth,
-            clipSize
-          );
-        }
-        context.resetTransform();
-        context.drawImage(this.frame.canvas, 0, 0);
+      if (videoWidth / videoHeight > clipWidth / clipHeight) {
+        const clipSize = videoWidth * (clipHeight / videoHeight);
+        context.drawImage(
+          this.canvas,
+          clipLeft - (clipSize - clipWidth) / 2,
+          clipTop,
+          clipSize,
+          clipHeight
+        );
       } else {
-        context.drawImage(this.canvas, 0, 0);
+        const clipSize = videoHeight * (clipWidth / videoWidth);
+        context.drawImage(
+          this.canvas,
+          clipLeft,
+          clipTop - (clipSize - clipHeight) / 2,
+          clipWidth,
+          clipSize
+        );
       }
+      context.resetTransform();
+      context.drawImage(this.frame.canvas, 0, 0);
       callback(canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
     } else {
-      callback(this.canvas.toDataURL('image/jpeg'), frameWidth, frameHeight);
+      callback((this.cacheCanvas || this.canvas).toDataURL('image/jpeg'), frameWidth, frameHeight);
     }
   }
 
   getARImage() {
     const { isBlend, offsetX, offsetY } = this.props;
-    const { width, height } = this.state;
+    const { width, height, videoWidth, videoHeight } = this.state;
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext('2d');
-    const videoWidth = this.video.videoWidth;
-    const videoHeight = this.video.videoHeight;
     if (videoWidth / videoHeight > width / height) {
       const w = videoWidth * (height / videoHeight);
       context.drawImage(this.video, (width - w) / 2, 0, w, height);
@@ -186,16 +189,7 @@ export default class Camera extends PureComponent {
     cacheCanvas.width = this.canvas.width;
     cacheCanvas.height = this.canvas.height;
     const context = cacheCanvas.getContext('2d');
-    const { width, height } = this.state;
-    const videoWidth = this.video.videoWidth;
-    const videoHeight = this.video.videoHeight;
-    if (videoWidth / videoHeight > width / height) {
-      const w = videoWidth * (height / videoHeight);
-      context.drawImage(this.video, (width - w) / 2, 0, w, height);
-    } else {
-      const h = videoHeight * (width / videoWidth);
-      context.drawImage(this.video, 0, (height - h) / 2, width, h);
-    }
+    context.drawImage(this.canvas, 0, 0);
     this.cacheCanvas = cacheCanvas;
   }
 
@@ -229,46 +223,40 @@ export default class Camera extends PureComponent {
             />
           ) : null}
           <video
-            ref={(ref) => {
-              this.video = ref;
-            }}
+            ref={this.videoRef}
             className='camera__video'
             muted
             playsInline
             autoPlay
           />
-            <PictureFrame
-              ref={(ref) => {
-                if (ref) {
-                  this.frame = ref;
-                }
-              }}
-              width={width}
-              height={height}
-              clipSize={clipSize}
-              clipRatio={clipRatio}
-              clipVerticalPosition={clipVerticalPosition}
-              thickness={matThickness}
-              color={mat}
-              frame={frame}
-              frameRatio={frameRatio}
-              frameBorderWidth={frameBorderWidth}
-              base={base}
-              margin={margin}
-              frameType={frameType}
-              pixelRatio={this.ratio}
-            >
-              <canvas
-                ref={(ref) => {
-                  if (ref) {
-                    this.canvas = ref;
-                  }
-                }}
-                className='camera__viewer'
-                width={videoWidth}
-                height={videoHeight}
-              />
-            </PictureFrame>
+          <PictureFrame
+            ref={(ref) => {
+              if (ref) {
+                this.frame = ref;
+              }
+            }}
+            width={width}
+            height={height}
+            clipSize={clipSize}
+            clipRatio={clipRatio}
+            clipVerticalPosition={clipVerticalPosition}
+            thickness={matThickness}
+            color={mat}
+            frame={frame}
+            frameRatio={frameRatio}
+            frameBorderWidth={frameBorderWidth}
+            base={base}
+            margin={margin}
+            frameType={frameType}
+            pixelRatio={this.ratio}
+          >
+            <canvas
+              ref={this.canvasRef}
+              className='camera__viewer'
+              width={videoWidth}
+              height={videoHeight}
+            />
+          </PictureFrame>
         </div>
       </Hammer>
     );
