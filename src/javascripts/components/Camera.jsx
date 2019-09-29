@@ -180,7 +180,7 @@ export default class Camera extends PureComponent {
     if (isBlend) {
       context.globalCompositeOperation = 'multiply';
     }
-    context.drawImage(this.ar.domElement, offsetX, offsetY, width, height);
+    context.drawImage(this.ar.domElement, offsetX * this.ratio, offsetY * this.ratio, width, height);
     return canvas.toDataURL('image/jpeg');
   }
 
