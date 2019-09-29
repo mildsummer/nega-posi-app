@@ -43,7 +43,7 @@ export default class SettingMenuItem extends Component {
   }
 
   renderItem(item) {
-    const { data, values, customValue, frameColor } = this.props;
+    const { data, values, customValue, frameColor, innerRef } = this.props;
     let element = null;
     const value = values[data.items.indexOf(item)];
     switch (item.type) {
@@ -75,6 +75,7 @@ export default class SettingMenuItem extends Component {
             onChange={this.onChange(item)}
             histogram={item.histogram}
             isRatio={item.ratio}
+            innerRef={innerRef}
           />
         );
         break;
@@ -160,5 +161,6 @@ SettingMenuItem.propTypes = {
   customValue: PropTypes.any,
   frameColor: PropTypes.object,
   onChange: PropTypes.func,
-  onEditCustomColor: PropTypes.func
+  onEditCustomColor: PropTypes.func,
+  innerRef: PropTypes.object.isRequired
 };

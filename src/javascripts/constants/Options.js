@@ -127,7 +127,7 @@ export default [
         max: 10,
         min: 0,
         required: true,
-        defaultValue: 10
+        defaultValue: 5
       }
     ],
     reset: true

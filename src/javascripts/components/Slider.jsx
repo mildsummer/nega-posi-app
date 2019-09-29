@@ -23,7 +23,10 @@ export default class Slider extends Component {
 
   onPanStart(e) {
     e.preventDefault();
-    const { value } = this.props;
+    const { value, innerRef } = this.props;
+    if (window.ontouchmove === null) {
+      innerRef.current.style.overflow = 'hidden';
+    }
     this.panStartValue = value;
     this.setState({
       panning: true
@@ -43,6 +46,8 @@ export default class Slider extends Component {
   }
 
   onPanEnd() {
+    const { innerRef } = this.props;
+    innerRef.current.style.overflow = '';
     this.setState({
       panning: false
     });
@@ -137,5 +142,6 @@ Slider.propTypes = {
   max: PropTypes.number.isRequired,
   min: PropTypes.number.isRequired,
   histogram: PropTypes.bool,
-  isRatio: PropTypes.bool
+  isRatio: PropTypes.bool,
+  innerRef: PropTypes.object.isRequired
 };
