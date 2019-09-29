@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Hammer from 'react-hammerjs';
 import Histogram from './Histogram';
-import { throttle } from '../utils/Utils';
 
 export default class Slider extends Component {
   constructor(props) {
     super(props);
     this.onPanStart = this.onPanStart.bind(this);
-    this.onPan = throttle(this.onPan.bind(this), 50);
+    this.onPan = this.onPan.bind(this);
     this.onPanEnd = this.onPanEnd.bind(this);
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
